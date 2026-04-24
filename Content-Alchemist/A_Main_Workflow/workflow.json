@@ -1,0 +1,736 @@
+﻿{
+    "updatedAt":  "2026-04-11T14:30:32.528Z",
+    "createdAt":  "2026-04-09T19:27:21.380Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "ðŸŽ™ï¸ Content Alchemist â€” Workflow A (MAIN)",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "Content Alchemist - Google Drive"
+                                                                   }
+                                      },
+                      "id":  "3a05cf11-0bbb-4a7c-bb16-bf6869dcd3b3",
+                      "name":  "Watch Incoming Audio",
+                      "parameters":  {
+                                         "event":  "fileCreated",
+                                         "folderToWatch":  {
+                                                               "__rl":  true,
+                                                               "mode":  "id",
+                                                               "value":  "REPLACE_WITH_YOUR_FOLDER_ID"
+                                                           },
+                                         "options":  {
+
+                                                     },
+                                         "pollTimes":  {
+                                                           "item":  [
+                                                                        {
+                                                                            "mode":  "everyMinute"
+                                                                        }
+                                                                    ]
+                                                       },
+                                         "triggerOn":  "specificFolder"
+                                     },
+                      "position":  [
+                                       752,
+                                       1008
+                                   ],
+                      "type":  "n8n-nodes-base.googleDriveTrigger",
+                      "typeVersion":  1
+                  },
+                  {
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "Content Alchemist - Google Drive"
+                                                                   }
+                                      },
+                      "id":  "806d873e-4893-40f1-a58f-162eb4f6f345",
+                      "name":  "Make Audio File Public",
+                      "parameters":  {
+                                         "fileId":  {
+                                                        "__rl":  true,
+                                                        "mode":  "id",
+                                                        "value":  "={{ $(\u0027Watch Incoming Audio\u0027).item.json.id }}"
+                                                    },
+                                         "operation":  "share",
+                                         "options":  {
+
+                                                     },
+                                         "permissionsUi":  {
+                                                               "permissionsValues":  {
+                                                                                         "role":  "reader",
+                                                                                         "type":  "anyone"
+                                                                                     }
+                                                           }
+                                     },
+                      "position":  [
+                                       992,
+                                       1008
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3
+                  },
+                  {
+                      "id":  "a3c30c84-d18c-4787-8272-3f7c16e30ff4",
+                      "name":  "Check ngrok URL Set",
+                      "onError":  "continueErrorOutput",
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "cond-ngrok",
+                                                                                   "leftValue":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.COLAB_NGROK_URL }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "notEmpty",
+                                                                                                    "singleValue":  true,
+                                                                                                    "type":  "string"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  3
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "position":  [
+                                       1232,
+                                       1008
+                                   ],
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3
+                  },
+                  {
+                      "id":  "4c9246b3-f3d8-4e3f-8723-ab22068fc752",
+                      "name":  "Transcribe via Colab Flask",
+                      "onError":  "continueRegularOutput",
+                      "parameters":  {
+                                         "jsonBody":  "={{ JSON.stringify({ audio_url: \u0027https://drive.google.com/uc?id=\u0027 + $(\u0027Watch Incoming Audio\u0027).item.json.id + \u0027\u0026export=download\u0027 }) }}",
+                                         "method":  "POST",
+                                         "options":  {
+                                                         "timeout":  120000
+                                                     },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "url":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.COLAB_NGROK_URL + \u0027/transcribe\u0027 }}"
+                                     },
+                      "position":  [
+                                       1472,
+                                       896
+                                   ],
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4
+                  },
+                  {
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "Content Alchemist Bot"
+                                                          }
+                                      },
+                      "id":  "e8777eb0-6762-4274-869f-3d6f2fa34ea1",
+                      "name":  "Telegram â€” ngrok URL Missing",
+                      "parameters":  {
+                                         "additionalFields":  {
+
+                                                              },
+                                         "chatId":  "={{ $(\u0027\\ud83d\\udccb Config (Update IDs Here)\u0027).item.json.TELEGRAM_CHAT_ID }}",
+                                         "operation":  "sendMessage",
+                                         "text":  "âš ï¸ Content Alchemist: COLAB_NGROK_URL variable is empty! Start Colab, copy the ngrok URL, then update the n8n environment variable."
+                                     },
+                      "position":  [
+                                       1472,
+                                       1136
+                                   ],
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1.2,
+                      "webhookId":  "07e8a36b-1e27-4d19-8bdc-0d182837a2ff"
+                  },
+                  {
+                      "id":  "e7d84096-6511-46aa-a5f6-0d5ccb953933",
+                      "name":  "Validate Transcript Length",
+                      "parameters":  {
+                                         "jsCode":  "const response = $input.first().json;\nconst responseData = JSON.stringify(response).toLowerCase();\nif (responseData.includes(\u0027\u003c!doctype html\u0027) || responseData.includes(\u0027\u003chtml\u0027) || responseData.includes(\u0027ngrok\u0027) || responseData.includes(\u0027tunnel not found\u0027)) {\n  throw new Error(\u0027Transcription service unreachable. The ngrok tunnel appears dead/expired. Restart Colab and update COLAB_NGROK_URL. File: \u0027 + $(\u0027Watch Incoming Audio\u0027).item.json.name);\n}\nconst statusCode = response.statusCode || response.status_code || response.code;\nif (statusCode \u0026\u0026 statusCode \u003e= 400) {\n  throw new Error(\u0027Transcription HTTP error \u0027 + statusCode + \u0027. Check if Colab is running. File: \u0027 + $(\u0027Watch Incoming Audio\u0027).item.json.name);\n}\nif (response.error) {\n  throw new Error(\u0027Transcription error: \u0027 + (response.error.message || response.error) + \u0027. File: \u0027 + $(\u0027Watch Incoming Audio\u0027).item.json.name);\n}\nconst transcript = response.transcript || \u0027\u0027;\nif (!transcript || transcript.trim().length \u003c 20) {\n  throw new Error(\u0027Transcript empty or too short. Colab Flask may not be running. File: \u0027 + $(\u0027Watch Incoming Audio\u0027).item.json.name);\n}\nreturn [{\n  json: {\n    transcript: transcript.trim(),\n    audioFileId: $(\u0027Watch Incoming Audio\u0027).item.json.id,\n    audioFileName: $(\u0027Watch Incoming Audio\u0027).item.json.name,\n    timestamp: new Date().toISOString()\n  }\n}];"
+                                     },
+                      "position":  [
+                                       1712,
+                                       896
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "id":  "1fbdc2cb-f8f0-4149-ae81-2c37e913c030",
+                      "name":  "Store Transcript Data",
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "s1",
+                                                                                     "name":  "transcript",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $json.transcript }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "s2",
+                                                                                     "name":  "audioFileId",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $json.audioFileId }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "s3",
+                                                                                     "name":  "audioFileName",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $json.audioFileName }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "s4",
+                                                                                     "name":  "timestamp",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $json.timestamp }}"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "position":  [
+                                       1952,
+                                       896
+                                   ],
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4
+                  },
+                  {
+                      "id":  "8e033a58-d299-40a2-ba50-23436187a577",
+                      "name":  "Parse and Validate AI JSON",
+                      "parameters":  {
+                                         "jsCode":  "// Parse GPT response and normalize to plain string arrays\nconst raw = $input.first().json?.message?.content\n  || $input.first().json?.choices?.[0]?.message?.content\n  || $input.first().json?.content\n  || \u0027\u0027;\n\n// Strip markdown code fences if GPT wraps output\nlet cleaned = raw.trim();\nif (cleaned.startsWith(\u0027```\u0027)) {\n  cleaned = cleaned.replace(/^```json?\\n?/, \u0027\u0027).replace(/\\n?```$/, \u0027\u0027).trim();\n}\n\nif (!cleaned) {\n  throw new Error(\u0027GPT returned an empty response.\u0027);\n}\n\nlet parsed;\ntry {\n  parsed = JSON.parse(cleaned);\n} catch(e) {\n  throw new Error(\u0027GPT returned malformed JSON. Raw output: \u0027 + raw.substring(0, 300));\n}\n\n// Robust normalization: extract strings even if keys are slightly different\nfunction normalizeToStrings(data, fallbackKey) {\n  let arr = data[fallbackKey];\n  \n  // If exact key doesn\u0027t exist, try to find an array property that might be it\n  if (!Array.isArray(arr)) {\n    const arrays = Object.entries(data).filter(([k, v]) =\u003e Array.isArray(v));\n    if (arrays.length \u003e 0) {\n       arr = arrays[0][1];\n    } else {\n       return [];\n    }\n  }\n\n  return arr.map(item =\u003e {\n    if (typeof item === \u0027string\u0027) return item;\n    if (typeof item === \u0027object\u0027 \u0026\u0026 item !== null) {\n      const firstStr = Object.values(item).find(v =\u003e typeof v === \u0027string\u0027);\n      return firstStr || JSON.stringify(item);\n    }\n    return String(item);\n  });\n}\n\nconst linkedinposts = normalizeToStrings(parsed, \u0027linkedinposts\u0027);\nconst twitterposts = normalizeToStrings(parsed, \u0027twitterposts\u0027);\nconst hooks = normalizeToStrings(parsed, \u0027hooks\u0027);\n\n// Only throw if absolutely nothing was found\nif (linkedinposts.length === 0 \u0026\u0026 twitterposts.length === 0 \u0026\u0026 hooks.length === 0) {\n  throw new Error(\u0027Could not find any content arrays in GPT response: \u0027 + cleaned.substring(0, 200));\n}\n\nreturn [{\n  json: {\n    linkedinposts,\n    twitterposts,\n    hooks,\n    transcript: $(\u0027Store Transcript Data\u0027).item.json.transcript,\n    audioFileId: $(\u0027Store Transcript Data\u0027).item.json.audioFileId,\n    timestamp: $(\u0027Store Transcript Data\u0027).item.json.timestamp\n  }\n}];"
+                                     },
+                      "position":  [
+                                       2672,
+                                       896
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "id":  "9f4d9922-8d32-411e-ae9b-ba15880e5637",
+                      "name":  "Run LinkedIn Branch",
+                      "parameters":  {
+                                         "options":  {
+
+                                                     },
+                                         "workflowId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "cWHSBOjXyeJQvvjQ"
+                                                        },
+                                         "workflowInputs":  {
+                                                                "assignments":  [
+                                                                                    {
+                                                                                        "id":  "li1",
+                                                                                        "name":  "linkedinposts",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $json.linkedinposts }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "li2",
+                                                                                        "name":  "transcript",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $json.transcript }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "li3",
+                                                                                        "name":  "timestamp",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $json.timestamp }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "li4",
+                                                                                        "name":  "linkedinFolderId",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.LINKEDIN_POSTS_FOLDER_ID }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "li5",
+                                                                                        "name":  "postImagesFolderId",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.POST_IMAGES_FOLDER_ID }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "li6",
+                                                                                        "name":  "sheetsId",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.SHEETS_SPREADSHEET_ID }}"
+                                                                                    }
+                                                                                ],
+                                                                "mappingMode":  "defineBelow",
+                                                                "value":  {
+
+                                                                          }
+                                                            }
+                                     },
+                      "position":  [
+                                       2928,
+                                       768
+                                   ],
+                      "type":  "n8n-nodes-base.executeWorkflow",
+                      "typeVersion":  1.3
+                  },
+                  {
+                      "id":  "0e7d576a-b114-46b0-88b0-18f7506a9645",
+                      "name":  "Run Twitter Branch",
+                      "parameters":  {
+                                         "options":  {
+
+                                                     },
+                                         "workflowId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "E3oeKmWu5WjSp3cU"
+                                                        },
+                                         "workflowInputs":  {
+                                                                "assignments":  [
+                                                                                    {
+                                                                                        "id":  "tw1",
+                                                                                        "name":  "twitterposts",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $json.twitterposts }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "tw2",
+                                                                                        "name":  "transcript",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $json.transcript }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "tw3",
+                                                                                        "name":  "timestamp",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $json.timestamp }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "tw4",
+                                                                                        "name":  "twitterFolderId",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.TWITTER_POSTS_FOLDER_ID }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "tw5",
+                                                                                        "name":  "postImagesFolderId",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.POST_IMAGES_FOLDER_ID }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "tw6",
+                                                                                        "name":  "sheetsId",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.SHEETS_SPREADSHEET_ID }}"
+                                                                                    }
+                                                                                ],
+                                                                "mappingMode":  "defineBelow",
+                                                                "value":  {
+
+                                                                          }
+                                                            }
+                                     },
+                      "position":  [
+                                       2928,
+                                       1008
+                                   ],
+                      "type":  "n8n-nodes-base.executeWorkflow",
+                      "typeVersion":  1.3
+                  },
+                  {
+                      "id":  "c76b6fea-514e-4082-ba1a-a7d5e6b06b89",
+                      "name":  "Run Hooks Branch",
+                      "parameters":  {
+                                         "options":  {
+
+                                                     },
+                                         "workflowId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "UUxEZHG6LhWH2Zce"
+                                                        },
+                                         "workflowInputs":  {
+                                                                "assignments":  [
+                                                                                    {
+                                                                                        "id":  "hk1",
+                                                                                        "name":  "hooks",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $json.hooks }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "hk2",
+                                                                                        "name":  "transcript",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $json.transcript }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "hk3",
+                                                                                        "name":  "timestamp",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $json.timestamp }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "hk4",
+                                                                                        "name":  "audioFileId",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $json.audioFileId }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "hk5",
+                                                                                        "name":  "hooksFolderId",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.HOOKS_FOLDER_ID }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "hk6",
+                                                                                        "name":  "archiveFolderId",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.ARCHIVE_FOLDER_ID }}"
+                                                                                    },
+                                                                                    {
+                                                                                        "id":  "hk7",
+                                                                                        "name":  "sheetsId",
+                                                                                        "type":  "string",
+                                                                                        "value":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.SHEETS_SPREADSHEET_ID }}"
+                                                                                    }
+                                                                                ],
+                                                                "mappingMode":  "defineBelow",
+                                                                "value":  {
+
+                                                                          }
+                                                            }
+                                     },
+                      "position":  [
+                                       2928,
+                                       1248
+                                   ],
+                      "type":  "n8n-nodes-base.executeWorkflow",
+                      "typeVersion":  1.3
+                  },
+                  {
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "Content Alchemist Bot"
+                                                          }
+                                      },
+                      "id":  "d57a4b45-9ef3-4cad-9e0a-c5325ee50f72",
+                      "name":  "Telegram â€” Content Ready",
+                      "parameters":  {
+                                         "additionalFields":  {
+                                                                  "parse_mode":  "Markdown"
+                                                              },
+                                         "chatId":  "={{ $(\u0027\\ud83d\\udccb Config (Update IDs Here)\u0027).item.json.TELEGRAM_CHAT_ID }}",
+                                         "operation":  "sendMessage",
+                                         "text":  "=âœ… Content Alchemist Complete!\n\nðŸŽ™ Audio: {{ $(\u0027Watch Incoming Audio\u0027).item.json.name }}\nâ± {{ $(\u0027Store Transcript Data\u0027).item.json.timestamp }}\n\nðŸ“ Ready in Google Drive:\nâ€¢ {{ $(\u0027Parse and Validate AI JSON\u0027).item.json.linkedinposts.length }} LinkedIn posts\nâ€¢ {{ $(\u0027Parse and Validate AI JSON\u0027).item.json.twitterposts.length }} Twitter posts\nâ€¢ {{ $(\u0027Parse and Validate AI JSON\u0027).item.json.hooks.length }} viral hooks"
+                                     },
+                      "position":  [
+                                       3200,
+                                       896
+                                   ],
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1.2,
+                      "webhookId":  "da2c4f2d-0dfa-4cba-8b4a-ba660eede8b8"
+                  },
+                  {
+                      "id":  "56ab8f52-4748-4eb3-b037-ee017262e30a",
+                      "name":  "ðŸ“‹ Config (Update IDs Here)",
+                      "parameters":  {
+                                         "jsCode":  "// ============================================================\n// CONTENT ALCHEMIST â€” CENTRAL CONFIG\n// Only thing to update manually: COLAB_NGROK_URL\n// (paste new URL each time Colab restarts)\n// ============================================================\nreturn [{\n  json: {\n    COLAB_NGROK_URL: \"PASTE_YOUR_NGROK_URL_HERE\",\n    TELEGRAM_CHAT_ID: \"REPLACE_WITH_YOUR_CHAT_ID\",\n    INCOMING_AUDIO_FOLDER_ID: \"REPLACE_WITH_YOUR_FOLDER_ID\",\n    TRANSCRIPT_FOLDER_ID: \"REPLACE_WITH_YOUR_FOLDER_ID\",\n    LINKEDIN_POSTS_FOLDER_ID: \"REPLACE_WITH_YOUR_FOLDER_ID\",\n    TWITTER_POSTS_FOLDER_ID: \"REPLACE_WITH_YOUR_FOLDER_ID\",\n    HOOKS_FOLDER_ID: \"REPLACE_WITH_YOUR_FOLDER_ID\",\n    POST_IMAGES_FOLDER_ID: \"REPLACE_WITH_YOUR_FOLDER_ID\",\n    ARCHIVE_FOLDER_ID: \"REPLACE_WITH_YOUR_FOLDER_ID\",\n    SHEETS_SPREADSHEET_ID: \"REPLACE_WITH_YOUR_SPREADSHEET_ID\"\n  }\n}];"
+                                     },
+                      "position":  [
+                                       992,
+                                       832
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "Content Alchemist - Google Drive"
+                                                                   }
+                                      },
+                      "id":  "9f1775a1-1cde-46e8-9c38-4d1116943c63",
+                      "name":  "Save Transcript to Drive",
+                      "parameters":  {
+                                         "content":  "={{ $json.transcript }}",
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027ðŸ“‹ Config (Update IDs Here)\u0027).item.json.TRANSCRIPT_FOLDER_ID || \u0027REPLACE_WITH_YOUR_FOLDER_ID\u0027 }}"
+                                                      },
+                                         "name":  "={{ \u0027transcript_\u0027 + $now.format(\u0027YYYY-MM-DD_HHmmss\u0027) + \u0027.txt\u0027 }}",
+                                         "operation":  "createFromText",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "position":  [
+                                       2192,
+                                       896
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3
+                  },
+                  {
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                            "name":  "Content Alchemist - OpenAI"
+                                                        }
+                                      },
+                      "id":  "feff588f-461d-4d82-9814-65bc5cf697d2",
+                      "name":  "GPT-4.1 CEO Ghostwriter",
+                      "parameters":  {
+                                         "chatModel":  "gpt-4o",
+                                         "options":  {
+                                                         "maxTokens":  2000,
+                                                         "temperature":  0.8
+                                                     },
+                                         "prompt":  {
+                                                        "messages":  [
+                                                                         {
+                                                                             "content":  "You are a world-class CEO ghostwriter for a D2C founder. Transform raw voice note transcripts into powerful, high-engagement social content. Write in first person. Confident, no corporate jargon. No hashtags inside LinkedIn posts. Speak like a sharp founder, not a marketer.\n\nCRITICAL INSTRUCTIONS ON FORMAT \u0026 LENGTH:\n1. LinkedIn Posts: You MUST write long-form, deeply detailed posts. Expand significantly on the transcript\u0027s insights using heavy storytelling, detailed breakdowns, and engaging formatting (line breaks, bullets). Do NOT write brief summaries. Each LinkedIn post should be comprehensive and at least 300 to 500 words long.\n2. Twitter/X Threads: Write these as multi-part long threads. IMPORTANT: Each item in the \"twitterposts\" array must be ONE ENTIRE THREAD, containing all parts concatenated together (e.g., \"1/ ... \\n\\n 2/ ... \\n\\n 3/ ...\"). DO NOT split a single thread across multiple array items. Every string in the array will become a separate complete post file.\n\nYou must output valid JSON. No markdown backticks, no introduction text.\nYour JSON must match this structure exactly, using these exact keys:\n{\n  \"linkedinposts\": [\n    { \"postContent\": \"Your entire first 500-word LinkedIn post here, using \\\\n\\\\n for formatting.\" },\n    { \"postContent\": \"Your entire second 500-word LinkedIn post here.\" }\n  ],\n  \"twitterposts\": [\n    { \"tweetContent\": \"Your entire first Twitter thread here, parts numbered 1/ 2/ 3/ and separated by \\\\n\\\\n\" },\n    { \"tweetContent\": \"Your entire second Twitter thread here, parts numbered 1/ 2/ 3/ and separated by \\\\n\\\\n\" }\n  ],\n  \"hooks\": [\n    { \"hookTitle\": \"First polarizing hook paragraph\" },\n    { \"hookTitle\": \"Second attention-grabbing hook paragraph\" }\n  ]\n}",
+                                                                             "role":  "system"
+                                                                         },
+                                                                         {
+                                                                             "content":  "={{ $(\u0027Store Transcript Data\u0027).item.json.transcript }}"
+                                                                         }
+                                                                     ]
+                                                    },
+                                         "requestOptions":  {
+
+                                                            },
+                                         "resource":  "chat"
+                                     },
+                      "position":  [
+                                       2432,
+                                       896
+                                   ],
+                      "type":  "n8n-nodes-base.openAi",
+                      "typeVersion":  1.1
+                  }
+              ],
+    "connections":  {
+                        "Check ngrok URL Set":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "index":  0,
+                                                                         "node":  "Transcribe via Colab Flask",
+                                                                         "type":  "main"
+                                                                     }
+                                                                 ],
+                                                                 [
+                                                                     {
+                                                                         "index":  0,
+                                                                         "node":  "Telegram â€” ngrok URL Missing",
+                                                                         "type":  "main"
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "GPT-4.1 CEO Ghostwriter":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "index":  0,
+                                                                             "node":  "Parse and Validate AI JSON",
+                                                                             "type":  "main"
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "Make Audio File Public":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "index":  0,
+                                                                            "node":  "Check ngrok URL Set",
+                                                                            "type":  "main"
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Parse and Validate AI JSON":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "index":  0,
+                                                                                "node":  "Run LinkedIn Branch",
+                                                                                "type":  "main"
+                                                                            },
+                                                                            {
+                                                                                "index":  0,
+                                                                                "node":  "Run Twitter Branch",
+                                                                                "type":  "main"
+                                                                            },
+                                                                            {
+                                                                                "index":  0,
+                                                                                "node":  "Run Hooks Branch",
+                                                                                "type":  "main"
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "Run LinkedIn Branch":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "index":  0,
+                                                                         "node":  "Telegram â€” Content Ready",
+                                                                         "type":  "main"
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Run Twitter Branch":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "index":  0,
+                                                                        "node":  "Telegram â€” Content Ready",
+                                                                        "type":  "main"
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Save Transcript to Drive":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "index":  0,
+                                                                              "node":  "GPT-4.1 CEO Ghostwriter",
+                                                                              "type":  "main"
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "Store Transcript Data":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "index":  0,
+                                                                           "node":  "Save Transcript to Drive",
+                                                                           "type":  "main"
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Transcribe via Colab Flask":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "index":  0,
+                                                                                "node":  "Validate Transcript Length",
+                                                                                "type":  "main"
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "Validate Transcript Length":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "index":  0,
+                                                                                "node":  "Store Transcript Data",
+                                                                                "type":  "main"
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "Watch Incoming Audio":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "index":  0,
+                                                                          "node":  "ðŸ“‹ Config (Update IDs Here)",
+                                                                          "type":  "main"
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "ðŸ“‹ Config (Update IDs Here)":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "index":  0,
+                                                                                   "node":  "Make Audio File Public",
+                                                                                   "type":  "main"
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "saveDataErrorExecution":  "all",
+                     "saveDataSuccessExecution":  "all",
+                     "saveManualExecutions":  true,
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  {
+                       "node:Watch Incoming Audio":  {
+                                                         "lastTimeChecked":  "2026-04-11T19:04:10Z"
+                                                     }
+                   },
+    "meta":  {
+                 "templateCredsSetupCompleted":  true
+             },
+    "pinData":  {
+
+                },
+    "versionId":  "4c1ec9cd-0660-4f9c-9454-f32c2cbc44ca",
+    "activeVersionId":  null,
+    "versionCounter":  158,
+    "triggerCount":  1,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-09T19:27:21.387Z",
+                       "createdAt":  "2026-04-09T19:27:21.387Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "yOrw4pzZcDOQgvKB",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

@@ -1,0 +1,188 @@
+﻿{
+  "success": true,
+  "data": {
+    "updatedAt": "2026-02-18T10:15:06.730Z",
+    "createdAt": "2026-02-18T10:15:06.730Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name": "WhatsApp Webhook - Simple",
+    "description": null,
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "path": "whatsapp",
+          "responseMode": "lastNode",
+          "options": {
+            "responseHeaders": {
+              "entries": [
+                {
+                  "name": "Content-Type",
+                  "value": "text/plain"
+                }
+              ]
+            }
+          }
+        },
+        "id": "2ba315b6-5aa9-435b-9fa0-78018d4650b8",
+        "name": "Webhook Verification",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ],
+        "webhookId": "87b24293-6085-4df8-bab8-a3834481bee5"
+      },
+      {
+        "parameters": {
+          "jsCode": "const VERIFY_TOKEN = 'pureremedysolutions_whatsapp_n8n_2026_verify';\nconst query = $input.first().json.query || {};\n\nif (query['hub.mode'] === 'subscribe' && query['hub.verify_token'] === VERIFY_TOKEN) {\n  const challenge = query['hub.challenge'];\n  $response.status(200).type('text/plain').send(challenge);\n  return [];\n} else {\n  $response.status(403).send('Forbidden');\n  return [];\n}"
+        },
+        "id": "a8310caf-e43a-4724-b478-415c9179961e",
+        "name": "Verify and Return Challenge",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          224,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "whatsapp",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "8a47722b-1104-4ee6-890c-f45ee778dec7",
+        "name": "Webhook Messages",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          208
+        ],
+        "webhookId": "37b04d6a-4e49-4580-beca-703bd68b299a"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Handle incoming messages\nconst body = $input.first().json.body || {};\nconst entries = body.entry || [];\nconst allMessages = [];\n\nfor (const entry of entries) {\n  const changes = entry.changes || [];\n  for (const change of changes) {\n    if (change.value && change.value.messages) {\n      for (const msg of change.value.messages) {\n        allMessages.push({\n          id: msg.id,\n          from: msg.from,\n          text: msg.text?.body || '',\n          timestamp: msg.timestamp\n        });\n      }\n    }\n  }\n}\n\nreturn [{\n  json: { \n    success: true, \n    received: allMessages.length,\n    messages: allMessages\n  }\n}];"
+        },
+        "id": "c17deea1-5a26-4cbc-b765-da49a9d6ef1e",
+        "name": "Process Message",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          224,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "authentication": "serviceAccount",
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "REPLACE_WITH_YOUR_ID",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Solar Prospects",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "WhatsApp Number": "={{ $json.messages[0].from }}",
+              "Reply Received": "Yes",
+              "Status": "Lead Replied - Needs Manual Follow-up"
+            }
+          },
+          "options": {}
+        },
+        "id": "125fb926-2904-462e-b1fe-b3a406b387e0",
+        "name": "Update Sheet on Reply",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.4,
+        "position": [
+          480,
+          208
+        ],
+        "credentials": {
+          "googleApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Service Account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Webhook Verification": {
+        "main": [
+          [
+            {
+              "node": "Verify and Return Challenge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook Messages": {
+        "main": [
+          [
+            {
+              "node": "Process Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process Message": {
+        "main": [
+          [
+            {
+              "node": "Update Sheet on Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "versionId": "a3855785-e70f-4ec4-a791-54b30f493a11",
+    "activeVersionId": null,
+    "versionCounter": 1,
+    "triggerCount": 0,
+    "shared": [
+      {
+        "updatedAt": "2026-02-18T10:15:06.737Z",
+        "createdAt": "2026-02-18T10:15:06.737Z",
+        "role": "workflow:owner",
+        "workflowId": "38V3lPALKVznSMvo",
+        "projectId": "4z38v6JO6ntgY8gF",
+        "project": {
+          "updatedAt": "2026-01-13T19:13:51.671Z",
+          "createdAt": "2026-01-13T19:11:25.659Z",
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "YOUR_NAME <your-email@example.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+        }
+      }
+    ],
+    "tags": [],
+    "activeVersion": null
+  }
+}
+

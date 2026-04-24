@@ -1,0 +1,15 @@
+﻿{
+  "name": "mcp-task-orchestrator",
+  "version": "1.0.0",
+  "description": "An MCP server bridging Claude Desktop to Google Sheets for autonomous task management.",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "googleapis": "^171.4.0",
+    "zod": "^4.3.6"
+  }
+}

@@ -1,0 +1,383 @@
+﻿{
+  "success": true,
+  "data": {
+    "updatedAt": "2026-02-04T16:14:49.754Z",
+    "createdAt": "2026-02-04T06:02:28.931Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name": "Auto-Blogger - Pure Remedy Solutions",
+    "description": null,
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "44b19640-201b-4837-af75-cddd9b9172d0",
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googlePalmApi",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": []
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{\nJSON.stringify({\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Act as an expert Ayurvedic Naturopath. Write a deep-dive blog post about: \" + $json.topic + \".\\n\\nCategory: \" + $json.category + \"\\nKeywords: \" + $json.keywords.join(', ') + \"\\n\\nStructure:\\n1. Hook (Scientific or Emotional)\\n2. The Ancient Wisdom (Ayurvedic perspective)\\n3. The Science (Modern research)\\n4. Actionable Recipe/Routine\\n5. Conclusion\\n\\nFormat: Use rich HTML (<h1>, 2, <ul>, <strong>). No markdown.\"\n        }\n      ]\n    }\n  ]\n})\n}}",
+          "options": {}
+        },
+        "id": "dc3eea69-dde0-4212-b528-a77866da4b4f",
+        "name": "Generate Content (Gemini)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.1,
+        "position": [
+          400,
+          0
+        ],
+        "credentials": {
+          "googlePalmApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "jsCode": "// Extract and format content from Gemini response\nconst response = $input.first().json;\n\nif (!response.candidates || !response.candidates[0]) {\n  throw new Error('No content generated from AI');\n}\n\nconst content = response.candidates[0].content.parts[0].text;\nconst config = $input.all()[0].json;\n\n// Clean up HTML formatting\nconst cleanContent = content\n  .replace(/```html/g, '')\n  .replace(/```/g, '')\n  .trim();\n\nreturn [{\n  json: {\n    title: config.topic,\n    content: cleanContent,\n    status: 'draft',\n    categories: [config.category],\n    tags: config.keywords,\n    run_id: config.run_id,\n    generated_at: new Date().toISOString()\n  }\n}];"
+        },
+        "id": "c045dec8-d2be-4a5f-a7d5-70198b4b9865",
+        "name": "Format for WordPress",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          608,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "title": "={{ $json.title }}",
+          "content": "={{ $json.content }}",
+          "status": "draft"
+        },
+        "id": "44a37088-b647-4f0c-b40d-b648cc42a83a",
+        "name": "Create WordPress Post",
+        "type": "n8n-nodes-base.wordpress",
+        "typeVersion": 1,
+        "position": [
+          800,
+          0
+        ],
+        "credentials": {
+          "wordpressApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Wordpress account"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "jsCode": "// Success logging\nconst post = $input.first().json;\nconst config = $input.all()[1]?.json || {};\n\nreturn [{\n  json: {\n    status: 'success',\n    run_id: config.run_id || new Date().toISOString(),\n    post_id: post.id,\n    post_title: post.title?.rendered || config.topic,\n    post_url: post.link,\n    created_at: new Date().toISOString(),\n    message: 'Blog post created successfully as DRAFT'\n  }\n}];"
+        },
+        "id": "7c3587c3-09c2-4349-bb1a-7a4561238935",
+        "name": "Log Success",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1008,
+          0
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "242287fd-be5a-4886-9cdf-4d48e85170b4",
+        "name": "Error Handler",
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          608,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Error logging\nconst error = $input.first().json;\nconst config = $input.all()[1]?.json || {};\n\nreturn [{\n  json: {\n    status: 'failed',\n    run_id: config.run_id || new Date().toISOString(),\n    error_message: error.message || 'Unknown error',\n    error_details: JSON.stringify(error),\n    failed_at: new Date().toISOString(),\n    requires_review: true,\n    action: 'Check error and retry manually or fix config'\n  }\n}];"
+        },
+        "id": "ff44f8df-4cd1-426d-a2ae-acf034d7333b",
+        "name": "Log Error",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          800,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "authentication": "serviceAccount",
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "REPLACE_WITH_YOUR_SHEET_ID",
+            "mode": "list",
+            "cachedResultName": "Auto-Blogger Logs"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Failed Posts",
+            "mode": "list",
+            "cachedResultName": "Failed Posts"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Run ID": "={{ $json.run_id }}",
+              "Status": "={{ $json.status }}",
+              "Error": "={{ $json.error_message }}",
+              "Failed At": "={{ $json.failed_at }}",
+              "Reviewed": "No"
+            }
+          },
+          "options": {}
+        },
+        "id": "3edefd31-a7f2-4090-a198-86370cc2d9ac",
+        "name": "Write to Review Queue",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1008,
+          208
+        ],
+        "credentials": {
+          "googleApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Service Account account"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "authentication": "serviceAccount",
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "REPLACE_WITH_YOUR_SHEET_ID",
+            "mode": "list",
+            "cachedResultName": "Auto-Blogger Logs"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Audit Log",
+            "mode": "list",
+            "cachedResultName": "Audit Log"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Run ID": "={{ $json.run_id }}",
+              "Status": "={{ $json.status }}",
+              "Post ID": "={{ $json.post_id || 'N/A' }}",
+              "Title": "={{ $json.post_title || 'N/A' }}",
+              "URL": "={{ $json.post_url || 'N/A' }}",
+              "Timestamp": "={{ $json.created_at || $json.failed_at }}"
+            }
+          },
+          "options": {}
+        },
+        "id": "fc4e2d9f-de8b-44c6-b75a-1e2d34c5550f",
+        "name": "Write to Audit Log",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1200,
+          0
+        ],
+        "credentials": {
+          "googleApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Service Account account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Auto-Blogger Configuration\n// Edit these values for each post\nreturn [{\n  json: {\n    topic: 'Benefits of Turmeric for Skin',\n    category: 'Skin Care',\n    keywords: ['turmeric', 'skin care', 'natural remedies', 'anti-inflammatory', 'glowing skin'],\n    run_id: new Date().toISOString()\n  }\n}];"
+        },
+        "id": "9295c54f-af88-4661-beaf-f95ab3e774ef",
+        "name": "Set Post Config",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          208,
+          0
+        ]
+      }
+    ],
+    "connections": {
+      "Manual Trigger": {
+        "main": [
+          [
+            {
+              "node": "Set Post Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate Content (Gemini)": {
+        "main": [
+          [
+            {
+              "node": "Format for WordPress",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format for WordPress": {
+        "main": [
+          [
+            {
+              "node": "Create WordPress Post",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create WordPress Post": {
+        "main": [
+          [
+            {
+              "node": "Log Success",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log Success": {
+        "main": [
+          [
+            {
+              "node": "Write to Audit Log",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Error Handler": {
+        "main": [
+          [
+            {
+              "node": "Log Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log Error": {
+        "main": [
+          [
+            {
+              "node": "Write to Review Queue",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Post Config": {
+        "main": [
+          [
+            {
+              "node": "Generate Content (Gemini)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false
+    },
+    "staticData": null,
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "pinData": {},
+    "versionId": "7e04af32-6104-4e84-8d26-b29fe789cd62",
+    "activeVersionId": null,
+    "versionCounter": 39,
+    "triggerCount": 0,
+    "shared": [
+      {
+        "updatedAt": "2026-02-04T06:02:28.944Z",
+        "createdAt": "2026-02-04T06:02:28.944Z",
+        "role": "workflow:owner",
+        "workflowId": "Y4Pci1l3coPfx0Wn",
+        "projectId": "4z38v6JO6ntgY8gF",
+        "project": {
+          "updatedAt": "2026-01-13T19:13:51.671Z",
+          "createdAt": "2026-01-13T19:11:25.659Z",
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "YOUR_NAME <your-email@example.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+        }
+      }
+    ],
+    "tags": [
+      {
+        "updatedAt": "2026-02-04T06:02:18.660Z",
+        "createdAt": "2026-02-04T06:02:18.660Z",
+        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+        "name": "SEO"
+      },
+      {
+        "updatedAt": "2026-02-04T06:02:18.744Z",
+        "createdAt": "2026-02-04T06:02:18.744Z",
+        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+        "name": "Auto-Blogger"
+      }
+    ],
+    "activeVersion": null
+  }
+}
+

@@ -1,0 +1,162 @@
+﻿{
+  "success": true,
+  "data": {
+    "updatedAt": "2026-03-08T18:25:04.631Z",
+    "createdAt": "2026-03-08T18:25:04.631Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name": "Error Alert â€” Signal Pipeline",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "9ca683f4-f5ac-4c70-af98-487e7ce1d574",
+        "name": "On Workflow Error",
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "fromEmail": "your-email@example.com",
+          "toEmail": "your-email@example.com",
+          "subject": "=ðŸš¨ Signal Pipeline Failed â€” {{ $json.execution.error.message }}",
+          "html": "=<h2>ðŸš¨ Signal Pipeline Error Alert</h2>\n<p>The <strong>Signal Pipeline â€” Job Posting Scanner</strong> workflow has failed.</p>\n<hr/>\n<table style=\"border-collapse:collapse;width:100%;max-width:600px;\">\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Error Message</td><td style=\"padding:8px;border:1px solid #ddd;color:#c0392b;\">{{ $json.execution.error.message }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Workflow Name</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.workflow.name }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Workflow ID</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.workflow.id }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Execution ID</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.execution.id }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Failed At</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.execution.lastNodeExecuted }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Mode</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.execution.mode }}</td></tr>\n</table>\n<hr/>\n<p><strong>ðŸ‘‰ Action:</strong> Check the execution log in n8n and fix the issue.</p>\n<p style=\"color:#888;font-size:12px;\">This alert was sent automatically by the Error Alert â€” Signal Pipeline workflow.</p>",
+          "options": {}
+        },
+        "id": "b0d58d56-c891-4cf4-93b3-ae6ef2c2fa0b",
+        "name": "Send Error Alert Email",
+        "type": "n8n-nodes-base.emailSend",
+        "typeVersion": 2.1,
+        "position": [
+          240,
+          0
+        ],
+        "webhookId": "3f5211d2-58f8-4c43-8de2-a9d8c0b458be",
+        "credentials": {
+          "smtp": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "SMTP Account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "On Workflow Error": {
+        "main": [
+          [
+            {
+              "node": "Send Error Alert Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "versionId": "65e5406b-b76a-4fad-95df-a2d3a3235c22",
+    "activeVersionId": "65e5406b-b76a-4fad-95df-a2d3a3235c22",
+    "versionCounter": 14,
+    "triggerCount": 0,
+    "shared": [
+      {
+        "updatedAt": "2026-03-08T18:25:04.634Z",
+        "createdAt": "2026-03-08T18:25:04.634Z",
+        "role": "workflow:owner",
+        "workflowId": "xrUkLrRQonyzJ60p",
+        "projectId": "4z38v6JO6ntgY8gF",
+        "project": {
+          "updatedAt": "2026-01-13T19:13:51.671Z",
+          "createdAt": "2026-01-13T19:11:25.659Z",
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "YOUR_NAME <your-email@example.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+        }
+      }
+    ],
+    "tags": [],
+    "activeVersion": {
+      "updatedAt": "2026-03-08T18:26:59.000Z",
+      "createdAt": "2026-03-08T18:25:04.636Z",
+      "versionId": "65e5406b-b76a-4fad-95df-a2d3a3235c22",
+      "workflowId": "xrUkLrRQonyzJ60p",
+      "nodes": [
+        {
+          "parameters": {},
+          "id": "9ca683f4-f5ac-4c70-af98-487e7ce1d574",
+          "name": "On Workflow Error",
+          "type": "n8n-nodes-base.errorTrigger",
+          "typeVersion": 1,
+          "position": [
+            0,
+            0
+          ]
+        },
+        {
+          "parameters": {
+            "fromEmail": "your-email@example.com",
+            "toEmail": "your-email@example.com",
+            "subject": "=ðŸš¨ Signal Pipeline Failed â€” {{ $json.execution.error.message }}",
+            "html": "=<h2>ðŸš¨ Signal Pipeline Error Alert</h2>\n<p>The <strong>Signal Pipeline â€” Job Posting Scanner</strong> workflow has failed.</p>\n<hr/>\n<table style=\"border-collapse:collapse;width:100%;max-width:600px;\">\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Error Message</td><td style=\"padding:8px;border:1px solid #ddd;color:#c0392b;\">{{ $json.execution.error.message }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Workflow Name</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.workflow.name }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Workflow ID</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.workflow.id }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Execution ID</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.execution.id }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Failed At</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.execution.lastNodeExecuted }}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:bold;\">Mode</td><td style=\"padding:8px;border:1px solid #ddd;\">{{ $json.execution.mode }}</td></tr>\n</table>\n<hr/>\n<p><strong>ðŸ‘‰ Action:</strong> Check the execution log in n8n and fix the issue.</p>\n<p style=\"color:#888;font-size:12px;\">This alert was sent automatically by the Error Alert â€” Signal Pipeline workflow.</p>",
+            "options": {}
+          },
+          "id": "b0d58d56-c891-4cf4-93b3-ae6ef2c2fa0b",
+          "name": "Send Error Alert Email",
+          "type": "n8n-nodes-base.emailSend",
+          "typeVersion": 2.1,
+          "position": [
+            240,
+            0
+          ],
+          "webhookId": "3f5211d2-58f8-4c43-8de2-a9d8c0b458be",
+          "credentials": {
+            "smtp": {
+              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+              "name": "SMTP Account"
+            }
+          }
+        }
+      ],
+      "connections": {
+        "On Workflow Error": {
+          "main": [
+            [
+              {
+                "node": "Send Error Alert Email",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        }
+      },
+      "authors": "YOUR_NAME",
+      "name": "Version 65e5406b",
+      "description": "",
+      "autosaved": false,
+      "workflowPublishHistory": [
+        {
+          "createdAt": "2026-03-08T18:26:59.958Z",
+          "id": 114,
+          "workflowId": "xrUkLrRQonyzJ60p",
+          "versionId": "65e5406b-b76a-4fad-95df-a2d3a3235c22",
+          "event": "activated",
+          "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+        }
+      ]
+    }
+  }
+}

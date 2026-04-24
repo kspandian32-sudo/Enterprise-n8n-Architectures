@@ -1,0 +1,368 @@
+﻿{
+    "updatedAt":  "2026-04-11T07:52:49.535Z",
+    "createdAt":  "2026-04-09T19:25:45.500Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "ðŸ’¼ Content Alchemist â€” Workflow B (LinkedIn Branch)",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "inputSource":  "passthrough"
+                                     },
+                      "id":  "d15eab57-a1d9-4f58-b84d-332056b50a4c",
+                      "name":  "Workflow Input",
+                      "position":  [
+                                       -912,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.executeWorkflowTrigger",
+                      "typeVersion":  1.1
+                  },
+                  {
+                      "parameters":  {
+                                         "fieldToSplitOut":  "linkedinposts",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "8d864c78-3e54-41b7-8201-0765eaf39122",
+                      "name":  "Split LinkedIn Posts",
+                      "position":  [
+                                       -688,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.splitOut",
+                      "typeVersion":  1
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "chat",
+                                         "chatModel":  "gpt-4o",
+                                         "prompt":  {
+                                                        "messages":  [
+                                                                         {
+                                                                             "role":  "system",
+                                                                             "content":  "You are a visual content strategist for LinkedIn. Write a DALL-E 3 image generation prompt for a professional, clean image that visually represents the theme of a LinkedIn post. No text overlays, no human faces, photorealistic or graphic design style. Return ONLY the image prompt, nothing else."
+                                                                         },
+                                                                         {
+                                                                             "content":  "={{ \u0027Write a DALL-E 3 image prompt for this LinkedIn post. Return only the prompt:\\n\\n\u0027 + $json.linkedinposts }}"
+                                                                         }
+                                                                     ]
+                                                    },
+                                         "options":  {
+                                                         "maxTokens":  300,
+                                                         "temperature":  0.9
+                                                     },
+                                         "requestOptions":  {
+
+                                                            }
+                                     },
+                      "id":  "576607cf-de07-46e7-9239-3e78d6589c6a",
+                      "name":  "Build Image Prompt (LinkedIn)",
+                      "position":  [
+                                       -208,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.openAi",
+                      "typeVersion":  1.1,
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                            "name":  "Content Alchemist - OpenAI"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "image",
+                                         "prompt":  "={{ $json.message.content }}",
+                                         "options":  {
+
+                                                     },
+                                         "requestOptions":  {
+
+                                                            }
+                                     },
+                      "id":  "b110d9ac-9ce1-4ff3-b629-9cd7efb4b7aa",
+                      "name":  "Generate Image (LinkedIn)",
+                      "position":  [
+                                       48,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.openAi",
+                      "typeVersion":  1.1,
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                            "name":  "Content Alchemist - OpenAI"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "name":  "={{ \u0027linkedin_img_\u0027 + ($runIndex + 1) + \u0027_\u0027 + $(\u0027Workflow Input\u0027).item.json.timestamp.replace(/:/g,\u0027-\u0027).substring(0,19) + \u0027.png\u0027 }}",
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Workflow Input\u0027).item.json.postImagesFolderId || \u0027REPLACE_WITH_YOUR_FOLDER_ID\u0027 }}"
+                                                      },
+                                         "options":  {
+
+                                                     },
+                                         "operation":  "upload"
+                                     },
+                      "id":  "82e94ebe-8d1c-4ad4-95ad-a2c7477a1f65",
+                      "name":  "Upload LinkedIn Image to Drive",
+                      "position":  [
+                                       288,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "createFromText",
+                                         "content":  "={{ $json.linkedinposts }}",
+                                         "name":  "={{ \u0027linkedin_post_\u0027 + ($runIndex + 1) + \u0027_\u0027 + $(\u0027Workflow Input\u0027).item.json.timestamp.replace(/:/g, \u0027-\u0027).substring(0, 19) + \u0027.txt\u0027 }}",
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Workflow Input\u0027).item.json.linkedinFolderId || \u0027REPLACE_WITH_YOUR_FOLDER_ID\u0027 }}"
+                                                      },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "6c7b701b-e102-45f4-bd86-7bbd9101063e",
+                      "name":  "Save LinkedIn Post .txt",
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       -448,
+                                       192
+                                   ],
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      }
+                  },
+                  {
+                      "id":  "loop-linkedin",
+                      "name":  "Loop LinkedIn Posts",
+                      "type":  "n8n-nodes-base.splitInBatches",
+                      "typeVersion":  3,
+                      "position":  [
+                                       408,
+                                       192
+                                   ],
+                      "parameters":  {
+                                         "batchSize":  1,
+                                         "options":  {
+
+                                                     }
+                                     }
+                  },
+                  {
+                      "id":  "785d37a2-b4fb-42d3-9f88-cbe8d7723418",
+                      "name":  "Log to LinkedIn Post Sheet",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.5,
+                      "position":  [
+                                       668,
+                                       192
+                                   ],
+                      "parameters":  {
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "matchingColumns":  [
+
+                                                                             ],
+                                                         "schema":  [
+
+                                                                    ],
+                                                         "value":  {
+                                                                       "Content":  "={{ $(\u0027Split LinkedIn Posts\u0027).item.json.linkedinposts }}",
+                                                                       "Image URL":  "={{ \u0027https://drive.google.com/file/d/\u0027 + $json.id + \u0027/view\u0027 }}",
+                                                                       "Timestamp":  "={{ $(\u0027Workflow Input\u0027).item.json.timestamp }}",
+                                                                       "Transcript":  "={{ $(\u0027Workflow Input\u0027).item.json.transcript.substring(0, 400) }}"
+                                                                   }
+                                                     },
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "={{ $(\u0027Workflow Input\u0027).item.json.sheetsId || \u0027REPLACE_WITH_YOUR_SPREADSHEET_ID\u0027 }}"
+                                                        },
+                                         "operation":  "append",
+                                         "options":  {
+
+                                                     },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "mode":  "name",
+                                                           "value":  "LinkedIn Post"
+                                                       }
+                                     },
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      }
+                  }
+              ],
+    "connections":  {
+                        "Build Image Prompt (LinkedIn)":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "Generate Image (LinkedIn)",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                        "Generate Image (LinkedIn)":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "Upload LinkedIn Image to Drive",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "Workflow Input":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Split LinkedIn Posts",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Split LinkedIn Posts":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Save LinkedIn Post .txt",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Save LinkedIn Post .txt":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "Build Image Prompt (LinkedIn)",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "Upload LinkedIn Image to Drive":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "Loop LinkedIn Posts",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           },
+                        "Log to LinkedIn Post Sheet":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "Loop LinkedIn Posts",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "Loop LinkedIn Posts":  {
+                                                    "main":  [
+                                                                 [
+
+                                                                 ],
+                                                                 [
+                                                                     {
+                                                                         "node":  "Log to LinkedIn Post Sheet",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "saveDataErrorExecution":  "all",
+                     "saveDataSuccessExecution":  "all",
+                     "saveManualExecutions":  true,
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  null,
+    "pinData":  {
+
+                },
+    "versionId":  "f0b4a80f-fc10-401f-bd05-a51aecc05f07",
+    "activeVersionId":  null,
+    "versionCounter":  56,
+    "triggerCount":  0,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-09T19:25:45.504Z",
+                       "createdAt":  "2026-04-09T19:25:45.504Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "cWHSBOjXyeJQvvjQ",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

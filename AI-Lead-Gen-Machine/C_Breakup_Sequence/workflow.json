@@ -1,0 +1,1316 @@
+﻿{
+    "updatedAt":  "2026-04-20T18:31:11.906Z",
+    "createdAt":  "2026-04-20T13:02:12.459Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "v7.6 FIXED - WF-C Email 3 Breakup (SMTP)",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "triggerAtHour":  11
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "id":  "09872cf0-b4f9-41e6-9c12-3b98d8624862",
+                      "name":  "Daily 11 AM: Email 3 Due?",
+                      "position":  [
+                                       -2416,
+                                       496
+                                   ],
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "typeVersion":  1.3
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "1475293523"
+                                                       },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "d5da9e67-ab79-4871-aa9d-6bcb152ec1bb",
+                      "name":  "Fetch CRM",
+                      "position":  [
+                                       -2192,
+                                       496
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      },
+                      "onError":  "stopExecution"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Filter: Status = \u0027Email 2 Sent\u0027 AND 4+ days elapsed.\nconst results = [];\nfor (const item of $input.all()) {\n  const status = (item.json.Status || \u0027\u0027).trim();\n  if (status !== \u0027Email 2 Sent\u0027 \u0026\u0026 status !== \u0027Email 2 Sent (Simulated)\u0027) continue;\n  const sentAt = item.json[\u0027Email 2 Sent At\u0027] || item.json.email2SentAt;\n  if (sentAt \u0026\u0026 (new Date() - new Date(sentAt)) \u003e= 4 * 24 * 60 * 60 * 1000) {\n    results.push({ json: item.json });\n  }\n}\nreturn results;"
+                                     },
+                      "id":  "17606088-616f-4278-9877-368ac1d477d1",
+                      "name":  "Filter: 4+ Days Passed",
+                      "position":  [
+                                       -1968,
+                                       496
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Collapse to single trigger for Blacklist Lookup (prevents rate limit)\nif ($itemIndex === 0) {\n  return [{ json: { _blacklistTrigger: true } }];\n}\nreturn [];"
+                                     },
+                      "id":  "df7b7729-6099-49d7-af0b-0afda413f8bf",
+                      "name":  "Consolidate for Blacklist",
+                      "position":  [
+                                       -1744,
+                                       496
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "487226189"
+                                                       },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "4912390d-e794-45b8-811c-49a139a1c731",
+                      "name":  "Blacklist Lookup",
+                      "position":  [
+                                       -1520,
+                                       496
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "retryOnFail":  true,
+                      "maxTries":  3,
+                      "waitBetweenTries":  3000,
+                      "alwaysOutputData":  true,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const items = $input.all();\nconst blacklistEmails = items\n  .filter(r =\u003e r.json \u0026\u0026 !r.json.error \u0026\u0026 !r.json._blacklistTrigger)\n  .map(r =\u003e (r.json.Email || r.json.email || \u0027\u0027).toLowerCase().trim())\n  .filter(Boolean);\nlet leads = [];\ntry { leads = $(\u0027Filter: 4+ Days Passed\u0027).all(); } catch(e) { leads = []; }\nif (leads.length === 0) return [{ json: { _noLeads: true, _blacklistEmails: [] } }];\nreturn leads.map(leadItem =\u003e ({ json: { ...leadItem.json, _blacklistEmails: blacklistEmails } }));"
+                                     },
+                      "id":  "c7164fe3-9603-4d44-8064-294f5c35718b",
+                      "name":  "Blacklist Safety Net",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -1296,
+                                       496
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const clean = [];\nfor (const item of $input.all()) {\n  const { _blacklistEmails, _noLeads, ...leadData } = item.json;\n  if (_noLeads) continue;\n  const blacklist = Array.isArray(_blacklistEmails) ? _blacklistEmails : [];\n  const email = (leadData.Email || leadData.email || \u0027\u0027).toLowerCase().trim();\n  if (email \u0026\u0026 blacklist.includes(email)) continue;\n  clean.push({ json: { ...leadData } });\n}\nreturn clean;"
+                                     },
+                      "id":  "49801b3e-84cb-4bd5-b682-69aada9e5c20",
+                      "name":  "Blacklist Gate",
+                      "position":  [
+                                       -1072,
+                                       496
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "thread",
+                                         "limit":  1,
+                                         "filters":  {
+                                                         "q":  "={{ \u0027to:\u0027 + $json.Email + \u0027 OR from:\u0027 + $json.Email }}"
+                                                     }
+                                     },
+                      "id":  "e145fed6-cf43-44c9-bb16-df8e6b3bbea4",
+                      "name":  "Get Gmail Thread",
+                      "position":  [
+                                       -848,
+                                       496
+                                   ],
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.2,
+                      "webhookId":  "7226e274-b945-4f50-a2b1-7f2023c64ee3",
+                      "alwaysOutputData":  true,
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Lead Gen Machine Gmail OAuth2 (kspandian32 READ)"
+                                                          }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "thread-id-valid-check-v1-new-wfc-hardened-final",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "notEmpty",
+                                                                                                    "type":  "string",
+                                                                                                    "singleValue":  true
+                                                                                                },
+                                                                                   "leftValue":  "={{ $json.id }}"
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        },
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "5b8a40d3-cc77-4685-a0f0-ee3c69f65663",
+                      "name":  "IF: Found Thread?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       -624,
+                                       496
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "thread",
+                                         "operation":  "get",
+                                         "threadId":  "={{ $json.id }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "ba49ef54-a3b3-410e-bbf9-80b03797da6f",
+                      "name":  "Fetch Thread Details",
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       -400,
+                                       424
+                                   ],
+                      "webhookId":  "5103b660-37d4-4f38-9cfe-4c777b86f9e4",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Lead Gen Machine Gmail OAuth2 (kspandian32 READ)"
+                                                          }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Merge thread details with lead data\nconst threads = $input.all();\nconst leads = $(\u0027Blacklist Gate\u0027).all();\nreturn threads.map((item, idx) =\u003e {\n  const thread = item.json;\n  const lead = leads[idx] ? leads[idx].json : {};\n  const messages = thread.messages || [];\n  const lastMsg = messages.length \u003e 0 ? messages[messages.length - 1] : {};\n  const replyBody = (lastMsg.snippet || lastMsg.text || thread.snippet || \u0027\u0027).toLowerCase();\n  const hasReply = messages.length \u003e= 2;\n  const unsubKeywords = [\u0027unsubscribe\u0027, \u0027remove me\u0027, \u0027stop emailing\u0027, \u0027opt out\u0027, \u0027take me off\u0027];\n  const isUnsubscribe = unsubKeywords.some(kw =\u003e replyBody.includes(kw));\n  return { json: { ...lead, replyBody, hasReply, isUnsubscribe, isActionable: hasReply || isUnsubscribe } };\n});"
+                                     },
+                      "id":  "df92dcb2-88f1-437c-82c1-df3f9328bcc4",
+                      "name":  "Reply Gate (Email 3)",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -176,
+                                       424
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "reply-check-flag-v4-c",
+                                                                                   "leftValue":  "={{ $json.isActionable }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "true",
+                                                                                                    "singleValue":  true,
+                                                                                                    "type":  "boolean"
+                                                                                                },
+                                                                                   "rightValue":  true
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "6cd64b87-6eae-467f-9041-4bb3a0a02eb7",
+                      "name":  "IF: Reply Detected?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       48,
+                                       424
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "return $input.all().map(item =\u003e {\n  const replyBody = (item.json.replyBody || \u0027\u0027).toLowerCase();\n  const bounceSignals = [\u0027undeliverable\u0027, \u0027delivery failed\u0027, \u0027delivery status notification\u0027, \u0027returned mail\u0027, \u0027recipient address rejected\u0027, \u0027user unknown\u0027, \u0027no such user\u0027, \u0027mailbox full\u0027, \u0027address not found\u0027];\n  const matchedSignal = bounceSignals.find(s =\u003e replyBody.includes(s));\n  return { json: { ...item.json, isBounce: !!matchedSignal, bounceSignal: matchedSignal || null } };\n});"
+                                     },
+                      "id":  "1a028ea9-073a-4d20-b34e-87a88da149bf",
+                      "name":  "Bounce Detection",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       272,
+                                       352
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "bounce-check-flag-v4-c",
+                                                                                   "leftValue":  "={{ $json.isBounce }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "true",
+                                                                                                    "singleValue":  true,
+                                                                                                    "type":  "boolean"
+                                                                                                },
+                                                                                   "rightValue":  true
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "5640685a-fce0-40b1-be3f-50b08289616f",
+                      "name":  "IF: Is Bounce?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       496,
+                                       352
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "487226189"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "schema":  [
+
+                                                                    ],
+                                                         "value":  [
+                                                                       {
+                                                                           "column":  "Email",
+                                                                           "value":  "={{ $json.Email }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Name",
+                                                                           "value":  "={{ ($json[\u0027First Name\u0027]||\u0027\u0027) + \u0027 \u0027 + ($json[\u0027Last Name\u0027]||\u0027\u0027) }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Reason",
+                                                                           "value":  "Bounce"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Signal",
+                                                                           "value":  "={{ $json.bounceSignal || \u0027undeliverable\u0027 }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Date",
+                                                                           "value":  "={{ new Date().toISOString() }}"
+                                                                       }
+                                                                   ]
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "b1679f59-b257-4a79-8ad3-ff3f353c4641",
+                      "name":  "Blacklist (Bounce)",
+                      "position":  [
+                                       720,
+                                       256
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "11003211"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "schema":  [
+
+                                                                    ],
+                                                         "value":  [
+                                                                       {
+                                                                           "column":  "Email",
+                                                                           "value":  "={{ $json.Email }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Name",
+                                                                           "value":  "={{ ($json[\u0027First Name\u0027]||\u0027\u0027) + \u0027 \u0027 + ($json[\u0027Last Name\u0027]||\u0027\u0027) }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Company",
+                                                                           "value":  "={{ $json[\u0027Company Name\u0027] || \u0027\u0027 }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Intent",
+                                                                           "value":  "BOUNCE"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Action",
+                                                                           "value":  "BLACKLISTED"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Bounce_Signal",
+                                                                           "value":  "={{ $json.bounceSignal || \u0027\u0027 }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Timestamp",
+                                                                           "value":  "={{ new Date().toISOString() }}"
+                                                                       }
+                                                                   ]
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "914c44af-988b-4aa9-b28a-a69201e606e5",
+                      "name":  "Write Bounce to Replies Sheet",
+                      "position":  [
+                                       944,
+                                       256
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "chat",
+                                         "prompt":  {
+                                                        "messages":  [
+                                                                         {
+                                                                             "role":  "system",
+                                                                             "content":  "Classify reply intent into exactly one of: INTERESTED, NOT_INTERESTED, UNSUBSCRIBE, OUT_OF_OFFICE, WRONG_PERSON. Respond ONLY with JSON: {\"intent\":\"CATEGORY\",\"confidence\":N,\"summary\":\"one sentence\"}"
+                                                                         },
+                                                                         {
+                                                                             "content":  "=Classify: {{ $json.replyBody }}"
+                                                                         }
+                                                                     ]
+                                                    },
+                                         "options":  {
+                                                         "maxTokens":  150,
+                                                         "temperature":  0.2
+                                                     },
+                                         "requestOptions":  {
+
+                                                            }
+                                     },
+                      "id":  "a91c7c94-2201-4e0e-b2d8-7ed769009ffc",
+                      "name":  "Classify Reply Intent",
+                      "position":  [
+                                       720,
+                                       448
+                                   ],
+                      "type":  "n8n-nodes-base.openAi",
+                      "typeVersion":  1.1,
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                            "name":  "OpenAI fresh-key"
+                                                        }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const aiItems = $input.all();\nconst leads = $(\u0027Bounce Detection\u0027).all();\nreturn aiItems.map((item, idx) =\u003e {\n  const lead = leads[idx] ? leads[idx].json : {};\n  if (lead.isBounce) return null;\n  let intentData = {};\n  try {\n    const content = item.json.message?.content || item.json.choices?.[0]?.message?.content || \u0027{}\u0027;\n    intentData = JSON.parse(String(content).replace(/```json\\n?/g,\u0027\u0027).replace(/```/g,\u0027\u0027).trim());\n  } catch(e) {\n    intentData = { intent: \u0027NOT_INTERESTED\u0027, summary: \u0027parse error\u0027, confidence: 0 };\n  }\n  return { json: {\n    ...lead,\n    intent: intentData.intent || \u0027NOT_INTERESTED\u0027,\n    summary: intentData.summary || \u0027\u0027,\n    confidence: intentData.confidence || 0,\n    \u0027AI Summary\u0027: intentData.summary || \u0027\u0027,\n    \u0027Replied At\u0027: new Date().toISOString()\n  } };\n}).filter(x =\u003e x !== null);"
+                                     },
+                      "id":  "0ed04ede-e716-45ee-9fb4-ddbf6150798b",
+                      "name":  "Parse Reply Intent",
+                      "position":  [
+                                       944,
+                                       448
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "1828942124"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "schema":  [
+
+                                                                    ],
+                                                         "value":  [
+                                                                       {
+                                                                           "column":  "Email",
+                                                                           "value":  "={{ $json.Email }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Name",
+                                                                           "value":  "={{ ($json[\u0027First Name\u0027]||\u0027\u0027) + \u0027 \u0027 + ($json[\u0027Last Name\u0027]||\u0027\u0027) }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Company",
+                                                                           "value":  "={{ $json[\u0027Company Name\u0027] || \u0027\u0027 }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Intent",
+                                                                           "value":  "={{ $json.intent }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Summary",
+                                                                           "value":  "={{ $json.summary }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Confidence",
+                                                                           "value":  "={{ $json.confidence }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Replied_At",
+                                                                           "value":  "={{ $json[\u0027Replied At\u0027] }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Timestamp",
+                                                                           "value":  "={{ new Date().toISOString() }}"
+                                                                       }
+                                                                   ]
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "05b5777f-ebde-4628-8aa5-9f3f4cc946e4",
+                      "name":  "Write Reply Dashboard",
+                      "position":  [
+                                       1392,
+                                       400
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "update",
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "1475293523"
+                                                       },
+                                         "columnToMatchOn":  "Email",
+                                         "valueToMatchOn":  "={{ $(\u0027Blacklist Gate\u0027).first().json.Email.toLowerCase().trim() }}",
+                                         "fieldsUi":  {
+                                                          "values":  [
+                                                                         {
+                                                                             "column":  "Status",
+                                                                             "fieldValue":  "Replied â€” Hot Lead"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Reply Intent",
+                                                                             "fieldValue":  "={{ $node[\"Parse Reply Intent\"].json.intent }}"
+                                                                         }
+                                                                     ]
+                                                      },
+                                         "options":  {
+                                                         "cellFormat":  "USER_ENTERED"
+                                                     }
+                                     },
+                      "id":  "83860fad-9651-42e1-a911-43c438a9b4c6",
+                      "name":  "Update CRM: Reply Status",
+                      "position":  [
+                                       1616,
+                                       400
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  3,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "unsubscribe-check-c",
+                                                                                   "leftValue":  "={{ $json.intent }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "equals",
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                   "rightValue":  "UNSUBSCRIBE"
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "537033f7-4549-4d2c-aadc-4af2c54df5b9",
+                      "name":  "Is Unsubscribe?",
+                      "position":  [
+                                       1840,
+                                       400
+                                   ],
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "487226189"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "schema":  [
+
+                                                                    ],
+                                                         "value":  [
+                                                                       {
+                                                                           "column":  "Email",
+                                                                           "value":  "={{ $json.Email }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Name",
+                                                                           "value":  "={{ ($json[\u0027First Name\u0027]||\u0027\u0027) + \u0027 \u0027 + ($json[\u0027Last Name\u0027]||\u0027\u0027) }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Reason",
+                                                                           "value":  "Unsubscribed"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Signal",
+                                                                           "value":  "User requested removal"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Date",
+                                                                           "value":  "={{ new Date().toISOString() }}"
+                                                                       }
+                                                                   ]
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "9f80e9e7-4211-4ee4-9e7a-e8a3c01c3aa1",
+                      "name":  "Blacklist (Unsubscribe)",
+                      "position":  [
+                                       2064,
+                                       304
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "7392899748",
+                                         "text":  "=ðŸ”¥ E2 REPLY: {{ $node[\"Parse Reply Intent\"].json.intent }}\nName: {{ $node[\"Blacklist Gate\"].json[\"First Name\"] || \u0027\u0027 }} {{ $node[\"Blacklist Gate\"].json[\"Last Name\"] || \u0027\u0027 }}\nCompany: {{ $node[\"Blacklist Gate\"].json[\"Company Name\"] || $node[\"Blacklist Gate\"].json[\"Company\"] || \u0027\u0027 }}\nEmail: {{ $node[\"Blacklist Gate\"].json.Email }}\nSummary: {{ $node[\"Parse Reply Intent\"].json.summary }}",
+                                         "additionalFields":  {
+
+                                                              },
+                                         "operation":  "sendMessage"
+                                     },
+                      "id":  "eaa19eb1-de16-4634-8f89-67c1cd2c4574",
+                      "name":  "Telegram: E2 Reply Alert",
+                      "position":  [
+                                       2064,
+                                       496
+                                   ],
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1.2,
+                      "webhookId":  "853fdc2d-58e1-448f-abae-9b65c4d04f4e",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Lead Gen Machine Telegram account"
+                                                          }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "safe-mode-final-wfc-bypass-v4-new-id-v2",
+                                                                                   "leftValue":  "true",
+                                                                                   "operator":  {
+                                                                                                    "type":  "boolean",
+                                                                                                    "singleValue":  true,
+                                                                                                    "operation":  "true"
+                                                                                                },
+                                                                                   "rightValue":  true
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        },
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "09654820-9b0e-4d68-8cb5-dad895cf0657",
+                      "name":  "SAFE MODE Check",
+                      "position":  [
+                                       1392,
+                                       784
+                                   ],
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "return $input.all().map(item =\u003e ({\n  json: {\n    ...item.json,\n    \u0027Simulated\u0027: \u0027YES\u0027,\n    \u0027Status\u0027: \u0027Sequence Done (Simulated)\u0027,\n    \u0027Email 3 Sent At\u0027: new Date().toISOString()\n  }\n}));"
+                                     },
+                      "id":  "1e636f1f-9c76-4686-9433-051bc30735ec",
+                      "name":  "SAFE MODE (Email 3 Simulated)",
+                      "position":  [
+                                       1840,
+                                       688
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "parameters":  {
+                                         "fromEmail":  "={{ $json[\u0027Sender Email\u0027] }}",
+                                         "toEmail":  "={{ $json.Email }}",
+                                         "subject":  "={{ $json[\u0027Email 3 Subject\u0027] }}",
+                                         "emailFormat":  "text",
+                                         "text":  "={{ $json[\u0027Email 3 Body\u0027] + \u0027\\n\\n--\\n\u0027 + ($json[\u0027Sender Name\u0027] || \u0027\u0027) }}",
+                                         "options":  {
+                                                         "replyTo":  "={{ $json[\u0027Sender Email\u0027] }}"
+                                                     }
+                                     },
+                      "id":  "5cdbd78d-a575-4714-ae72-f2536eebecb1",
+                      "name":  "Send Email 3 (Breakup)",
+                      "position":  [
+                                       1616,
+                                       880
+                                   ],
+                      "type":  "n8n-nodes-base.emailSend",
+                      "typeVersion":  2.1,
+                      "webhookId":  "526d07c3-5ef2-4540-9ecc-e90de40da145",
+                      "credentials":  {
+                                          "smtp":  {
+                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                       "name":  "SMTP Account"
+                                                   }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const leads = $(\u0027SAFE MODE Check\u0027).all();\nreturn $input.all().map((item, idx) =\u003e {\n  const lead = leads[idx] ? leads[idx].json : {};\n  return { json: { ...lead, \u0027Status\u0027: \u0027Sequence Done\u0027, \u0027Email 3 Sent At\u0027: new Date().toISOString(), \u0027Simulated\u0027: \u0027NO\u0027 } };\n});"
+                                     },
+                      "id":  "9fee4260-0297-4b61-9764-9d369167b7fe",
+                      "name":  "Capture E3 Context",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       1840,
+                                       880
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "update",
+                                         "documentId":  {
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo",
+                                                            "mode":  "id"
+                                                        },
+                                         "sheetName":  {
+                                                           "value":  "1475293523",
+                                                           "mode":  "id"
+                                                       },
+                                         "columnToMatchOn":  "Email",
+                                         "valueToMatchOn":  "={{ $(\u0027Blacklist Gate\u0027).first().json.Email.toLowerCase().trim() }}",
+                                         "fieldsUi":  {
+                                                          "values":  [
+                                                                         {
+                                                                             "column":  "Status",
+                                                                             "fieldValue":  "Email 3 Sent"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Email 3 Sent At",
+                                                                             "fieldValue":  "={{ new Date().toISOString() }}"
+                                                                         }
+                                                                     ]
+                                                      },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "6f7a1240-94fd-4ed3-9b4f-06f4e3b51b48",
+                      "name":  "Update CRM: Sequence Done",
+                      "position":  [
+                                       2064,
+                                       784
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  3,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "7392899748",
+                                         "text":  "=ðŸ Sequence Complete\nRecipient: {{ ($json[\u0027First Name\u0027]||\u0027\u0027) + \u0027 \u0027 + ($json[\u0027Last Name\u0027]||\u0027\u0027) }}\nCompany: {{ $json[\u0027Company Name\u0027] || \u0027\u0027 }}\nEmail: {{ $json.Email }}\nSimulated: {{ $json.Simulated || \u0027NO\u0027 }}",
+                                         "additionalFields":  {
+
+                                                              },
+                                         "operation":  "sendMessage"
+                                     },
+                      "id":  "9e2c13c1-f93c-420c-9c3e-49e997fb526f",
+                      "name":  "Telegram: Sequence Complete",
+                      "position":  [
+                                       2288,
+                                       784
+                                   ],
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1.2,
+                      "webhookId":  "456597ac-532f-4639-8a3a-0b7c66d5cc1e",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Lead Gen Machine Telegram account"
+                                                          }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "intent-ooo-check-v3-strict",
+                                                                                   "leftValue":  "={{ $json.intent }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "equals",
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                   "rightValue":  "OUT_OF_OFFICE"
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "bee48c47-7758-4096-a282-738be9b6776a",
+                      "name":  "IF: Is OOO?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       1168,
+                                       448
+                                   ]
+                  }
+              ],
+    "connections":  {
+                        "Daily 11 AM: Email 3 Due?":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "Fetch CRM",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "Fetch CRM":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Filter: 4+ Days Passed",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Filter: 4+ Days Passed":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "Consolidate for Blacklist",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Consolidate for Blacklist":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "Blacklist Lookup",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "Blacklist Lookup":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Blacklist Safety Net",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "Blacklist Safety Net":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Blacklist Gate",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Blacklist Gate":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Get Gmail Thread",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Get Gmail Thread":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "IF: Found Thread?",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "IF: Found Thread?":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Fetch Thread Details",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ],
+                                                               [
+                                                                   {
+                                                                       "node":  "SAFE MODE Check",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Fetch Thread Details":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Reply Gate (Email 3)",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Reply Gate (Email 3)":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "IF: Reply Detected?",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "IF: Reply Detected?":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Bounce Detection",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ],
+                                                                 [
+                                                                     {
+                                                                         "node":  "SAFE MODE Check",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Bounce Detection":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "IF: Is Bounce?",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "IF: Is Bounce?":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Blacklist (Bounce)",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ],
+                                                            [
+                                                                {
+                                                                    "node":  "Classify Reply Intent",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Blacklist (Bounce)":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Write Bounce to Replies Sheet",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Classify Reply Intent":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Parse Reply Intent",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Write Reply Dashboard":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Update CRM: Reply Status",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Update CRM: Reply Status":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "Is Unsubscribe?",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "Is Unsubscribe?":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Blacklist (Unsubscribe)",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ],
+                                                             [
+                                                                 {
+                                                                     "node":  "Telegram: E2 Reply Alert",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "SAFE MODE Check":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "SAFE MODE (Email 3 Simulated)",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ],
+                                                             [
+                                                                 {
+                                                                     "node":  "Send Email 3 (Breakup)",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "SAFE MODE (Email 3 Simulated)":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "Update CRM: Sequence Done",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                        "Send Email 3 (Breakup)":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "Capture E3 Context",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Capture E3 Context":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Update CRM: Sequence Done",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Update CRM: Sequence Done":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "Telegram: Sequence Complete",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "Parse Reply Intent":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "IF: Is OOO?",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "IF: Is OOO?":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "SAFE MODE Check",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ],
+                                                         [
+                                                             {
+                                                                 "node":  "Write Reply Dashboard",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate",
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false
+                 },
+    "staticData":  {
+                       "node:Daily 11 AM: Email 3 Due?":  {
+                                                              "recurrenceRules":  [
+
+                                                                                  ]
+                                                          }
+                   },
+    "meta":  {
+                 "templateCredsSetupCompleted":  true
+             },
+    "pinData":  {
+
+                },
+    "versionId":  "fb35407a-70b5-4fc8-8294-d424cc7f6e2c",
+    "activeVersionId":  null,
+    "versionCounter":  50,
+    "triggerCount":  1,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-20T13:02:12.482Z",
+                       "createdAt":  "2026-04-20T13:02:12.482Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "zewinRNR3zlwb052",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

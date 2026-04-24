@@ -1,0 +1,2020 @@
+﻿{
+    "updatedAt":  "2026-04-04T18:33:03.771Z",
+    "createdAt":  "2026-04-04T08:15:57.037Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "AI Proposal \u0026 Invoice Autopilot v3 â€” Enhanced (FIXED)",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "formTitle":  "New Client Proposal Request",
+                                         "formDescription":  "Fill in the client details. A personalised proposal + invoice will be generated and emailed automatically within 30 seconds.",
+                                         "formFields":  {
+                                                            "values":  [
+                                                                           {
+                                                                               "fieldLabel":  "Client Full Name",
+                                                                               "requiredField":  true
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "Company Name",
+                                                                               "requiredField":  true
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "Client Email",
+                                                                               "fieldType":  "email",
+                                                                               "requiredField":  true
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "Industry / Niche",
+                                                                               "requiredField":  true
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "Service Requested",
+                                                                               "requiredField":  true
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "Budget / Pricing Agreed",
+                                                                               "requiredField":  true
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "Timeline",
+                                                                               "requiredField":  true
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "Key Goals / Requirements",
+                                                                               "fieldType":  "textarea",
+                                                                               "requiredField":  true
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "Additional Notes",
+                                                                               "fieldType":  "textarea"
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "Preferred Language",
+                                                                               "placeholder":  "English / Hindi / Tamil / Telugu / Kannada"
+                                                                           }
+                                                                       ]
+                                                        },
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "typeVersion":  2.5,
+                      "name":  "ðŸ“‹ Client Intake Form",
+                      "position":  [
+                                       -15840,
+                                       -368
+                                   ],
+                      "type":  "n8n-nodes-base.formTrigger",
+                      "id":  "774979ec-0047-49ea-9397-0052acee63f5",
+                      "webhookId":  "f3971e88-2910-49ae-8a08-e6bccb0839ec"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "text",
+                                         "responseBody":  "=\u003chtml\u003e\u003chead\u003e\u003cstyle\u003ebody{font-family:\u0027Segoe UI\u0027,Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}.container{background:#fff;padding:50px;border-radius:16px;text-align:center;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}.checkmark{width:80px;height:80px;background:#22c55e;border-radius:50%;display:flex;justify-content:center;align-items:center;margin:0 auto 25px;}.checkmark svg{width:40px;height:40px;fill:#fff;}h1{color:#333;margin-bottom:15px;}p{color:#666;font-size:16px;line-height:1.6;}\u003c/style\u003e\u003c/head\u003e\u003cbody\u003e\u003cdiv class=\"container\"\u003e\u003cdiv class=\"checkmark\"\u003e\u003csvg viewBox=\"0 0 24 24\"\u003e\u003cpath d=\"M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z\"/\u003e\u003c/svg\u003e\u003c/div\u003e\u003ch1\u003eThank You!\u003c/h1\u003e\u003cp\u003eYour proposal request has been received successfully.\u003c/p\u003e\u003cp\u003e\u003cstrong\u003eWhat happens next?\u003c/strong\u003e\u003c/p\u003e\u003cp\u003eYour personalized proposal and invoice will be generated and emailed to you within \u003cstrong\u003e30 seconds\u003c/strong\u003e.\u003c/p\u003e\u003cp style=\"margin-top:25px;color:#888;font-size:14px;\"\u003eYou can close this window now.\u003c/p\u003e\u003c/div\u003e\u003c/body\u003e\u003c/html\u003e",
+                                         "options":  {
+                                                         "responseHeaders":  {
+                                                                                 "entries":  [
+                                                                                                 {
+                                                                                                     "name":  "Content-Type",
+                                                                                                     "value":  "text/html"
+                                                                                                 }
+                                                                                             ]
+                                                                             }
+                                                     }
+                                     },
+                      "name":  "âœ… Form Submitted Response",
+                      "position":  [
+                                       -15616,
+                                       -368
+                                   ],
+                      "id":  "5cffad2c-f13a-41b0-a4e3-e557787b65f8",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Final Resilient Mapping with ALL required fields\nconst input = $input.first().json;\n\n// Extract values directly from root\nconst clientName = input[\u0027Client Full Name\u0027] || \u0027Valued Client\u0027;\nconst companyName = input[\u0027Company Name\u0027] || \u0027Your Company\u0027;\nconst clientEmail = input[\u0027Client Email\u0027] || \u0027spsiddarthan17@gmail.com\u0027;\nconst budgetAgreed = input[\u0027Budget / Pricing Agreed\u0027] || \u00270\u0027;\nconst timeline = input[\u0027Timeline\u0027] || \u0027TBD\u0027;\nconst goals = input[\u0027Key Goals / Requirements\u0027] || \u0027Not specified\u0027;\nconst additionalNotes = input[\u0027Additional Notes\u0027] || \u0027\u0027;\nconst preferredLanguage = input[\u0027Preferred Language\u0027] || \u0027English\u0027;\nconst industry = input[\u0027Industry / Niche\u0027] || \u0027General\u0027;\nconst serviceType = input[\u0027Service Requested\u0027] || \u0027Consulting\u0027;\n\n// Handle currency formatting\nconst budget = parseFloat(String(budgetAgreed).replace(/[^0-9.]/g, \u0027\u0027)) || 0;\nconst gst = budget * 0.18;\nconst totalWithGST = budget + gst;\nconst proposalSuffix = Math.floor(Math.random() * 100000);\n\n// Calculate due date (30 days from now)\nconst today = new Date();\nconst dueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);\nconst dueDateFormatted = dueDate.toLocaleDateString(\u0027en-IN\u0027);\nconst dateCreated = today.toLocaleDateString(\u0027en-IN\u0027);\n\nreturn [{\n  json: {\n    clientName,\n    companyName,\n    clientEmail,\n    industry,\n    serviceType,\n    timeline,\n    goals,\n    additionalNotes,\n    preferredLanguage,\n    budget,\n    budgetFormatted: \u0027â‚¹\u0027 + budget.toLocaleString(\u0027en-IN\u0027),\n    gst,\n    gstFormatted: \u0027â‚¹\u0027 + gst.toLocaleString(\u0027en-IN\u0027),\n    totalWithGST,\n    totalFormatted: \u0027â‚¹\u0027 + totalWithGST.toLocaleString(\u0027en-IN\u0027),\n    proposalId: \u0027PROP-\u0027 + proposalSuffix,\n    invoiceId: \u0027INV-\u0027 + proposalSuffix,\n    dateCreated,\n    dueDate: dueDateFormatted,\n    emailSubject: \u0027Tailored Proposal â€” \u0027 + companyName,\n    acceptUrl: \u0027https://n8n.pureremedysolutions.com/webhook/proposal-accept?proposalId=PROP-\u0027 + proposalSuffix,\n    declineUrl: \u0027https://n8n.pureremedysolutions.com/webhook/proposal-decline?proposalId=PROP-\u0027 + proposalSuffix,\n    systemPrompt: \u0027You are a professional business proposal writer. Generate compelling, professional proposal content. Respond with valid JSON only, no markdown code blocks. The JSON should have these exact keys: executive_summary, why_choose_us, our_approach, scope_of_work, deliverables_timeline, expected_outcomes, investment_justification, competitive_positioning. Each value should be a detailed paragraph or bullet points as a string.\u0027,\n    userPrompt: `Create a professional business proposal for ${companyName} in the ${industry} industry. They need ${serviceType} services with a budget of â‚¹${budget.toLocaleString(\u0027en-IN\u0027)} and timeline of ${timeline}. Their key goals are: ${goals}. Additional notes: ${additionalNotes}. Make it compelling and professional.`,\n    debug_keys: Object.keys(input)\n  }\n}];"
+                                     },
+                      "typeVersion":  2,
+                      "type":  "n8n-nodes-base.code",
+                      "id":  "1b162535-bfc2-41f8-9a06-f9963d4ab776",
+                      "position":  [
+                                       -15392,
+                                       -368
+                                   ],
+                      "name":  "ðŸ”§ Parse \u0026 Prepare"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.openai.com/v1/chat/completions",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ model: \u0027gpt-4o\u0027, temperature: 0.72, max_tokens: 4000, messages: [{ role: \u0027system\u0027, content: $json.systemPrompt }, { role: \u0027user\u0027, content: $json.userPrompt }] }) }}",
+                                         "options":  {
+                                                         "timeout":  60000
+                                                     }
+                                     },
+                      "name":  "ðŸ¤– Generate Proposal Content",
+                      "position":  [
+                                       -15168,
+                                       -368
+                                   ],
+                      "id":  "08ea96e5-e279-4d36-9d9f-c3377a329126",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "AI Proposal - OpenAI API Key Header Auth"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const aiResponse = $input.first().json;\nconst formData = $(\u0027ðŸ”§ Parse \u0026 Prepare\u0027).first().json;\n\nlet aiContent;\ntry {\n  let raw = \u0027\u0027;\n  if (aiResponse.choices \u0026\u0026 aiResponse.choices[0] \u0026\u0026 aiResponse.choices[0].message) {\n    raw = aiResponse.choices[0].message.content;\n  } else if (aiResponse.message \u0026\u0026 aiResponse.message.content) {\n    raw = aiResponse.message.content;\n  } else if (aiResponse.text) {\n    raw = aiResponse.text;\n  } else if (typeof aiResponse.content === \u0027string\u0027) {\n    raw = aiResponse.content;\n  } else if (typeof aiResponse === \u0027string\u0027) {\n    raw = aiResponse;\n  } else {\n    raw = JSON.stringify(aiResponse);\n  }\n  \n  // Clean up markdown code blocks if present\n  raw = raw.replace(/```json\\s*/gi, \u0027\u0027).replace(/```\\s*/gi, \u0027\u0027).trim();\n  \n  // Extract JSON object\n  const firstBrace = raw.indexOf(\u0027{\u0027);\n  const lastBrace = raw.lastIndexOf(\u0027}\u0027);\n  if (firstBrace !== -1 \u0026\u0026 lastBrace !== -1) {\n    raw = raw.substring(firstBrace, lastBrace + 1);\n  }\n  \n  aiContent = JSON.parse(raw);\n} catch (e) {\n  // Fallback content if AI parsing fails\n  aiContent = {\n    executive_summary: `We are excited to present this tailored proposal for ${formData.companyName}. With deep expertise in the ${formData.industry} sector, our team has designed a ${formData.serviceType} engagement built around your specific goals: ${formData.goals}. We are confident this partnership will deliver measurable results within ${formData.timeline}, positioning ${formData.companyName} for accelerated growth.`,\n    why_choose_us: `1. Industry Expertise: Our team has delivered 50+ successful ${formData.industry} projects.\\n2. Proven Methodology: Our structured approach has achieved an average 35% improvement in client KPIs.\\n3. Dedicated Support: A named project manager and weekly progress reviews.\\n4. Results Guarantee: We tie our deliverables to measurable outcomes.`,\n    our_approach: `Phase 1 â€” Discovery (Week 1): Comprehensive audit of ${formData.companyName}\u0027s current state and requirements.\\nPhase 2 â€” Strategy (Week 2): Data-driven roadmap development tailored to your goals.\\nPhase 3 â€” Execution (Week 3 onward): Implementation with regular checkpoints and adjustments.`,\n    scope_of_work: `Our ${formData.serviceType} engagement for ${formData.companyName} includes comprehensive analysis, strategy development, implementation support, and ongoing optimization to achieve your stated goals.`,\n    deliverables_timeline: `Week 1-2: Discovery and Analysis\\nWeek 3-4: Strategy Development\\nWeek 5+: Implementation and Optimization\\nTimeline: ${formData.timeline}`,\n    expected_outcomes: `Based on our experience in the ${formData.industry} sector, we anticipate significant improvements in your key metrics, enhanced operational efficiency, and measurable progress toward your stated goals.`,\n    investment_justification: `Your investment of ${formData.budgetFormatted} represents excellent value considering the comprehensive nature of our ${formData.serviceType} services and the expected ROI based on similar engagements.`,\n    competitive_positioning: `Our unique combination of ${formData.industry} expertise, proven methodology, and dedicated support team positions ${formData.companyName} to outperform competitors and capture market opportunities.`\n  };\n}\n\n// Merge form data with AI content\nreturn [{ \n  json: { \n    ...formData, \n    executive_summary: aiContent.executive_summary || \u0027\u0027,\n    why_choose_us: aiContent.why_choose_us || \u0027\u0027,\n    our_approach: aiContent.our_approach || \u0027\u0027,\n    scope_of_work: aiContent.scope_of_work || \u0027\u0027,\n    deliverables_timeline: aiContent.deliverables_timeline || \u0027\u0027,\n    expected_outcomes: aiContent.expected_outcomes || \u0027\u0027,\n    investment_justification: aiContent.investment_justification || \u0027\u0027,\n    competitive_positioning: aiContent.competitive_positioning || \u0027\u0027\n  } \n}];"
+                                     },
+                      "id":  "72efa938-1383-4f61-a1a6-95bb121abb04",
+                      "type":  "n8n-nodes-base.code",
+                      "position":  [
+                                       -14944,
+                                       -368
+                                   ],
+                      "name":  "ðŸ”€ Merge AI + Form Data",
+                      "typeVersion":  2
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://www.googleapis.com/drive/v3/files/1bggvSEi-h3Sbc-E8QCEHVCWpfosKeAFshx9OjUcSpzo/copy",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ name: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.companyName + \u0027 - Proposal - \u0027 + $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.proposalId }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "name":  "ðŸ“„ Copy Slides Template",
+                      "position":  [
+                                       -14720,
+                                       -464
+                                   ],
+                      "id":  "fd15802b-d39b-4cb1-8d16-247893d3f090",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{ \u0027https://slides.googleapis.com/v1/presentations/\u0027 + $json.id + \u0027:batchUpdate\u0027 }}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ requests: Object.entries({client_name: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.clientName, company_name: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.companyName, proposal_id: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.proposalId, date_created: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.dateCreated, executive_summary: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.executive_summary || \u0027\u0027, why_choose_us: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.why_choose_us || \u0027\u0027, our_approach: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.our_approach || \u0027\u0027, scope_of_work: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.scope_of_work || \u0027\u0027, deliverables_timeline: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.deliverables_timeline || \u0027\u0027, budget: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.budgetFormatted, total_investment: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.totalFormatted, timeline: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.timeline, expected_outcomes: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.expected_outcomes || \u0027\u0027, investment_justification: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.investment_justification || \u0027\u0027, competitive_positioning: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.competitive_positioning || \u0027\u0027}).map(([k, v]) =\u003e ({ replaceAllText: { containsText: { text: \u0027{\u0027 + \u0027{\u0027 + k + \u0027}\u0027 + \u0027}\u0027, matchCase: true }, replaceText: String(v) } })) }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "typeVersion":  4.4,
+                      "name":  "Apply Slides Updates",
+                      "position":  [
+                                       -14496,
+                                       -464
+                                   ],
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "id":  "d1bc3add-a8b6-4dfe-9631-06bdb4b360bd",
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "={{ \u0027https://www.googleapis.com/drive/v3/files/\u0027 + $(\u0027ðŸ“„ Copy Slides Template\u0027).first().json.id + \u0027/export?mimeType=application/pdf\u0027 }}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "responseFormat":  "file"
+                                                                                       }
+                                                                      }
+                                                     }
+                                     },
+                      "name":  "ðŸ“¥ Export Proposal PDF",
+                      "typeVersion":  4.4,
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "id":  "882eff5a-23cd-47da-8897-81be3784b5e6",
+                      "position":  [
+                                       -14272,
+                                       -464
+                                   ],
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const item = $input.first();\nconst companyName = $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.companyName || \u0027Company\u0027;\nconst proposalId = $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.proposalId || \u0027PROP\u0027;\n\nreturn [{\n  json: { \n    fileName: `${companyName} - Proposal - ${proposalId}.pdf`,\n    type: \u0027proposal\u0027\n  },\n  binary: { \n    proposal: {\n      ...item.binary.data,\n      fileName: `${companyName} - Proposal - ${proposalId}.pdf`,\n      mimeType: \u0027application/pdf\u0027\n    }\n  }\n}];"
+                                     },
+                      "typeVersion":  2,
+                      "name":  "ðŸ·ï¸ Label Proposal PDF",
+                      "position":  [
+                                       -14048,
+                                       -464
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "id":  "07dd2f2d-7e1d-4cfc-acd2-b91e47b66cd3"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://www.googleapis.com/drive/v3/files/1xaA9RKpX38i_t_H28Sg36XXXpwxTvu8ZIHSIdFOlsb4/copy",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ name: $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.companyName + \u0027 - Invoice - \u0027 + $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.invoiceId }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "cbfe4f42-8dd1-41c9-9dd8-393f48c04675",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "position":  [
+                                       -14720,
+                                       -272
+                                   ],
+                      "name":  "ðŸ“Š Copy Invoice Template",
+                      "typeVersion":  4.4,
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "PUT",
+                                         "url":  "={{ \u0027https://sheets.googleapis.com/v4/spreadsheets/\u0027 + $(\u0027ðŸ“Š Copy Invoice Template\u0027).first().json.id + \u0027/values/Sheet1!B1:B16?valueInputOption=RAW\u0027 }}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ range: \u0027Sheet1!B1:B16\u0027, majorDimension: \u0027COLUMNS\u0027, values: [[ $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.invoiceId, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.dateCreated, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.dueDate, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.clientName, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.companyName, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.clientEmail, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.serviceType, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.timeline, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.budgetFormatted, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.gstFormatted, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.totalFormatted, \u0027Pending Payment\u0027, \u0027Bank Transfer / UPI / Stripe\u0027, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.proposalId, \u0027Thank you for choosing us!\u0027, \u0027upi://pay?pa=YOUR_UPI@bank\u0027 ]] }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "name":  "ðŸ“ Fill Invoice Data",
+                      "typeVersion":  4.4,
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "id":  "eaafce6f-7849-4630-9e49-2b6664b6070a",
+                      "position":  [
+                                       -14496,
+                                       -272
+                                   ],
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "={{ \u0027https://www.googleapis.com/drive/v3/files/\u0027 + $(\u0027ðŸ“Š Copy Invoice Template\u0027).first().json.id + \u0027/export?mimeType=application/pdf\u0027 }}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "responseFormat":  "file"
+                                                                                       }
+                                                                      }
+                                                     }
+                                     },
+                      "position":  [
+                                       -14272,
+                                       -272
+                                   ],
+                      "name":  "ðŸ“¥ Export Invoice PDF",
+                      "typeVersion":  4.4,
+                      "id":  "25b825cf-6e52-4b71-b522-4e58c37ae293",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const item = $input.first();\nconst companyName = $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.companyName || \u0027Company\u0027;\nconst invoiceId = $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.invoiceId || \u0027INV\u0027;\n\nreturn [{\n  json: { \n    fileName: `${companyName} - Invoice - ${invoiceId}.pdf`,\n    type: \u0027invoice\u0027\n  },\n  binary: { \n    invoice: {\n      ...item.binary.data,\n      fileName: `${companyName} - Invoice - ${invoiceId}.pdf`,\n      mimeType: \u0027application/pdf\u0027\n    }\n  }\n}];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "name":  "ðŸ·ï¸ Label Invoice PDF",
+                      "position":  [
+                                       -14048,
+                                       -272
+                                   ],
+                      "id":  "3c0df44f-2642-4495-a2a2-25bf3c6fcb49"
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "combine",
+                                         "combineBy":  "combineAll",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "name":  "â³ Wait For Both PDFs",
+                      "position":  [
+                                       -13824,
+                                       -368
+                                   ],
+                      "id":  "5a38e166-fada-4efc-85b8-f404ee1846ea",
+                      "type":  "n8n-nodes-base.merge",
+                      "typeVersion":  3.2
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Combine both PDFs with proper binary handling\nconst proposalNode = $(\"ðŸ·ï¸ Label Proposal PDF\").first();\nconst invoiceNode = $(\"ðŸ·ï¸ Label Invoice PDF\").first();\nconst formData = $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json;\n\nreturn [{\n  json: { \n    combined: true,\n    clientName: formData.clientName,\n    companyName: formData.companyName,\n    clientEmail: formData.clientEmail,\n    emailSubject: formData.emailSubject,\n    proposalId: formData.proposalId,\n    invoiceId: formData.invoiceId,\n    acceptUrl: formData.acceptUrl,\n    declineUrl: formData.declineUrl,\n    totalFormatted: formData.totalFormatted,\n    serviceType: formData.serviceType\n  },\n  binary: {\n    proposal: proposalNode.binary.proposal,\n    invoice: invoiceNode.binary.invoice\n  }\n}];"
+                                     },
+                      "typeVersion":  2,
+                      "type":  "n8n-nodes-base.code",
+                      "id":  "68604593-f891-43ba-8707-adb336562924",
+                      "position":  [
+                                       -13600,
+                                       -368
+                                   ],
+                      "name":  "ðŸ“Ž Combine Both PDFs"
+                  },
+                  {
+                      "parameters":  {
+                                         "sendTo":  "={{ $json.clientEmail }}",
+                                         "subject":  "={{ $json.emailSubject }}",
+                                         "message":  "=\u003cdiv style=\"font-family:\u0027Segoe UI\u0027,Arial,sans-serif;max-width:650px;margin:0 auto;background:#fff;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;\"\u003e\n  \u003cdiv style=\"background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px 30px;text-align:center;\"\u003e\n    \u003ch1 style=\"color:#fff;margin:0;font-size:24px;\"\u003e{{ $json.emailSubject }}\u003c/h1\u003e\n  \u003c/div\u003e\n  \u003cdiv style=\"padding:35px 30px;\"\u003e\n    \u003cp style=\"font-size:16px;color:#333;\"\u003eDear {{ $json.clientName }},\u003c/p\u003e\n    \u003cp style=\"font-size:15px;color:#555;line-height:1.8;\"\u003eThank you for your interest in our services. We are pleased to present your tailored proposal and invoice for review.\u003c/p\u003e\n    \u003cp style=\"font-size:15px;color:#555;line-height:1.8;\"\u003e\u003cstrong\u003eProposal ID:\u003c/strong\u003e {{ $json.proposalId }}\u003cbr\u003e\u003cstrong\u003eInvoice ID:\u003c/strong\u003e {{ $json.invoiceId }}\u003cbr\u003e\u003cstrong\u003eTotal Investment:\u003c/strong\u003e {{ $json.totalFormatted }}\u003c/p\u003e\n    \u003cp style=\"font-size:15px;color:#555;line-height:1.8;\"\u003ePlease find your personalized documents attached to this email.\u003c/p\u003e\n    \u003cdiv style=\"text-align:center;margin:30px 0;\"\u003e\n      \u003ca href=\"{{ $json.acceptUrl }}\" style=\"display:inline-block;padding:14px 32px;background:#22c55e;color:#fff;text-decoration:none;border-radius:8px;font-size:16px;font-weight:bold;margin:0 8px;\"\u003eâœ… Accept Proposal\u003c/a\u003e\n      \u003ca href=\"{{ $json.declineUrl }}\" style=\"display:inline-block;padding:14px 32px;background:#ef4444;color:#fff;text-decoration:none;border-radius:8px;font-size:16px;font-weight:bold;margin:0 8px;\"\u003eâŒ Decline\u003c/a\u003e\n    \u003c/div\u003e\n    \u003cp style=\"font-size:14px;color:#888;line-height:1.6;\"\u003eIf you have any questions or would like to discuss the proposal, please don\u0027t hesitate to reply to this email.\u003c/p\u003e\n    \u003chr style=\"border:none;border-top:1px solid #eee;margin:25px 0;\"\u003e\n    \u003cp style=\"font-size:13px;color:#999;text-align:center;\"\u003ePure Remedy Solutions\u003cbr\u003eCrafting Solutions, Delivering Excellence\u003c/p\u003e\n  \u003c/div\u003e\n\u003c/div\u003e",
+                                         "options":  {
+                                                         "attachmentsUi":  {
+                                                                               "attachmentsBinary":  [
+                                                                                                         {
+                                                                                                             "property":  "proposal"
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "property":  "invoice"
+                                                                                                         }
+                                                                                                     ]
+                                                                           }
+                                                     },
+                                         "operation":  "send"
+                                     },
+                      "id":  "2ff1b28e-ac5d-494a-9f95-a025ba222f23",
+                      "name":  "ðŸ“§ Send Proposal Email",
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       -13376,
+                                       -368
+                                   ],
+                      "webhookId":  "5ee3cc50-561c-4d9d-829c-c39ef87eff88",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Proposal - Gmail"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const d = $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json;\nconst msg = `ðŸš€ *Proposal Sent!*\n\nðŸ‘¤ *Client:* ${d.clientName}\nðŸ¢ *Company:* ${d.companyName}\nðŸ“§ *Email:* ${d.clientEmail}\nðŸ›  *Service:* ${d.serviceType}\nðŸ’° *Value:* ${d.totalFormatted}\nðŸ†” *Proposal ID:* ${d.proposalId}\nðŸ†” *Invoice ID:* ${d.invoiceId}`;\nreturn [{ json: { text: msg } }];"
+                                     },
+                      "position":  [
+                                       -13152,
+                                       -272
+                                   ],
+                      "name":  "ðŸ“± Format Telegram â€” Sent",
+                      "typeVersion":  2,
+                      "type":  "n8n-nodes-base.code",
+                      "id":  "dcf44c67-098c-421d-a656-845faaba17f3"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ chat_id: \u00277392899748\u0027, text: $json.text, parse_mode: \u0027Markdown\u0027 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "48f4665f-ea50-4e8e-aac4-ac74e4b078ed",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "position":  [
+                                       -12928,
+                                       -272
+                                   ],
+                      "name":  "ðŸ“¨ Telegram â€” Proposal Sent",
+                      "typeVersion":  4.4
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!A:Q:append?valueInputOption=USER_ENTERED\u0026insertDataOption=INSERT_ROWS",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ values: [[ $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.proposalId, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.invoiceId, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.dateCreated, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.clientName, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.companyName, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.clientEmail, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.serviceType, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.industry, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.budgetFormatted, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.totalFormatted, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.timeline, \u0027Proposal Sent\u0027, \u0027\u0027, \u0027\u0027, \u0027\u0027, \u0027\u0027, \u0027\u0027 ]] }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "aa971427-14c8-4b13-8985-f14cedfb509a",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "position":  [
+                                       -12704,
+                                       -272
+                                   ],
+                      "name":  "ðŸ“ Append CRM Row",
+                      "typeVersion":  4.4,
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/Dashboard!A:F:append?valueInputOption=USER_ENTERED\u0026insertDataOption=INSERT_ROWS",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ values: [[ $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.dateCreated, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.proposalId, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.clientName, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.companyName, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.totalFormatted, $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.serviceType ]] }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "ee921282-eef0-4e8d-b677-a409c8b1e718",
+                      "name":  "ðŸ“Š Dashboard Updater",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       -13152,
+                                       -464
+                                   ],
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "amount":  3,
+                                         "unit":  "days"
+                                     },
+                      "typeVersion":  1.1,
+                      "name":  "â³ Wait 3 Days",
+                      "position":  [
+                                       -12480,
+                                       -272
+                                   ],
+                      "type":  "n8n-nodes-base.wait",
+                      "webhookId":  "wait-3-days",
+                      "id":  "2ca91764-5073-4ab4-bc60-b3b463239f15"
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!A:Q",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "typeVersion":  4.4,
+                      "id":  "bef2e54a-f291-4ae6-a3e3-9c3308da67e8",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "position":  [
+                                       -12256,
+                                       -272
+                                   ],
+                      "name":  "ðŸ”Ž Find Row Day 3",
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Get the proposalId that was stored during this execution\nconst proposalId = $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.proposalId;\nconst sheetData = $input.first().json;\nconst rows = sheetData.values || [];\n\nlet found = null;\nlet rowIndex = -1;\n\n// Find the row matching our proposalId\nfor (let i = 1; i \u003c rows.length; i++) {\n  if (String(rows[i][0] || \u0027\u0027).trim() === String(proposalId || \u0027\u0027).trim()) {\n    found = rows[i];\n    rowIndex = i + 1; // 1-indexed sheet row (header = row 1)\n    break;\n  }\n}\n\n// Fallback to last row if not found\nif (!found \u0026\u0026 rows.length \u003e 1) {\n  found = rows[rows.length - 1] || [];\n  rowIndex = rows.length;\n}\n\nreturn [{\n  json: {\n    proposalId: (found \u0026\u0026 found[0]) || proposalId || \u0027\u0027,\n    invoiceId: (found \u0026\u0026 found[1]) || \u0027\u0027,\n    rowIndex,\n    clientName: (found \u0026\u0026 found[3]) || \u0027there\u0027,\n    companyName: (found \u0026\u0026 found[4]) || \u0027\u0027,\n    clientEmail: (found \u0026\u0026 found[5]) || \u0027\u0027,\n    serviceType: (found \u0026\u0026 found[6]) || \u0027\u0027,\n    industry: (found \u0026\u0026 found[7]) || \u0027\u0027,\n    budgetFormatted: (found \u0026\u0026 found[8]) || \u0027\u0027,\n    totalFormatted: (found \u0026\u0026 found[9]) || \u0027\u0027,\n    timeline: (found \u0026\u0026 found[10]) || \u0027\u0027,\n    Status: (found \u0026\u0026 found[11]) || \u0027Proposal Sent\u0027,\n  }\n}];"
+                                     },
+                      "id":  "71f0c45f-b273-4a53-a7ae-b38c81ecceeb",
+                      "name":  "ðŸ” Parse CRM Day 3",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -12032,
+                                       -272
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  false,
+                                                                            "typeValidation":  "loose"
+                                                                        },
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "cond1",
+                                                                                   "leftValue":  "={{ $json.Status }}",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "notContains"
+                                                                                                },
+                                                                                   "rightValue":  "Accepted"
+                                                                               },
+                                                                               {
+                                                                                   "id":  "cond1b",
+                                                                                   "leftValue":  "={{ $json.Status }}",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "notContains"
+                                                                                                },
+                                                                                   "rightValue":  "Declined"
+                                                                               }
+                                                                           ]
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "bc95cb71-d2ae-47dd-894c-bf87d18e36b6",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "name":  "â“ Follow Up Day 3?",
+                      "position":  [
+                                       -11808,
+                                       -272
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "sendTo":  "={{ $json.clientEmail }}",
+                                         "subject":  "={{ \u0027Just following up on your proposal â€” \u0027 + $json.companyName }}",
+                                         "message":  "=\u003cdiv style=\"font-family:\u0027Segoe UI\u0027,Arial,sans-serif;max-width:650px;margin:0 auto;padding:30px;background:#fff;border:1px solid #e0e0e0;border-radius:12px;\"\u003e\n  \u003ch2 style=\"color:#667eea;\"\u003eFollowing up on your proposal\u003c/h2\u003e\n  \u003cp\u003eHi {{ $json.clientName }},\u003c/p\u003e\n  \u003cp\u003eI wanted to follow up on the proposal we sent for \u003cstrong\u003e{{ $json.companyName }}\u003c/strong\u003e. Have you had a chance to review it?\u003c/p\u003e\n  \u003cp\u003eIf you have any questions or would like to discuss anything, please reply to this email â€” I\u0027d love to help.\u003c/p\u003e\n  \u003cdiv style=\"margin:25px 0;text-align:center;\"\u003e\n    \u003ca href=\"https://n8n.pureremedysolutions.com/webhook/proposal-accept?proposalId={{ $json.proposalId }}\" style=\"display:inline-block;padding:12px 28px;background:#22c55e;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:0 6px;\"\u003eâœ… Accept Proposal\u003c/a\u003e\n    \u003ca href=\"https://n8n.pureremedysolutions.com/webhook/proposal-decline?proposalId={{ $json.proposalId }}\" style=\"display:inline-block;padding:12px 28px;background:#ef4444;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:0 6px;\"\u003eâŒ Decline\u003c/a\u003e\n  \u003c/div\u003e\n  \u003cp style=\"color:#888;font-size:13px;\"\u003ePure Remedy Solutions\u003c/p\u003e\n\u003c/div\u003e",
+                                         "options":  {
+
+                                                     },
+                                         "operation":  "send"
+                                     },
+                      "name":  "ðŸ“§ Send Follow-Up #1",
+                      "position":  [
+                                       -11584,
+                                       -368
+                                   ],
+                      "webhookId":  "50354b60-8340-4cc5-91fd-2bdb79f41fd6",
+                      "id":  "b09e20a8-23a5-4ed9-964c-b4204cb69417",
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.2,
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Proposal - Gmail"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const d = $(\u0027ðŸ” Parse CRM Day 3\u0027).first().json;\nconst msg = `ðŸ“¬ *Follow-Up #1 Sent*\n\nðŸ‘¤ *Client:* ${d.clientName}\nðŸ¢ *Company:* ${d.companyName}\nðŸ†” *Proposal:* ${d.proposalId}`;\nreturn [{ json: { text: msg } }];"
+                                     },
+                      "id":  "e0ea41a5-2f2a-4e36-9209-8d24183d98f3",
+                      "typeVersion":  2,
+                      "name":  "ðŸ“± Format Telegram â€” FU1",
+                      "position":  [
+                                       -11360,
+                                       -368
+                                   ],
+                      "type":  "n8n-nodes-base.code"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ chat_id: \u00277392899748\u0027, text: $json.text, parse_mode: \u0027Markdown\u0027 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "position":  [
+                                       -11136,
+                                       -368
+                                   ],
+                      "name":  "ðŸ“¨ Telegram â€” FU1 Sent",
+                      "typeVersion":  4.4,
+                      "id":  "97a84401-e0db-4347-ab83-1137878ba970",
+                      "type":  "n8n-nodes-base.httpRequest"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "PUT",
+                                         "url":  "={{ \u0027https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!L\u0027 + $(\u0027ðŸ” Parse CRM Day 3\u0027).first().json.rowIndex + \u0027:M\u0027 + $(\u0027ðŸ” Parse CRM Day 3\u0027).first().json.rowIndex + \u0027?valueInputOption=USER_ENTERED\u0027 }}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ values: [[\u0027Follow-Up Sent\u0027, \u0027Day 3\u0027]] }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "name":  "ðŸ“ Update CRM Day 3",
+                      "position":  [
+                                       -10912,
+                                       -368
+                                   ],
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "id":  "4fbbf86c-7868-4751-a100-1b9731795e57",
+                      "typeVersion":  4.4,
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "amount":  4,
+                                         "unit":  "days"
+                                     },
+                      "name":  "â³ Wait 4 More Days",
+                      "position":  [
+                                       -10688,
+                                       -368
+                                   ],
+                      "webhookId":  "wait-7-days",
+                      "id":  "d9526d46-f62e-4d16-8075-40f321e09fd8",
+                      "type":  "n8n-nodes-base.wait",
+                      "typeVersion":  1.1
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!A:Q",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "position":  [
+                                       -10464,
+                                       -368
+                                   ],
+                      "name":  "ðŸ”Ž Find Row Day 7",
+                      "typeVersion":  4.4,
+                      "id":  "d6bc3ddb-de9c-4f09-92d3-7cb08a08d7c5",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Get the proposalId that was stored during this execution\nconst proposalId = $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.proposalId;\nconst sheetData = $input.first().json;\nconst rows = sheetData.values || [];\n\nlet found = null;\nlet rowIndex = -1;\n\nfor (let i = 1; i \u003c rows.length; i++) {\n  if (String(rows[i][0] || \u0027\u0027).trim() === String(proposalId || \u0027\u0027).trim()) {\n    found = rows[i];\n    rowIndex = i + 1;\n    break;\n  }\n}\n\nif (!found \u0026\u0026 rows.length \u003e 1) {\n  found = rows[rows.length - 1] || [];\n  rowIndex = rows.length;\n}\n\nreturn [{\n  json: {\n    proposalId: (found \u0026\u0026 found[0]) || proposalId || \u0027\u0027,\n    invoiceId: (found \u0026\u0026 found[1]) || \u0027\u0027,\n    rowIndex,\n    clientName: (found \u0026\u0026 found[3]) || \u0027there\u0027,\n    companyName: (found \u0026\u0026 found[4]) || \u0027\u0027,\n    clientEmail: (found \u0026\u0026 found[5]) || \u0027\u0027,\n    serviceType: (found \u0026\u0026 found[6]) || \u0027\u0027,\n    totalFormatted: (found \u0026\u0026 found[9]) || \u0027\u0027,\n    Status: (found \u0026\u0026 found[11]) || \u0027Proposal Sent\u0027,\n  }\n}];"
+                                     },
+                      "id":  "727f0c32-ee63-4680-a803-0ba78e21fdcc",
+                      "name":  "ðŸ” Parse CRM Day 7",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -10240,
+                                       -368
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  false,
+                                                                            "typeValidation":  "loose"
+                                                                        },
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "cond2",
+                                                                                   "leftValue":  "={{ $json.Status }}",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "notContains"
+                                                                                                },
+                                                                                   "rightValue":  "Accepted"
+                                                                               },
+                                                                               {
+                                                                                   "id":  "cond2b",
+                                                                                   "leftValue":  "={{ $json.Status }}",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "notContains"
+                                                                                                },
+                                                                                   "rightValue":  "Declined"
+                                                                               }
+                                                                           ]
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "name":  "â“ Follow Up Day 7?",
+                      "typeVersion":  2.3,
+                      "id":  "d192edee-c961-4678-bd01-c9f76b4bd9e5",
+                      "type":  "n8n-nodes-base.if",
+                      "position":  [
+                                       -10016,
+                                       -368
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "sendTo":  "={{ $json.clientEmail }}",
+                                         "subject":  "={{ \u0027Checking in again: \u0027 + $json.companyName }}",
+                                         "message":  "=\u003cdiv style=\"font-family:\u0027Segoe UI\u0027,Arial,sans-serif;max-width:650px;margin:0 auto;padding:30px;background:#fff;border:1px solid #e0e0e0;border-radius:12px;\"\u003e\n  \u003ch2 style=\"color:#764ba2;\"\u003eChecking in â€” {{ $json.companyName }}\u003c/h2\u003e\n  \u003cp\u003eHi {{ $json.clientName }},\u003c/p\u003e\n  \u003cp\u003eThis is our second follow-up regarding the proposal for \u003cstrong\u003e{{ $json.companyName }}\u003c/strong\u003e. We want to make sure you have everything you need to make a decision.\u003c/p\u003e\n  \u003cp\u003ePlease let us know if you\u0027d like to adjust the scope, pricing, or timeline â€” we are flexible and happy to work with you.\u003c/p\u003e\n  \u003cdiv style=\"margin:25px 0;text-align:center;\"\u003e\n    \u003ca href=\"https://n8n.pureremedysolutions.com/webhook/proposal-accept?proposalId={{ $json.proposalId }}\" style=\"display:inline-block;padding:12px 28px;background:#22c55e;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:0 6px;\"\u003eâœ… Accept Proposal\u003c/a\u003e\n    \u003ca href=\"https://n8n.pureremedysolutions.com/webhook/proposal-decline?proposalId={{ $json.proposalId }}\" style=\"display:inline-block;padding:12px 28px;background:#ef4444;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:0 6px;\"\u003eâŒ Decline\u003c/a\u003e\n  \u003c/div\u003e\n  \u003cp style=\"color:#888;font-size:13px;\"\u003ePure Remedy Solutions\u003c/p\u003e\n\u003c/div\u003e",
+                                         "options":  {
+
+                                                     },
+                                         "operation":  "send"
+                                     },
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.2,
+                      "name":  "ðŸ“§ Send Follow-Up #2",
+                      "position":  [
+                                       -9792,
+                                       -464
+                                   ],
+                      "webhookId":  "914f62d8-4e4f-4f9e-9bdb-293d13f73d36",
+                      "id":  "8e382448-f0cb-41ef-b85c-508e309ecd18",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Proposal - Gmail"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const d = $(\u0027ðŸ” Parse CRM Day 7\u0027).first().json;\nconst msg = `ðŸ“¬ *Follow-Up #2 Sent*\n\nðŸ‘¤ *Client:* ${d.clientName}\nðŸ¢ *Company:* ${d.companyName}\nðŸ†” *Proposal:* ${d.proposalId}`;\nreturn [{ json: { text: msg } }];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "name":  "ðŸ“± Format Telegram â€” FU2",
+                      "position":  [
+                                       -9568,
+                                       -464
+                                   ],
+                      "id":  "e933ff94-3ec1-4a24-b28c-a10c890fb824"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ chat_id: \u00277392899748\u0027, text: $json.text, parse_mode: \u0027Markdown\u0027 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "name":  "ðŸ“¨ Telegram â€” FU2 Sent",
+                      "position":  [
+                                       -9344,
+                                       -464
+                                   ],
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "id":  "49989716-03f4-4255-9edc-f2f6b85b49e0",
+                      "typeVersion":  4.4
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "PUT",
+                                         "url":  "={{ \u0027https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!L\u0027 + $(\u0027ðŸ” Parse CRM Day 7\u0027).first().json.rowIndex + \u0027:M\u0027 + $(\u0027ðŸ” Parse CRM Day 7\u0027).first().json.rowIndex + \u0027?valueInputOption=USER_ENTERED\u0027 }}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ values: [[\u0027Follow-Up Sent\u0027, \u0027Day 7\u0027]] }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "typeVersion":  4.4,
+                      "id":  "51ede530-5fe5-4036-9e1a-9763ed024664",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "position":  [
+                                       -9120,
+                                       -464
+                                   ],
+                      "name":  "ðŸ“ Update CRM Day 7",
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "amount":  7,
+                                         "unit":  "days"
+                                     },
+                      "webhookId":  "wait-14-days",
+                      "typeVersion":  1.1,
+                      "name":  "â³ Wait 7 More Days",
+                      "position":  [
+                                       -8896,
+                                       -464
+                                   ],
+                      "type":  "n8n-nodes-base.wait",
+                      "id":  "dfcdb488-4211-470c-ac54-8dd4e4b528f6"
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!A:Q",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "typeVersion":  4.4,
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "id":  "1f41a2c9-8262-466e-97d4-b1cae1cae4f9",
+                      "position":  [
+                                       -8672,
+                                       -464
+                                   ],
+                      "name":  "ðŸ”Ž Find Row Day 14",
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Get the proposalId that was stored during this execution\nconst proposalId = $(\u0027ðŸ”€ Merge AI + Form Data\u0027).first().json.proposalId;\nconst sheetData = $input.first().json;\nconst rows = sheetData.values || [];\n\nlet found = null;\nlet rowIndex = -1;\n\nfor (let i = 1; i \u003c rows.length; i++) {\n  if (String(rows[i][0] || \u0027\u0027).trim() === String(proposalId || \u0027\u0027).trim()) {\n    found = rows[i];\n    rowIndex = i + 1;\n    break;\n  }\n}\n\nif (!found \u0026\u0026 rows.length \u003e 1) {\n  found = rows[rows.length - 1] || [];\n  rowIndex = rows.length;\n}\n\nreturn [{\n  json: {\n    proposalId: (found \u0026\u0026 found[0]) || proposalId || \u0027\u0027,\n    invoiceId: (found \u0026\u0026 found[1]) || \u0027\u0027,\n    rowIndex,\n    clientName: (found \u0026\u0026 found[3]) || \u0027there\u0027,\n    companyName: (found \u0026\u0026 found[4]) || \u0027\u0027,\n    clientEmail: (found \u0026\u0026 found[5]) || \u0027\u0027,\n    serviceType: (found \u0026\u0026 found[6]) || \u0027\u0027,\n    totalFormatted: (found \u0026\u0026 found[9]) || \u0027\u0027,\n    Status: (found \u0026\u0026 found[11]) || \u0027Proposal Sent\u0027,\n  }\n}];"
+                                     },
+                      "id":  "72f1de18-d9f8-494c-85fb-38a2124a6ca2",
+                      "name":  "ðŸ” Parse CRM Day 14",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -8448,
+                                       -464
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  false,
+                                                                            "typeValidation":  "loose"
+                                                                        },
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "cond3",
+                                                                                   "leftValue":  "={{ $json.Status }}",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "notContains"
+                                                                                                },
+                                                                                   "rightValue":  "Accepted"
+                                                                               },
+                                                                               {
+                                                                                   "id":  "cond3b",
+                                                                                   "leftValue":  "={{ $json.Status }}",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "notContains"
+                                                                                                },
+                                                                                   "rightValue":  "Declined"
+                                                                               }
+                                                                           ]
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "9670512e-327e-4d6b-aa68-ddd2bc6ce7aa",
+                      "position":  [
+                                       -8224,
+                                       -464
+                                   ],
+                      "name":  "â“ Follow Up Day 14?",
+                      "typeVersion":  2.3,
+                      "type":  "n8n-nodes-base.if"
+                  },
+                  {
+                      "parameters":  {
+                                         "sendTo":  "={{ $json.clientEmail }}",
+                                         "subject":  "={{ \u0027Closing out your proposal file â€” \u0027 + $json.companyName }}",
+                                         "message":  "=\u003cdiv style=\"font-family:\u0027Segoe UI\u0027,Arial,sans-serif;max-width:650px;margin:0 auto;padding:30px;background:#fff;border:1px solid #e0e0e0;border-radius:12px;\"\u003e\n  \u003ch2 style=\"color:#ef4444;\"\u003eClosing your proposal file â€” {{ $json.companyName }}\u003c/h2\u003e\n  \u003cp\u003eHi {{ $json.clientName }},\u003c/p\u003e\n  \u003cp\u003eWe have not heard back regarding the proposal for \u003cstrong\u003e{{ $json.companyName }}\u003c/strong\u003e, so we are closing this file for now.\u003c/p\u003e\n  \u003cp\u003eIf you\u0027d like to revisit this in future, please reach out anytime â€” we would be happy to reconnect and put together a fresh proposal.\u003c/p\u003e\n  \u003cp style=\"color:#888;font-size:13px;\"\u003ePure Remedy Solutions\u003c/p\u003e\n\u003c/div\u003e",
+                                         "options":  {
+
+                                                     },
+                                         "operation":  "send"
+                                     },
+                      "typeVersion":  2.2,
+                      "name":  "ðŸ“§ Send Final Email",
+                      "position":  [
+                                       -8000,
+                                       -560
+                                   ],
+                      "id":  "8abc7393-eaad-4d94-85ea-26dc496461af",
+                      "webhookId":  "60753e1e-b15c-43f8-b23a-4f2ba33ecd5d",
+                      "type":  "n8n-nodes-base.gmail",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Proposal - Gmail"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const d = $(\u0027ðŸ” Parse CRM Day 14\u0027).first().json;\nconst msg = `ðŸ“• *Proposal Closed*\n\nðŸ‘¤ *Client:* ${d.clientName}\nðŸ¢ *Company:* ${d.companyName}\nðŸ†” *Proposal:* ${d.proposalId}\nðŸ“ *Reason:* No Response after 14 days`;\nreturn [{ json: { text: msg } }];"
+                                     },
+                      "name":  "ðŸ“± Format Telegram â€” Closed",
+                      "typeVersion":  2,
+                      "type":  "n8n-nodes-base.code",
+                      "id":  "bc802a7b-f848-4811-b4f4-0629736b6514",
+                      "position":  [
+                                       -7776,
+                                       -560
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ chat_id: \u00277392899748\u0027, text: $json.text, parse_mode: \u0027Markdown\u0027 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "id":  "8c8f355f-732a-4f65-ae75-66650c4c33c2",
+                      "typeVersion":  4.4,
+                      "name":  "ðŸ“¨ Telegram â€” Closed",
+                      "position":  [
+                                       -7552,
+                                       -560
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "PUT",
+                                         "url":  "={{ \u0027https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!L\u0027 + $(\u0027ðŸ” Parse CRM Day 14\u0027).first().json.rowIndex + \u0027:M\u0027 + $(\u0027ðŸ” Parse CRM Day 14\u0027).first().json.rowIndex + \u0027?valueInputOption=USER_ENTERED\u0027 }}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ values: [[\u0027Closed - No Response\u0027, \u0027Day 14\u0027]] }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "274304b8-0c0d-4307-82b9-d2815eeebf70",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "position":  [
+                                       -7328,
+                                       -560
+                                   ],
+                      "name":  "ðŸ“ Update CRM Closed",
+                      "typeVersion":  4.4,
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "path":  "proposal-accept",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "position":  [
+                                       -15840,
+                                       -48
+                                   ],
+                      "name":  "âœ… Webhook Accept",
+                      "typeVersion":  2.1,
+                      "id":  "f2faf3c8-4203-416c-b2bf-812912384b2f",
+                      "webhookId":  "61c69b47-6044-41ac-8cb2-01aec61e2107",
+                      "type":  "n8n-nodes-base.webhook",
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "text",
+                                         "responseBody":  "=\u003chtml\u003e\u003chead\u003e\u003cstyle\u003ebody{font-family:\u0027Segoe UI\u0027,Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);}.container{background:#fff;padding:50px;border-radius:16px;text-align:center;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}.checkmark{width:80px;height:80px;background:#22c55e;border-radius:50%;display:flex;justify-content:center;align-items:center;margin:0 auto 25px;}.checkmark svg{width:40px;height:40px;fill:#fff;}h1{color:#333;margin-bottom:15px;}p{color:#666;font-size:16px;line-height:1.6;}\u003c/style\u003e\u003c/head\u003e\u003cbody\u003e\u003cdiv class=\"container\"\u003e\u003cdiv class=\"checkmark\"\u003e\u003csvg viewBox=\"0 0 24 24\"\u003e\u003cpath d=\"M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z\"/\u003e\u003c/svg\u003e\u003c/div\u003e\u003ch1\u003eProposal Accepted!\u003c/h1\u003e\u003cp\u003eThank you for accepting our proposal. We\u0027re excited to work with you!\u003c/p\u003e\u003cp\u003eOur team will be in touch shortly to get started.\u003c/p\u003e\u003c/div\u003e\u003c/body\u003e\u003c/html\u003e",
+                                         "options":  {
+                                                         "responseHeaders":  {
+                                                                                 "entries":  [
+                                                                                                 {
+                                                                                                     "name":  "Content-Type",
+                                                                                                     "value":  "text/html"
+                                                                                                 }
+                                                                                             ]
+                                                                             }
+                                                     }
+                                     },
+                      "name":  "ðŸ’¬ Respond Accept",
+                      "position":  [
+                                       -15616,
+                                       -48
+                                   ],
+                      "id":  "c0f18ff9-b707-41b8-9662-748a1a09da58",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!A:Q",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "049c1c62-291c-4d33-b88d-367f255f0604",
+                      "typeVersion":  4.4,
+                      "name":  "ðŸ” Read CRM Accept",
+                      "position":  [
+                                       -15392,
+                                       -48
+                                   ],
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const proposalId = $(\u0027âœ… Webhook Accept\u0027).first().json.query?.proposalId || \u0027\u0027;\nconst sheetData = $(\u0027ðŸ” Read CRM Accept\u0027).first().json;\nconst rows = sheetData.values || [];\n\nlet found = null;\nlet rowIndex = -1;\n\nfor (let i = 1; i \u003c rows.length; i++) {\n  if (String(rows[i][0] || \u0027\u0027).trim() === proposalId.trim()) {\n    found = rows[i];\n    rowIndex = i + 1;\n    break;\n  }\n}\n\nif (!found \u0026\u0026 rows.length \u003e 1) {\n  found = rows[rows.length - 1];\n  rowIndex = rows.length;\n}\n\nconst clientName = found ? (found[3] || \u0027Valued Client\u0027) : \u0027Valued Client\u0027;\nconst companyName = found ? (found[4] || \u0027Your Company\u0027) : \u0027Your Company\u0027;\nconst clientEmail = found ? (found[5] || \u0027\u0027) : \u0027\u0027;\nconst serviceType = found ? (found[6] || \u0027Consulting\u0027) : \u0027Consulting\u0027;\nconst totalFormatted = found ? (found[9] || \u0027\u0027) : \u0027\u0027;\n\nreturn [{ \n  json: { \n    proposalId, \n    rowIndex, \n    clientName, \n    companyName, \n    clientEmail, \n    serviceType, \n    totalFormatted, \n    status: \u0027Proposal Accepted\u0027 \n  } \n}];"
+                                     },
+                      "position":  [
+                                       -15168,
+                                       -48
+                                   ],
+                      "name":  "âš™ï¸ Process Accept",
+                      "typeVersion":  2,
+                      "type":  "n8n-nodes-base.code",
+                      "id":  "879acb49-004a-4840-9342-a59bc9d6eab5"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "PUT",
+                                         "url":  "={{ \u0027https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!L\u0027 + $json.rowIndex + \u0027:M\u0027 + $json.rowIndex + \u0027?valueInputOption=USER_ENTERED\u0027 }}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ values: [[\u0027Proposal Accepted\u0027, new Date().toLocaleDateString(\u0027en-IN\u0027)]] }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "id":  "3dfa2087-ec53-4a90-80d9-6196cc4cfc8b",
+                      "typeVersion":  4.4,
+                      "name":  "ðŸ“ Update CRM Accepted",
+                      "position":  [
+                                       -14944,
+                                       -48
+                                   ],
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "sendTo":  "={{ $(\u0027âš™ï¸ Process Accept\u0027).first().json.clientEmail }}",
+                                         "subject":  "=Welcome aboard â€” {{ $(\u0027âš™ï¸ Process Accept\u0027).first().json.companyName }}!",
+                                         "message":  "=\u003cdiv style=\"font-family:\u0027Segoe UI\u0027,Arial,sans-serif;max-width:650px;margin:0 auto;background:#fff;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;\"\u003e\n  \u003cdiv style=\"background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);padding:40px 30px;text-align:center;\"\u003e\n    \u003ch1 style=\"color:#fff;margin:0;font-size:24px;\"\u003eðŸŽ‰ Welcome Aboard!\u003c/h1\u003e\n  \u003c/div\u003e\n  \u003cdiv style=\"padding:35px 30px;\"\u003e\n    \u003cp style=\"font-size:16px;color:#333;\"\u003eDear {{ $(\u0027âš™ï¸ Process Accept\u0027).first().json.clientName }},\u003c/p\u003e\n    \u003cp style=\"font-size:15px;color:#555;line-height:1.8;\"\u003eThank you for accepting our proposal! We\u0027re thrilled to partner with \u003cstrong\u003e{{ $(\u0027âš™ï¸ Process Accept\u0027).first().json.companyName }}\u003c/strong\u003e.\u003c/p\u003e\n    \u003cp style=\"font-size:15px;color:#555;line-height:1.8;\"\u003e\u003cstrong\u003eWhat happens next?\u003c/strong\u003e\u003c/p\u003e\n    \u003cul style=\"font-size:15px;color:#555;line-height:2;\"\u003e\n      \u003cli\u003eOur team will review your project requirements\u003c/li\u003e\n      \u003cli\u003eYou\u0027ll receive a kickoff call invitation within 24-48 hours\u003c/li\u003e\n      \u003cli\u003eWe\u0027ll set up your dedicated project workspace\u003c/li\u003e\n    \u003c/ul\u003e\n    \u003cp style=\"font-size:15px;color:#555;line-height:1.8;\"\u003eIf you have any immediate questions, feel free to reply to this email.\u003c/p\u003e\n    \u003chr style=\"border:none;border-top:1px solid #eee;margin:25px 0;\"\u003e\n    \u003cp style=\"font-size:13px;color:#999;text-align:center;\"\u003ePure Remedy Solutions\u003cbr\u003eCrafting Solutions, Delivering Excellence\u003c/p\u003e\n  \u003c/div\u003e\n\u003c/div\u003e",
+                                         "options":  {
+
+                                                     },
+                                         "operation":  "send"
+                                     },
+                      "typeVersion":  2.2,
+                      "name":  "ðŸ“§ Send Welcome Email",
+                      "position":  [
+                                       -14720,
+                                       -48
+                                   ],
+                      "webhookId":  "ff53c7d0-832c-4868-b2a6-b6e1a250264a",
+                      "id":  "67cec263-99ad-4f67-b20a-4fdf4c556a2a",
+                      "type":  "n8n-nodes-base.gmail",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Proposal - Gmail"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const d = $(\u0027âš™ï¸ Process Accept\u0027).first().json;\nconst msg = `ðŸŽ‰ *Proposal ACCEPTED!*\n\nðŸ‘¤ *Client:* ${d.clientName}\nðŸ¢ *Company:* ${d.companyName}\nðŸ“§ *Email:* ${d.clientEmail}\nðŸ›  *Service:* ${d.serviceType}\nðŸ’° *Value:* ${d.totalFormatted}\nðŸ†” *Proposal ID:* ${d.proposalId}`;\nreturn [{ json: { text: msg } }];"
+                                     },
+                      "id":  "c0201402-5da3-4e41-8c29-352b2cbf72a7",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "name":  "ðŸ“± Format Telegram â€” Accepted",
+                      "position":  [
+                                       -14496,
+                                       -48
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ chat_id: \u00277392899748\u0027, text: $json.text, parse_mode: \u0027Markdown\u0027 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "name":  "ðŸ“¨ Telegram â€” Accepted",
+                      "position":  [
+                                       -14272,
+                                       -48
+                                   ],
+                      "id":  "9287ac65-c897-4f9e-aa9f-8cefbdf9f618",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4
+                  },
+                  {
+                      "parameters":  {
+                                         "path":  "proposal-decline",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "typeVersion":  2.1,
+                      "type":  "n8n-nodes-base.webhook",
+                      "id":  "5bc5b9c3-cb79-465f-87ee-d2fcb0958a93",
+                      "webhookId":  "8073eef2-2820-48ff-8455-086165643e5a",
+                      "position":  [
+                                       -15840,
+                                       192
+                                   ],
+                      "name":  "âŒ Webhook Decline",
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "text",
+                                         "responseBody":  "=\u003chtml\u003e\u003chead\u003e\u003cstyle\u003ebody{font-family:\u0027Segoe UI\u0027,Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:linear-gradient(135deg,#6b7280 0%,#4b5563 100%);}.container{background:#fff;padding:50px;border-radius:16px;text-align:center;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}h1{color:#333;margin-bottom:15px;}p{color:#666;font-size:16px;line-height:1.6;}\u003c/style\u003e\u003c/head\u003e\u003cbody\u003e\u003cdiv class=\"container\"\u003e\u003ch1\u003eProposal Declined\u003c/h1\u003e\u003cp\u003eWe understand that this proposal wasn\u0027t the right fit at this time.\u003c/p\u003e\u003cp\u003eIf your needs change in the future, please don\u0027t hesitate to reach out. We\u0027d be happy to work with you.\u003c/p\u003e\u003cp style=\"margin-top:25px;color:#888;font-size:14px;\"\u003eThank you for considering us.\u003c/p\u003e\u003c/div\u003e\u003c/body\u003e\u003c/html\u003e",
+                                         "options":  {
+                                                         "responseHeaders":  {
+                                                                                 "entries":  [
+                                                                                                 {
+                                                                                                     "name":  "Content-Type",
+                                                                                                     "value":  "text/html"
+                                                                                                 }
+                                                                                             ]
+                                                                             }
+                                                     }
+                                     },
+                      "name":  "ðŸ’¬ Respond Decline",
+                      "typeVersion":  1.5,
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "id":  "4c37c51e-e155-410a-94af-5282a7dbd1d7",
+                      "position":  [
+                                       -15616,
+                                       192
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!A:Q",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "typeVersion":  4.4,
+                      "name":  "ðŸ” Read CRM Decline",
+                      "position":  [
+                                       -15392,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "id":  "081edb8c-ea53-455d-b4ad-ddf3caabec16",
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const proposalId = $(\u0027âŒ Webhook Decline\u0027).first().json.query?.proposalId || \u0027\u0027;\nconst sheetData = $(\u0027ðŸ” Read CRM Decline\u0027).first().json;\nconst rows = sheetData.values || [];\n\nlet found = null;\nlet rowIndex = -1;\n\nfor (let i = 1; i \u003c rows.length; i++) {\n  if (String(rows[i][0] || \u0027\u0027).trim() === proposalId.trim()) {\n    found = rows[i];\n    rowIndex = i + 1;\n    break;\n  }\n}\n\nif (!found \u0026\u0026 rows.length \u003e 1) {\n  found = rows[rows.length - 1];\n  rowIndex = rows.length;\n}\n\nconst clientName = found ? (found[3] || \u0027Valued Client\u0027) : \u0027Valued Client\u0027;\nconst companyName = found ? (found[4] || \u0027Your Company\u0027) : \u0027Your Company\u0027;\nconst clientEmail = found ? (found[5] || \u0027\u0027) : \u0027\u0027;\nconst serviceType = found ? (found[6] || \u0027\u0027) : \u0027\u0027;\nconst totalFormatted = found ? (found[9] || \u0027\u0027) : \u0027\u0027;\n\nreturn [{ \n  json: { \n    proposalId, \n    rowIndex, \n    clientName, \n    companyName, \n    clientEmail,\n    serviceType,\n    totalFormatted,\n    status: \u0027Proposal Declined\u0027 \n  } \n}];"
+                                     },
+                      "typeVersion":  2,
+                      "name":  "âš™ï¸ Process Decline",
+                      "position":  [
+                                       -15168,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "id":  "a80ff275-a12c-4d78-9925-f6b8aa202f24"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "PUT",
+                                         "url":  "={{ \u0027https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!L\u0027 + $json.rowIndex + \u0027:M\u0027 + $json.rowIndex + \u0027?valueInputOption=USER_ENTERED\u0027 }}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "googleOAuth2Api",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ values: [[\u0027Proposal Declined\u0027, new Date().toLocaleDateString(\u0027en-IN\u0027)]] }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "id":  "220732a2-18ac-4f9e-ba83-27ef4ae72fae",
+                      "typeVersion":  4.4,
+                      "name":  "ðŸ“ Update CRM Declined",
+                      "position":  [
+                                       -14944,
+                                       192
+                                   ],
+                      "credentials":  {
+                                          "googleOAuth2Api":  {
+                                                                  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                  "name":  "AI Proposal - Generic OAuth"
+                                                              }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const d = $(\u0027âš™ï¸ Process Decline\u0027).first().json;\nconst msg = `âŒ *Proposal Declined*\n\nðŸ‘¤ *Client:* ${d.clientName}\nðŸ¢ *Company:* ${d.companyName}\nðŸ›  *Service:* ${d.serviceType}\nðŸ’° *Value:* ${d.totalFormatted}\nðŸ†” *Proposal ID:* ${d.proposalId}`;\nreturn [{ json: { text: msg } }];"
+                                     },
+                      "name":  "ðŸ“± Format Telegram â€” Declined",
+                      "position":  [
+                                       -14720,
+                                       192
+                                   ],
+                      "id":  "1188493b-cac9-4346-8f52-fe36df1b6645",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ chat_id: \u00277392899748\u0027, text: $json.text, parse_mode: \u0027Markdown\u0027 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "position":  [
+                                       -14496,
+                                       192
+                                   ],
+                      "name":  "ðŸ“¨ Telegram â€” Declined",
+                      "typeVersion":  4.4,
+                      "id":  "3276db66-4203-419d-97b3-a272feba36b2"
+                  }
+              ],
+    "connections":  {
+                        "ðŸ“‹ Client Intake Form":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "âœ… Form Submitted Response",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "âœ… Form Submitted Response":  {
+                                                            "main":  [
+                                                                         [
+                                                                             {
+                                                                                 "node":  "ðŸ”§ Parse \u0026 Prepare",
+                                                                                 "type":  "main",
+                                                                                 "index":  0
+                                                                             }
+                                                                         ]
+                                                                     ]
+                                                        },
+                        "ðŸ”§ Parse \u0026 Prepare":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "ðŸ¤– Generate Proposal Content",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "ðŸ¤– Generate Proposal Content":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "ðŸ”€ Merge AI + Form Data",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           },
+                        "ðŸ”€ Merge AI + Form Data":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "ðŸ“„ Copy Slides Template",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           },
+                                                                           {
+                                                                               "node":  "ðŸ“Š Copy Invoice Template",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "ðŸ“„ Copy Slides Template":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "Apply Slides Updates",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "Apply Slides Updates":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "ðŸ“¥ Export Proposal PDF",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "ðŸ“¥ Export Proposal PDF":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "ðŸ·ï¸ Label Proposal PDF",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "ðŸ·ï¸ Label Proposal PDF":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "â³ Wait For Both PDFs",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "ðŸ“Š Copy Invoice Template":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "ðŸ“ Fill Invoice Data",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "ðŸ“ Fill Invoice Data":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "ðŸ“¥ Export Invoice PDF",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "ðŸ“¥ Export Invoice PDF":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "ðŸ·ï¸ Label Invoice PDF",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "ðŸ·ï¸ Label Invoice PDF":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "â³ Wait For Both PDFs",
+                                                                               "type":  "main",
+                                                                               "index":  1
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "â³ Wait For Both PDFs":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "ðŸ“Ž Combine Both PDFs",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "ðŸ“Ž Combine Both PDFs":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "ðŸ“§ Send Proposal Email",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "ðŸ“§ Send Proposal Email":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "ðŸ“± Format Telegram â€” Sent",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          },
+                                                                          {
+                                                                              "node":  "ðŸ“Š Dashboard Updater",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "ðŸ“± Format Telegram â€” Sent":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "ðŸ“¨ Telegram â€” Proposal Sent",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                        "ðŸ“¨ Telegram â€” Proposal Sent":  {
+                                                                "main":  [
+                                                                             [
+                                                                                 {
+                                                                                     "node":  "ðŸ“ Append CRM Row",
+                                                                                     "type":  "main",
+                                                                                     "index":  0
+                                                                                 }
+                                                                             ]
+                                                                         ]
+                                                            },
+                        "ðŸ“ Append CRM Row":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "â³ Wait 3 Days",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "â³ Wait 3 Days":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "ðŸ”Ž Find Row Day 3",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "ðŸ”Ž Find Row Day 3":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "ðŸ” Parse CRM Day 3",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "ðŸ” Parse CRM Day 3":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "â“ Follow Up Day 3?",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "â“ Follow Up Day 3?":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "ðŸ“§ Send Follow-Up #1",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "ðŸ“§ Send Follow-Up #1":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "ðŸ“± Format Telegram â€” FU1",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "ðŸ“± Format Telegram â€” FU1":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "node":  "ðŸ“¨ Telegram â€” FU1 Sent",
+                                                                                  "type":  "main",
+                                                                                  "index":  0
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         },
+                        "ðŸ“¨ Telegram â€” FU1 Sent":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "ðŸ“ Update CRM Day 3",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "ðŸ“ Update CRM Day 3":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "â³ Wait 4 More Days",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "â³ Wait 4 More Days":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "ðŸ”Ž Find Row Day 7",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "ðŸ”Ž Find Row Day 7":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "ðŸ” Parse CRM Day 7",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "ðŸ” Parse CRM Day 7":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "â“ Follow Up Day 7?",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "â“ Follow Up Day 7?":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "ðŸ“§ Send Follow-Up #2",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "ðŸ“§ Send Follow-Up #2":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "ðŸ“± Format Telegram â€” FU2",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "ðŸ“± Format Telegram â€” FU2":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "node":  "ðŸ“¨ Telegram â€” FU2 Sent",
+                                                                                  "type":  "main",
+                                                                                  "index":  0
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         },
+                        "ðŸ“¨ Telegram â€” FU2 Sent":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "ðŸ“ Update CRM Day 7",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "ðŸ“ Update CRM Day 7":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "â³ Wait 7 More Days",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "â³ Wait 7 More Days":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "ðŸ”Ž Find Row Day 14",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "ðŸ”Ž Find Row Day 14":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "ðŸ” Parse CRM Day 14",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "ðŸ” Parse CRM Day 14":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "â“ Follow Up Day 14?",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "â“ Follow Up Day 14?":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "ðŸ“§ Send Final Email",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "ðŸ“§ Send Final Email":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "ðŸ“± Format Telegram â€” Closed",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "ðŸ“± Format Telegram â€” Closed":  {
+                                                                "main":  [
+                                                                             [
+                                                                                 {
+                                                                                     "node":  "ðŸ“¨ Telegram â€” Closed",
+                                                                                     "type":  "main",
+                                                                                     "index":  0
+                                                                                 }
+                                                                             ]
+                                                                         ]
+                                                            },
+                        "ðŸ“¨ Telegram â€” Closed":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "ðŸ“ Update CRM Closed",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "âœ… Webhook Accept":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "ðŸ’¬ Respond Accept",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "ðŸ’¬ Respond Accept":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "ðŸ” Read CRM Accept",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "ðŸ” Read CRM Accept":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "âš™ï¸ Process Accept",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "âš™ï¸ Process Accept":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "ðŸ“ Update CRM Accepted",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "ðŸ“ Update CRM Accepted":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "ðŸ“§ Send Welcome Email",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "ðŸ“§ Send Welcome Email":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "ðŸ“± Format Telegram â€” Accepted",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "ðŸ“± Format Telegram â€” Accepted":  {
+                                                                  "main":  [
+                                                                               [
+                                                                                   {
+                                                                                       "node":  "ðŸ“¨ Telegram â€” Accepted",
+                                                                                       "type":  "main",
+                                                                                       "index":  0
+                                                                                   }
+                                                                               ]
+                                                                           ]
+                                                              },
+                        "âŒ Webhook Decline":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "ðŸ’¬ Respond Decline",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "ðŸ’¬ Respond Decline":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "ðŸ” Read CRM Decline",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "ðŸ” Read CRM Decline":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "âš™ï¸ Process Decline",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "âš™ï¸ Process Decline":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "ðŸ“ Update CRM Declined",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "ðŸ“ Update CRM Declined":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "ðŸ“± Format Telegram â€” Declined",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "ðŸ“± Format Telegram â€” Declined":  {
+                                                                  "main":  [
+                                                                               [
+                                                                                   {
+                                                                                       "node":  "ðŸ“¨ Telegram â€” Declined",
+                                                                                       "type":  "main",
+                                                                                       "index":  0
+                                                                                   }
+                                                                               ]
+                                                                           ]
+                                                              }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "saveDataErrorExecution":  "all",
+                     "saveDataSuccessExecution":  "all",
+                     "saveManualExecutions":  true,
+                     "saveExecutionProgress":  true,
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "templateCredsSetupCompleted":  true
+             },
+    "pinData":  {
+
+                },
+    "versionId":  "3e2b1a0e-f589-46c5-8921-d55ee0a8c54e",
+    "activeVersionId":  null,
+    "versionCounter":  389,
+    "triggerCount":  3,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-04T08:15:57.191Z",
+                       "createdAt":  "2026-04-04T08:15:57.191Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "VAXNt9pHnSeFRRSU",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

@@ -1,0 +1,36 @@
+### WHAT THIS CONTRACT IS
+
+This agreement is between Verdant Commerce Private Limited (Verdant) and NexaTech Solutions LLP (NexaTech). The core purpose of the agreement is for NexaTech to provide certain services to Verdant, with specific payment terms and conditions outlined. The document specifies that both parties have signed this agreement on April 13, 2026.
+
+### WHAT YOU ARE AGREEING TO DO
+
+1. **Provide written approval or feedback within 5 business days of submission for each Deliverable** [Clause (b)].
+2. **Ensure written approval before proceeding to the next milestone** [Clause (c)].
+3. **Attend mandatory weekly progress calls every Monday at 10:00 AM IST** [Clause (d)].
+
+### WHAT THE OTHER PARTY AGREES TO DO
+
+1. **Provide services as per the agreed milestones and deliverables**.
+2. **Issue invoices for each milestone payment within 7 days of delivery**.
+
+### WHAT YOU CANNOT DO
+
+1. **Engage any other software development firm or consultant for similar services for a period of 24 months after the agreement ends** [Clause 6.1].
+2. **Solicit employment from any employee or partner involved in this project for 18 months after the agreement ends** [Clause 6.2].
+
+### WHAT HAPPENS IF THINGS GO WRONG
+
+- If either party breaches the contract, they must cure the breach within 15 days of receiving written notice.
+- If a dispute arises, it will be resolved through negotiation or arbitration in Mumbai.
+
+### KEY DATES AND DEADLINES
+
+1. **Sign and advance payment due upon signing** [Clause 3.2 (a)].
+2. **Payment for Phase 1 delivery and acceptance within 7 days of invoice** [Clause 3.2 (b)].
+3. **Final project completion and deployment payment within 7 days of invoice** [Clause 3.2 (c)].
+4. **90-day notice required for termination by the Client** [Clause 9.3 (a)].
+5. **7-day notice required for termination by the Service Provider** [Clause 9.3 (b)].
+
+### PLAIN ENGLISH SUMMARY
+
+By signing this contract, you agree to hire NexaTech Solutions LLP to provide specific services and pay them in installments over the course of the project. You must review their work within a week and give feedback or approval as required. Both parties are bound by confidentiality for five years after the agreement ends and cannot compete with each other for 24 months post-agreement. Any disputes will be resolved through negotiation, and if that fails, arbitration in Mumbai.

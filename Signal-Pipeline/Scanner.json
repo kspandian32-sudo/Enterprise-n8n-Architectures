@@ -1,0 +1,1925 @@
+﻿{
+  "success": true,
+  "data": {
+    "updatedAt": "2026-03-09T15:51:27.191Z",
+    "createdAt": "2026-03-09T05:32:25.586Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name": "Signal Pipeline â€” Job Posting Scanner",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours",
+                "hoursInterval": 12
+              }
+            ]
+          }
+        },
+        "id": "d247483b-ddb7-4612-b4e7-aca2370c92f6",
+        "name": "Every 6 Hours",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Fire 3 search queries per run for broader coverage.\n// Time-based rotation: each 6-hour window starts at a different offset.\n// With 14 queries and 3 per run, full keyword coverage every ~2 days.\n\nconst queries = [\n  'data entry clerk',\n  'operations coordinator',\n  'manual reporting specialist',\n  'spreadsheet management',\n  'CRM coordinator',\n  'invoicing specialist',\n  'bookkeeper QuickBooks',\n  'administrative assistant data entry',\n  'accounts payable clerk',\n  'order entry processor',\n  'sales operations coordinator',\n  'office coordinator CRM',\n  'data migration specialist',\n  'invoice processing clerk'\n];\n\nconst SIX_HOURS_MS = 6 * 60 * 60 * 1000;\nconst baseIdx = Math.floor(Date.now() / SIX_HOURS_MS) % queries.length;\n\n// Return 3 queries â€” the HTTP Request node will fire once per item\nconst selected = [];\nfor (let i = 0; i < 3; i++) {\n  const idx = (baseIdx + i) % queries.length;\n  selected.push({ json: { search_query: queries[idx], query_index: idx } });\n}\nreturn selected;"
+        },
+        "id": "16061353-a446-44e2-847c-8f698afe5761",
+        "name": "Select Search Query",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          240,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://jsearch.p.rapidapi.com/search",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "query",
+                "value": "={{ $json.search_query }}"
+              },
+              {
+                "name": "page",
+                "value": "1"
+              },
+              {
+                "name": "num_pages",
+                "value": "5"
+              },
+              {
+                "name": "date_posted",
+                "value": "month"
+              },
+              {
+                "name": "country",
+                "value": "us"
+              },
+              {
+                "name": "language",
+                "value": "en"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-RapidAPI-Host",
+                "value": "jsearch.p.rapidapi.com"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "7002207a-2bc2-4e1e-ba6e-0783a2b50efa",
+        "name": "Search Job Postings",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          480,
+          0
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "RapidAPI â€” JSearch"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Merge jobs from ALL API responses (multiple search queries per run).\n// Clear accumulated results at pipeline start.\nconst staticData = $getWorkflowStaticData('global');\nstaticData._signalResults = [];\n\nconst items = $input.all();\nif (!items || items.length === 0) {\n  return [{ json: { _no_data: true, message: 'No input received' } }];\n}\n\n// Collect jobs from ALL API responses\nconst allJobs = [];\nfor (const item of items) {\n  const inputJson = item.json;\n  if (inputJson.data && Array.isArray(inputJson.data)) {\n    for (const job of inputJson.data) {\n      allJobs.push(job);\n    }\n  }\n}\n\nif (allJobs.length === 0) {\n  return [{ json: { _no_data: true, message: 'All API responses returned 0 job listings' } }];\n}\n\nfunction cleanMarkdown(str) {\n  if (!str) return '';\n  return str\n    .replace(/\\*\\*/g, '')\n    .replace(/__/g, '')\n    .replace(/^#+\\s*/gm, '')\n    .replace(/\\*([^*]+)\\*/g, '$1')\n    .replace(/_([^_]+)_/g, '$1')\n    .replace(/`([^`]+)`/g, '$1')\n    .replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, '$1')\n    .trim();\n}\n\nconst jobBoardNames = [\n  'remoterockethub', 'remote rockethub', 'remote rocket hub',\n  'jobmatrix', 'totalh', 'talentify', 'jobrapido', 'jooble',\n  'neuvoo', 'recruit.net', 'jobleads', 'careerjet', 'jobomas',\n  'jobvertise', 'postjobfree', 'jobdiagnosis', 'lensa',\n  'zippia', 'simplyhired', 'snagajob', 'whatjobs', 'jobcase',\n  'arbeitnow', 'jobgether', 'adzuna', 'getwork',\n  'talent.com', 'linkedin', 'indeed', 'glassdoor', 'ziprecruiter',\n  'dice', 'monster', 'careerbuilder', 'hired', 'angel.co',\n  'wellfound', 'remotive', 'weworkremotely', 'flexjobs',\n  'remote.co', 'builtin', 'themuse', 'idealist',\n  'virtualvocations', 'workingnomads', 'nodesk',\n  'remotejobs', 'remote ok', 'remoteok', 'jobspresso',\n  'pangian', 'dynamitejobs', 'himalayas', 'rocketpunch',\n  'crossover', 'toptal', 'gun.io', 'andela', 'turing',\n  'dailyremote'\n];\n\nconst staffingAgencies = [\n  'asg', 'robert half', 'randstad', 'adecco', 'manpower',\n  'kelly services', 'hays', 'kforce', 'insight global',\n  'teksystems', 'tek systems', 'apex systems', 'aerotek',\n  'beacon hill', 'cybercoders', 'creative circle',\n  'aquent', 'onward search', 'mastech', 'collabera',\n  'infosys bpo', 'cognizant', 'wipro staffing',\n  'allegis', 'expresspros', 'express employment',\n  'spherion', 'volt', 'yoh', 'modis'\n];\n\nfunction isJobBoard(name) {\n  if (!name) return false;\n  const lower = name.toLowerCase().trim();\n  for (const board of jobBoardNames) {\n    if (lower.includes(board)) return true;\n  }\n  if (/^[a-z0-9][a-z0-9-]*\\.[a-z]{2,}$/i.test(lower)) return true;\n  return false;\n}\n\nfunction isStaffingAgency(name, companyType) {\n  if (!name) return false;\n  const lower = name.toLowerCase().trim();\n  const typeL = (companyType || '').toLowerCase();\n  if (typeL.includes('staffing') || typeL.includes('recruiting') || typeL.includes('placement')) return true;\n  for (const agency of staffingAgencies) {\n    if (lower === agency || lower.includes(agency)) return true;\n  }\n  return false;\n}\n\nfunction extractRealEmployer(description) {\n  if (!description) return null;\n  const patterns = [\n    /(?:Company|Employer|Client|Organization)\\s*:\\s*([A-Z][A-Za-z0-9&'. -]{2,40})/i,\n    /(?:Our client|our client),?\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:[,.]|\\s+is)/i,\n    /(?:on behalf of|partnered with|working with)\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:[,.]|\\s+to)/i,\n    /([A-Z][A-Za-z0-9&'. -]{2,40})\\s+is\\s+(?:looking|hiring|seeking|searching)\\s+(?:for|a|an)/,\n    /(?:Work|work)\\s+(?:at|for|with)\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:\\s*[,!.]|\\s*\\n|\\s+and\\b)/,\n    /(?:Welcome to|welcome to)\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:\\s*[!.]|\\s*\\n)/,\n    /(?:About|about)\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:\\s*\\n|\\s*-|\\s*:)/,\n    /(?:Join|join)\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:\\s+as\\b|\\s+and\\b|\\s+today|!|,|\\.|\\s*\\n)/\n  ];\n\n  const skipWords = [\n    'the', 'our', 'this', 'that', 'your', 'their', 'some',\n    'you', 'we', 'us', 'my', 'its', 'his', 'her', 'who',\n    'what', 'when', 'where', 'how', 'why', 'all', 'any',\n    'each', 'every', 'both', 'few', 'more', 'most', 'other',\n    'remote', 'full time', 'part time', 'position', 'role',\n    'team', 'department', 'company', 'organization', 'about',\n    'summary', 'overview', 'description', 'responsibilities',\n    'requirements', 'qualifications', 'benefits', 'salary',\n    'join us', 'apply now', 'click here', 'learn more',\n    'location', 'schedule', 'compensation', 'duties',\n    'job summary', 'job description', 'job title',\n    'equal opportunity', 'disclaimer'\n  ];\n\n  for (const pattern of patterns) {\n    const match = description.match(pattern);\n    if (match && match[1]) {\n      const candidate = match[1].trim();\n      if (candidate.length < 3) continue;\n      const lower = candidate.toLowerCase();\n      if (skipWords.includes(lower)) continue;\n      if (isJobBoard(candidate)) continue;\n      if (isInvalidCompanyName(candidate)) continue;\n      if (candidate.split(/\\s+/).length === 1 && lower.length < 5 && !/[A-Z]{2,}/.test(candidate)) continue;\n      return candidate;\n    }\n  }\n  return null;\n}\n\n// Data quality: filter company names that are actually skill/category tags\nfunction isInvalidCompanyName(name) {\n  if (!name) return true;\n  const lower = name.toLowerCase().trim();\n  // Common patterns where a skill/category gets misread as a company\n  const skillTagPatterns = [\n    /^(it|hr|qa|ui|ux)\\s+(excel|word|testing|design|support|skills)/i,\n    /^(microsoft|ms)\\s+(excel|word|powerpoint|outlook|office|teams)/i,\n    /^(google|apple|amazon)\\s+(sheets|docs|drive|search)/i,\n    /^(data|remote|online|digital|virtual)\\s+(entry|work|job|position)/i\n  ];\n  for (const pattern of skillTagPatterns) {\n    if (pattern.test(name)) return true;\n  }\n  return false;\n}\n\nfunction isSpamEmployer(name, website) {\n  if (!name || name.length < 2) return true;\n  if (isInvalidCompanyName(name)) return true;\n  const lower = name.toLowerCase().trim();\n  const ws = (website || '').toLowerCase();\n\n  const invalidNames = [\n    'you', 'we', 'us', 'they', 'them', 'me', 'he', 'she', 'it',\n    'the', 'this', 'that', 'here', 'there', 'now', 'today',\n    'who', 'what', 'when', 'where', 'how', 'why'\n  ];\n  if (invalidNames.includes(lower)) return true;\n\n  const spamDomains = [\n    'jobmatrix', 'totalh', 'jobrapido', 'jobomas',\n    'jobvertise', 'postjobfree', 'jobdiagnosis',\n    'zippia', 'salary.com', 'whatjobs', 'jobcase',\n    'upwork', 'fiverr', 'freelancer'\n  ];\n  for (const spam of spamDomains) {\n    if (lower.includes(spam) || ws.includes(spam)) return true;\n  }\n  if (/^[^a-zA-Z]*$/.test(name)) return true;\n  if (lower.length <= 2 && !/^[a-z]{2}$/i.test(lower)) return true;\n  const genericNames = [\n    'work from home', 'remote position', 'hiring now', 'apply today',\n    'urgent hiring', 'immediate start', 'easy work', 'home based',\n    'online job', 'virtual assistant hiring'\n  ];\n  for (const generic of genericNames) {\n    if (lower.includes(generic)) return true;\n  }\n  return false;\n}\n\nfunction buildLocation(city, state, country) {\n  city = (city || '').trim();\n  state = (state || '').trim();\n  country = (country || '').trim();\n  if (city && state) return city + ', ' + state;\n  if (state) return state;\n  if (city) return city;\n  if (country) return country;\n  return 'Remote / Not specified';\n}\n\nfunction pickBestUrl(job) {\n  const applyLink = (job.job_apply_link || '').trim();\n  const googleLink = (job.job_google_link || '').trim();\n  const aggregatorDomains = [\n    'dailyremote.com', 'remoterockethub.com', 'jooble.org',\n    'talentify.io', 'jobrapido.com', 'neuvoo.com', 'adzuna.com',\n    'getwork.com', 'lensa.com', 'zippia.com', 'whatjobs.com',\n    'jobcase.com', 'arbeitnow.com', 'jobgether.com'\n  ];\n  function isGoogleFragment(url) {\n    if (!url) return false;\n    return url.includes('google.com/search') && (url.includes('#vhid=') || url.includes('udm=8'));\n  }\n  function isAggregator(url) {\n    if (!url) return false;\n    const lower = url.toLowerCase();\n    for (const agg of aggregatorDomains) {\n      if (lower.includes(agg)) return true;\n    }\n    return false;\n  }\n  if (applyLink && !isAggregator(applyLink) && !isGoogleFragment(applyLink)) return applyLink;\n  if (googleLink && !isGoogleFragment(googleLink)) return googleLink;\n  if (applyLink && !isGoogleFragment(applyLink)) return applyLink;\n  if (applyLink) return applyLink;\n  if (googleLink) return googleLink;\n  return '';\n}\n\nconst results = [];\nfor (const job of allJobs) {\n  let companyName = cleanMarkdown(job.employer_name || '');\n  const companyWebsite = (job.employer_website || '').trim();\n  const rawDescription = job.job_description || '';\n  const description = cleanMarkdown(rawDescription.substring(0, 2000));\n  const title = cleanMarkdown(job.job_title || '');\n  const companyType = (job.employer_company_type || '').trim();\n  let employerSource = 'direct';\n\n  if (isJobBoard(companyName)) {\n    const extracted = extractRealEmployer(rawDescription);\n    if (extracted) {\n      companyName = extracted;\n      employerSource = 'extracted_from_description';\n    } else {\n      continue;\n    }\n  } else if (isStaffingAgency(companyName, companyType)) {\n    const extracted = extractRealEmployer(rawDescription);\n    if (extracted) {\n      employerSource = 'extracted_from_agency:' + companyName;\n      companyName = extracted;\n    } else {\n      employerSource = 'staffing_agency';\n    }\n  }\n\n  if (isSpamEmployer(companyName, companyWebsite)) continue;\n\n  const city = (job.job_city || '').trim();\n  const state = (job.job_state || '').trim();\n  const country = (job.job_country || '').trim();\n\n  results.push({\n    json: {\n      job_title: title,\n      company_name: companyName,\n      company_website: companyWebsite,\n      job_description: description,\n      job_city: city,\n      job_state: state,\n      job_country: country,\n      job_location: buildLocation(city, state, country),\n      employer_company_type: companyType,\n      job_posting_url: pickBestUrl(job),\n      date_posted: job.job_posted_at_datetime_utc || '',\n      job_publisher: (job.job_publisher || '').trim(),\n      employer_source: employerSource\n    }\n  });\n}\n\nif (results.length > 0) {\n  return results;\n}\nreturn [{ json: { _no_data: true, message: 'All ' + allJobs.length + ' jobs filtered out' } }];"
+        },
+        "id": "c4bb14e5-548c-47c8-92bf-8348031f5bdf",
+        "name": "Extract Job Data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          720,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Deduplication, pre-filtering, and title-based exclusion\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData._seenJobs) {\n  staticData._seenJobs = {};\n}\n\nconst now = Date.now();\nconst sevenDays = 7 * 24 * 60 * 60 * 1000;\nfor (const url of Object.keys(staticData._seenJobs)) {\n  if (now - staticData._seenJobs[url] > sevenDays) {\n    delete staticData._seenJobs[url];\n  }\n}\n\nconst excludeKeywords = [\n  // Physical / blue collar\n  'forklift', 'warehouse', 'nurse', 'nursing', 'construction',\n  'truck driver', 'cdl', 'janitor', 'custodian', 'security guard',\n  'electrician', 'plumber', 'hvac', 'welder', 'mechanic',\n  'physical therapist', 'registered nurse', 'licensed practical',\n  'certified nursing', 'phlebotom', 'radiology', 'surgical',\n  'teacher', 'teaching', 'professor', 'sous chef', 'line cook',\n  'barista', 'cashier', 'retail associate',\n  // Scam / gig postings\n  'research study', 'focus group', 'paid survey', 'paid studies',\n  '$790/wk', '$800/wk', '$1000/wk', 'earn up to',\n  'get paid to share your opinion', 'mystery shopper',\n  'product testing', 'clinical trial', 'test products at home',\n  'be your own boss', 'unlimited earning', 'work when you want',\n  'side hustle', 'gig economy', 'flexible schedule with no',\n  'anyone can apply', 'start immediately no experience',\n  // Senior / strategic roles (NOT automation targets)\n  'it manager', 'it operations manager', 'operations manager',\n  'project manager', 'program manager', 'product manager',\n  'director of', 'vice president', 'vp of',\n  'head of it', 'head of operations', 'head of engineering',\n  'chief information officer', 'chief technology officer',\n  'chief operating officer', 'chief revenue officer',\n  'systems administrator', 'network administrator',\n  'network engineer', 'infrastructure engineer',\n  'devops manager', 'security analyst', 'security engineer',\n  // Engineering / dev roles\n  'software developer', 'software engineer', 'frontend developer',\n  'backend developer', 'full stack developer', 'full-stack developer',\n  'devops engineer', 'solutions architect', 'principal engineer',\n  'staff engineer', 'machine learning engineer', 'data scientist',\n  'senior developer', 'lead developer', 'engineering manager',\n  // QA / testing (not automation targets)\n  'qa tester', 'qa engineer', 'quality assurance engineer',\n  'test engineer', 'automation engineer',\n  // Sales leadership\n  'account executive', 'vp of sales', 'vice president of sales',\n  'chief revenue officer', 'chief technology officer',\n  'sales director', 'sales manager'\n];\n\nconst items = $input.all();\nconst filtered = [];\n\nfor (const item of items) {\n  // Skip sentinel items from Extract Job Data\n  if (item.json._no_data || item.json._error) continue;\n\n  const url = item.json.job_posting_url || '';\n  const desc = (item.json.job_description || '').toLowerCase();\n  const title = (item.json.job_title || '').toLowerCase();\n  const company = (item.json.company_name || '').trim();\n  const combined = title + ' ' + desc;\n\n  if (!company || company.length < 2) continue;\n  if (url && staticData._seenJobs[url]) continue;\n\n  let excluded = false;\n  for (const kw of excludeKeywords) {\n    // For title-level exclusions (manager, director, vp), check title only\n    // For description-level exclusions (scam, physical), check combined\n    if (['it manager', 'it operations manager', 'operations manager',\n         'project manager', 'program manager', 'product manager',\n         'director of', 'vice president', 'vp of',\n         'head of it', 'head of operations', 'head of engineering',\n         'sales director', 'sales manager'].includes(kw)) {\n      if (title.includes(kw)) { excluded = true; break; }\n    } else {\n      if (combined.includes(kw)) { excluded = true; break; }\n    }\n  }\n  if (excluded) continue;\n\n  if (url) {\n    staticData._seenJobs[url] = now;\n  }\n\n  filtered.push(item);\n}\n\nreturn filtered.length > 0 ? filtered : [];"
+        },
+        "id": "7c26e58d-bbba-4413-9b4f-33dd7106aeea",
+        "name": "Deduplicate & Pre-Filter",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          960,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "ddd1f049-41cf-41ec-b26b-ecaf0c0f8202",
+        "name": "Process One By One",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          1200,
+          0
+        ],
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "// ISSUE 6 FIX: Expanded tool detection with 60+ tools,\n// searches title + description, and properly detects multiple tools.\nconst desc = ($json.job_description || '').toLowerCase();\nconst title = ($json.job_title || '').toLowerCase();\nconst combined = title + ' ' + desc;\n\nconst toolPatterns = [\n  // CRM\n  { name: 'Salesforce', pattern: 'salesforce' },\n  { name: 'HubSpot', pattern: 'hubspot' },\n  { name: 'Zoho CRM', pattern: 'zoho' },\n  { name: 'Pipedrive', pattern: 'pipedrive' },\n  { name: 'Dynamics 365', pattern: 'dynamics 365' },\n  { name: 'Freshsales', pattern: 'freshsales' },\n  { name: 'Copper CRM', pattern: 'copper crm' },\n  // E-commerce\n  { name: 'Shopify', pattern: 'shopify' },\n  { name: 'WooCommerce', pattern: 'woocommerce' },\n  { name: 'Magento', pattern: 'magento' },\n  { name: 'BigCommerce', pattern: 'bigcommerce' },\n  // Accounting/Finance\n  { name: 'QuickBooks', pattern: 'quickbooks' },\n  { name: 'Xero', pattern: /\\bxero\\b/ },\n  { name: 'FreshBooks', pattern: 'freshbooks' },\n  { name: 'Sage', pattern: /\\bsage\\b/ },\n  { name: 'NetSuite', pattern: 'netsuite' },\n  { name: 'Bill.com', pattern: 'bill.com' },\n  // Project Management\n  { name: 'Monday.com', pattern: 'monday.com' },\n  { name: 'Jira', pattern: /\\bjira\\b/ },\n  { name: 'Asana', pattern: /\\basana\\b/ },\n  { name: 'Trello', pattern: /\\btrello\\b/ },\n  { name: 'ClickUp', pattern: 'clickup' },\n  { name: 'Basecamp', pattern: 'basecamp' },\n  { name: 'Wrike', pattern: /\\bwrike\\b/ },\n  { name: 'Smartsheet', pattern: 'smartsheet' },\n  // Support/Helpdesk\n  { name: 'Zendesk', pattern: 'zendesk' },\n  { name: 'Freshdesk', pattern: 'freshdesk' },\n  { name: 'ServiceNow', pattern: 'servicenow' },\n  { name: 'Intercom', pattern: 'intercom' },\n  // Communication\n  { name: 'Slack', pattern: /\\bslack\\b/ },\n  { name: 'Microsoft Teams', pattern: 'microsoft teams' },\n  { name: 'Twilio', pattern: 'twilio' },\n  // Spreadsheets/Data\n  { name: 'Google Sheets', pattern: 'google sheets' },\n  { name: 'Excel', pattern: /\\bexcel\\b/ },\n  { name: 'Airtable', pattern: 'airtable' },\n  { name: 'Notion', pattern: /\\bnotion\\b/ },\n  // Analytics/BI\n  { name: 'Tableau', pattern: 'tableau' },\n  { name: 'Power BI', pattern: 'power bi' },\n  { name: 'Looker', pattern: /\\blooker\\b/ },\n  { name: 'Google Analytics', pattern: 'google analytics' },\n  // Marketing/Email\n  { name: 'Mailchimp', pattern: 'mailchimp' },\n  { name: 'ActiveCampaign', pattern: 'activecampaign' },\n  { name: 'Klaviyo', pattern: 'klaviyo' },\n  { name: 'Constant Contact', pattern: 'constant contact' },\n  { name: 'Marketo', pattern: 'marketo' },\n  { name: 'Pardot', pattern: 'pardot' },\n  // Automation\n  { name: 'Zapier', pattern: 'zapier' },\n  { name: 'Power Automate', pattern: 'power automate' },\n  { name: 'Make/Integromat', pattern: /\\b(make\\.com|integromat)\\b/ },\n  // ERP/Legacy\n  { name: 'SAP', pattern: /\\bsap\\b/ },\n  { name: 'AS400', pattern: /as\\/?400/ },\n  { name: 'Oracle', pattern: /\\boracle\\b/ },\n  // Salesforce ecosystem\n  { name: 'Einstein Analytics', pattern: 'einstein' },\n  // Payments\n  { name: 'Stripe', pattern: /\\bstripe\\b/ },\n  { name: 'PayPal', pattern: 'paypal' },\n  { name: 'Square', pattern: /\\bsquare\\b(?!\\s+feet|\\s+ft|\\s+meter|\\s+mile)/ },\n  // Documents/Signing\n  { name: 'DocuSign', pattern: 'docusign' },\n  { name: 'PandaDoc', pattern: 'pandadoc' },\n  // Phone/Contact Center\n  { name: 'Amazon Connect', pattern: 'amazon connect' },\n  { name: 'RingCentral', pattern: 'ringcentral' },\n  { name: 'Five9', pattern: 'five9' },\n  { name: 'Dialpad', pattern: 'dialpad' },\n  // Web/CMS\n  { name: 'WordPress', pattern: 'wordpress' },\n  { name: 'Webflow', pattern: 'webflow' }\n];\n\nconst detected = [];\nfor (const tool of toolPatterns) {\n  let found = false;\n  if (typeof tool.pattern === 'string') {\n    found = combined.includes(tool.pattern);\n  } else {\n    found = tool.pattern.test(combined);\n  }\n  if (found && !detected.includes(tool.name)) {\n    detected.push(tool.name);\n  }\n}\n\nreturn {\n  json: {\n    ...$json,\n    detected_tools: detected.join(', ') || 'None detected',\n    detected_tool_count: detected.length\n  }\n};"
+        },
+        "id": "22a3d72c-4a0f-4338-8772-09551fa73ac5",
+        "name": "Detect Tech Stack",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1440,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"model\": \"gpt-4o-mini\",\n  \"max_tokens\": 650,\n  \"temperature\": 0,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": {{ JSON.stringify(\"You are a B2B sales intelligence analyst specializing in workflow automation opportunities.\\n\\nYour job: analyze a job posting and determine whether the company actually needs a PERSON for this role, or whether they need AUTOMATION (specifically n8n workflow automation).\\n\\nCONTEXT YOU RECEIVE:\\n- Company name and employer type\\n- Pre-detected software tools found in the job description\\n- The full job description\\n\\nSigns that a company needs automation instead of a person:\\n- The job involves repetitive data transfer between systems\\n- The job involves manually checking things that could be monitored automatically\\n- The job involves copying data from emails/forms into spreadsheets or CRMs\\n- The job involves sending routine notifications or follow-ups\\n- The job involves generating reports from multiple data sources\\n- The job description mentions specific software tools that could be connected via APIs\\n- Multiple integrable tools detected = stronger signal\\n- Tasks like 'update records', 'process invoices', 'route tickets', 'generate reports' are strong automation signals\\n\\nSigns that this is a legitimate human-only role (NOT an automation opportunity):\\n- The job requires complex human judgment, creativity, or relationship building\\n- The job is for a senior strategic role (VP, Director)\\n- The job requires physical presence or manual labor\\n- The job is primarily about managing other people\\n- The role requires CRM STRATEGY, stakeholder management, or cross-functional leadership\\n- The role is at a tech vendor selling the software (Salesforce employee, HubSpot employee) â€” these are NOT automation prospects\\n\\nSCORING CALIBRATION â€” you MUST use the full 1-10 range:\\n- Score 9-10: Textbook automation. The job explicitly lists tasks like 'copy data from emails into spreadsheet', 'generate weekly reports from multiple systems', 'monitor inbox and route tickets', or 'transfer orders between platforms.' Multiple named software tools with known APIs. Almost every listed duty could be an n8n workflow.\\n- Score 7-8: Strong automation signals. The role is mostly repetitive data/process work. Mentions specific integrable tools. Company is clearly hiring a human to do work a well-designed workflow could handle.\\n- Score 5-6: Moderate signals. Some tasks could be automated but the role also requires meaningful human judgment, client communication, or coordination that cannot be fully automated.\\n- Score 3-4: Weak signals. Primarily a human role with only minor repetitive elements.\\n- Score 1-2: No automation opportunity. Senior strategic role, creative role, people management, physical labor, or tech vendor employee.\\n\\nCRITICAL RULES:\\n- Do NOT default to 5 or 6. Be decisive.\\n- A 'Salesforce Administrator' role that focuses on user training, stakeholder requirements, and CRM strategy is a 3-4, NOT a 7-8.\\n- A 'Bookkeeper' who manually copies invoices between QuickBooks and a CRM is an 8-9.\\n- An 'Operations Coordinator' who manually enters orders from email into a spreadsheet and then into an ERP is a 9.\\n- A 'Data Entry Clerk' copying information between two systems is an 8-9.\\n- A 'VP of Sales' at a CRM vendor is a 1.\\n- An 'Account Executive' at any company is a 2.\\n- If the company IS a tech/software vendor (like Salesforce, HubSpot, etc.), the score should be 1-2 regardless of job duties.\\n- If automation_score is 2 or below, set outreach_message to 'N/A'.\\n\\nRespond ONLY in this exact JSON format with no other text:\\n{\\n  \\\"automation_score\\\": <number 1-10>,\\n  \\\"pain_category\\\": \\\"<one of: Lead Ops, Data/Integration, Customer Ops, Financial Ops, People Ops, Content/Marketing, Other>\\\",\\n  \\\"reasoning\\\": \\\"<one sentence explaining your score>\\\",\\n  \\\"estimated_company_size\\\": \\\"<your estimate: Small (1-20), Medium (20-100), Large (100-500), Enterprise (500+)>\\\",\\n  \\\"automation_suggestion\\\": \\\"<one sentence describing what n8n workflow could replace this role>\\\",\\n  \\\"outreach_message\\\": \\\"<one personalized sentence for cold outreach based on the specific job and company, or N/A if score is 2 or below>\\\"\\n}\") }}\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify(\"Analyze this job posting:\\n\\nCompany: \" + $json.company_name + \"\\nEmployer Type: \" + ($json.employer_company_type || 'Not specified') + \"\\nJob Title: \" + $json.job_title + \"\\nLocation: \" + $json.job_location + \"\\nDetected Software Tools: \" + $json.detected_tools + \"\\n\\nJob Description:\\n\" + $json.job_description) }}\n    }\n  ]\n}",
+          "options": {}
+        },
+        "id": "d4668d9c-2085-416a-b681-d5eb69e6b002",
+        "name": "AI Score This Job",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1680,
+          0
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Header Auth OpenAI"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "// ISSUE 1 FIX: Parse AI response and merge with job data from Detect Tech Stack.\n// Uses HTTP Request response format: choices[0].message.content\n\nlet content = '';\nconst input = $json;\n\n// Handle OpenAI API HTTP response format\nif (input.choices && input.choices[0] && input.choices[0].message) {\n  content = String(input.choices[0].message.content || '');\n} else if (input.message && input.message.content) {\n  content = String(input.message.content);\n} else if (input.text) {\n  content = String(input.text);\n}\n\nconst clean = content.replace(/```json\\s*/g, '').replace(/```\\s*/g, '').trim();\n\n// Get the original job data from Detect Tech Stack node\nlet job = {};\ntry {\n  job = $('Detect Tech Stack').item.json || {};\n} catch(e) {\n  try {\n    job = $('Process One By One').item.json || {};\n  } catch(e2) {\n    job = {};\n  }\n}\n\nlet score = 0;\nlet cat = 'Unknown';\nlet reason = 'No response';\nlet size = 'Unknown';\nlet suggest = 'N/A';\nlet outreach = '';\n\ntry {\n  const m = clean.match(/\\{[\\s\\S]*\\}/);\n  if (m) {\n    const p = JSON.parse(m[0]);\n    score = parseInt(p.automation_score, 10) || 0;\n    cat = String(p.pain_category || 'Unknown');\n    reason = String(p.reasoning || '');\n    size = String(p.estimated_company_size || 'Unknown');\n    suggest = String(p.automation_suggestion || '');\n    outreach = String(p.outreach_message || '');\n  }\n} catch(e) {\n  reason = 'Parse error: ' + e.message;\n}\n\nif (score < 0) score = 0;\nif (score > 10) score = 10;\nif (score <= 2) outreach = 'N/A';\n\nreturn {\n  json: {\n    job_title: String(job.job_title || ''),\n    company_name: String(job.company_name || ''),\n    company_website: String(job.company_website || ''),\n    job_description: String(job.job_description || ''),\n    job_city: String(job.job_city || ''),\n    job_state: String(job.job_state || ''),\n    job_location: String(job.job_location || ''),\n    job_posting_url: String(job.job_posting_url || ''),\n    employer_company_type: String(job.employer_company_type || ''),\n    detected_tools: String(job.detected_tools || ''),\n    detected_tool_count: Number(job.detected_tool_count || 0),\n    employer_source: String(job.employer_source || 'direct'),\n    automation_score: score,\n    pain_category: cat,\n    reasoning: reason,\n    estimated_company_size: size,\n    automation_suggestion: suggest,\n    outreach_message: outreach,\n    detected_date: new Date().toISOString().split('T')[0]\n  }\n};"
+        },
+        "id": "f3576417-56de-42ab-afd5-833104e0e51f",
+        "name": "Parse AI Response",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1920,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "// Accumulate each processed result into staticData\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData._signalResults) {\n  staticData._signalResults = [];\n}\n\nconst item = $json;\n\nstaticData._signalResults.push({\n  job_title: String(item.job_title || ''),\n  company_name: String(item.company_name || ''),\n  company_website: String(item.company_website || ''),\n  job_description: String(item.job_description || ''),\n  job_city: String(item.job_city || ''),\n  job_state: String(item.job_state || ''),\n  job_location: String(item.job_location || ''),\n  job_posting_url: String(item.job_posting_url || ''),\n  employer_company_type: String(item.employer_company_type || ''),\n  detected_tools: String(item.detected_tools || ''),\n  detected_tool_count: Number(item.detected_tool_count || 0),\n  employer_source: String(item.employer_source || 'direct'),\n  automation_score: Number(item.automation_score) || 0,\n  pain_category: String(item.pain_category || ''),\n  reasoning: String(item.reasoning || ''),\n  estimated_company_size: String(item.estimated_company_size || ''),\n  automation_suggestion: String(item.automation_suggestion || ''),\n  outreach_message: String(item.outreach_message || ''),\n  detected_date: String(item.detected_date || new Date().toISOString().split('T')[0])\n});\n\nreturn { json: { accumulated: true, count: staticData._signalResults.length } };"
+        },
+        "id": "f865f477-9165-455b-a215-f9e206fea44b",
+        "name": "Accumulate Result",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2160,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// ISSUE 1 FIX: Collect all accumulated results after the batch loop completes.\n// SplitInBatches output 0 fires when ALL batches are done.\nconst staticData = $getWorkflowStaticData('global');\nconst results = staticData._signalResults || [];\n\n// Clear for next run\nstaticData._signalResults = [];\n\nif (results.length === 0) {\n  return [{ json: { _no_results: true, automation_score: 0 } }];\n}\n\nreturn results.map(item => ({ json: item }));"
+        },
+        "id": "2ca78cac-4882-487d-968e-e77505a0e71c",
+        "name": "Collect All Results",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1200,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "c1",
+                "leftValue": "={{ $json.company_name }}",
+                "operator": {
+                  "operation": "exists",
+                  "type": "string"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "loose"
+            }
+          },
+          "options": {}
+        },
+        "id": "3390b8f8-9069-4bab-a3f4-ae21b9083419",
+        "name": "Has Results?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1440,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "authentication": "serviceAccount",
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "171oeM44bH3FyBHOvzS-icqR11QnSXkpxgsxMokCbrKE"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "All Scanned"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "schema": [
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Scan Date",
+                "id": "Scan Date",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Company Name",
+                "id": "Company Name",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Job Title",
+                "id": "Job Title",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Location",
+                "id": "Location",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Employer Type",
+                "id": "Employer Type",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "AI Score",
+                "id": "AI Score",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Pain Category",
+                "id": "Pain Category",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Reasoning",
+                "id": "Reasoning",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Detected Tools",
+                "id": "Detected Tools",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Automation Suggestion",
+                "id": "Automation Suggestion",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Source URL",
+                "id": "Source URL",
+                "required": false,
+                "type": "string"
+              }
+            ],
+            "value": {
+              "AI Score": "={{ $json.automation_score }}",
+              "Automation Suggestion": "={{ $json.automation_suggestion }}",
+              "Company Name": "={{ $json.company_name }}",
+              "Detected Tools": "={{ $json.detected_tools }}",
+              "Employer Type": "={{ $json.employer_company_type }}",
+              "Job Title": "={{ $json.job_title }}",
+              "Location": "={{ $json.job_location }}",
+              "Pain Category": "={{ $json.pain_category }}",
+              "Reasoning": "={{ $json.reasoning }}",
+              "Scan Date": "={{ $json.detected_date }}",
+              "Source URL": "={{ $json.job_posting_url }}"
+            }
+          },
+          "options": {}
+        },
+        "id": "572e856a-9d17-4523-ab58-f3653e057883",
+        "name": "Log All Scanned",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1680,
+          208
+        ],
+        "credentials": {
+          "googleApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Service Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "c2",
+                "leftValue": "={{ $json.automation_score }}",
+                "rightValue": 6,
+                "operator": {
+                  "type": "number",
+                  "operation": "gte"
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "79c49e68-a509-4f4a-bf59-15e4726d3d44",
+        "name": "Filter Qualified Leads",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1680,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "authentication": "serviceAccount",
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "171oeM44bH3FyBHOvzS-icqR11QnSXkpxgsxMokCbrKE"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Signal Log"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "schema": [
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Date Detected",
+                "id": "Date Detected",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Company Name",
+                "id": "Company Name",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Company Website",
+                "id": "Company Website",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Signal Type",
+                "id": "Signal Type",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Signal Detail",
+                "id": "Signal Detail",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Pain Category",
+                "id": "Pain Category",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "AI Score (1-10)",
+                "id": "AI Score (1-10)",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "AI Reasoning",
+                "id": "AI Reasoning",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Estimated Company Size",
+                "id": "Estimated Company Size",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Detected Tools",
+                "id": "Detected Tools",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Source URL",
+                "id": "Source URL",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Outreach Message",
+                "id": "Outreach Message",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Status",
+                "id": "Status",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "Notes",
+                "id": "Notes",
+                "required": false,
+                "type": "string"
+              }
+            ],
+            "value": {
+              "AI Reasoning": "={{ $json.reasoning }}",
+              "AI Score (1-10)": "={{ $json.automation_score }}",
+              "Company Name": "={{ $json.company_name }}",
+              "Company Website": "={{ $json.company_website }}",
+              "Date Detected": "={{ $json.detected_date }}",
+              "Detected Tools": "={{ $json.detected_tools }}",
+              "Estimated Company Size": "={{ $json.estimated_company_size }}",
+              "Notes": "",
+              "Outreach Message": "={{ $json.outreach_message }}",
+              "Pain Category": "={{ $json.pain_category }}",
+              "Signal Detail": "={{ $json.job_title }}",
+              "Signal Type": "Job Posting",
+              "Source URL": "={{ $json.job_posting_url }}",
+              "Status": "New"
+            }
+          },
+          "options": {}
+        },
+        "id": "8f1a6c45-a335-4392-8e77-8e622cff2775",
+        "name": "Log to Signal Sheet",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1920,
+          320
+        ],
+        "credentials": {
+          "googleApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Service Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Build email alert â€” only for score >= 8 (hot leads per guideline)\nconst items = $input.all();\nconst hotLeads = items.filter(item => (Number(item.json.automation_score) || 0) >= 8);\n\nif (hotLeads.length === 0) {\n  return [{ json: { has_hot_leads: false, count: 0, subject: '', html: '' } }];\n}\n\nlet html = '<h2>\\uD83D\\uDD25 ' + hotLeads.length + ' Hot Automation Prospect(s) Detected!</h2>';\nhtml += '<p>The following leads scored <strong>8+/10</strong> on the automation opportunity scale:</p><hr/>';\n\nfor (const lead of hotLeads) {\n  const j = lead.json;\n  html += '<div style=\"margin-bottom:20px;padding:15px;border:1px solid #ddd;border-radius:8px;\">';\n  html += '<h3>' + (j.company_name || 'Unknown') + ' \\u2014 ' + (j.job_title || 'Unknown') + '</h3>';\n  if (j.employer_source && j.employer_source !== 'direct') {\n    html += '<p style=\"color:#e67e22;\"><strong>\\u26A0\\uFE0F Note:</strong> Company name was ' + j.employer_source + '</p>';\n  }\n  html += '<p><strong>Location:</strong> ' + (j.job_location || 'Not specified') + '</p>';\n  html += '<p><strong>AI Score:</strong> ' + j.automation_score + '/10</p>';\n  html += '<p><strong>Pain Category:</strong> ' + (j.pain_category || '') + '</p>';\n  html += '<p><strong>Company Size:</strong> ' + (j.estimated_company_size || '') + '</p>';\n  html += '<p><strong>Detected Tools (' + (j.detected_tool_count || 0) + '):</strong> ' + (j.detected_tools || 'None') + '</p>';\n  html += '<p><strong>Why this is hot:</strong> ' + (j.reasoning || '') + '</p>';\n  html += '<p><strong>Suggested automation:</strong> ' + (j.automation_suggestion || '') + '</p>';\n  if (j.outreach_message && j.outreach_message !== 'N/A') {\n    html += '<p><strong>\\uD83D\\uDCE7 Outreach:</strong> <em>' + j.outreach_message + '</em></p>';\n  }\n  html += '<p><a href=\"' + (j.job_posting_url || '#') + '\">View Original Posting</a>';\n  if (j.company_website) {\n    html += ' | <a href=\"' + j.company_website + '\">Company Website</a>';\n  }\n  html += '</p>';\n  html += '</div>';\n}\n\nhtml += '<hr/><p><strong>\\uD83D\\uDC49 Action:</strong> Review these prospects and consider outreach.</p>';\n\nconst subject = hotLeads.length === 1\n  ? '\\uD83D\\uDD25 Hot Prospect: ' + hotLeads[0].json.company_name + ' (Score: ' + hotLeads[0].json.automation_score + '/10)'\n  : '\\uD83D\\uDD25 ' + hotLeads.length + ' Hot Prospects Detected (Scores 8+/10)';\n\nreturn [{ json: { has_hot_leads: true, count: hotLeads.length, subject: subject, html: html } }];"
+        },
+        "id": "48059dad-dbc7-46da-b531-a69dae2ea7ae",
+        "name": "Build Hot Alert Summary",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1920,
+          544
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "c4",
+                "leftValue": "={{ $json.count }}",
+                "rightValue": 0,
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "f6336044-6c16-4a0b-905f-552da689f9cc",
+        "name": "Has Hot Leads?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          2160,
+          544
+        ]
+      },
+      {
+        "parameters": {
+          "fromEmail": "your-email@example.com",
+          "toEmail": "your-email@example.com",
+          "subject": "={{ $json.subject }}",
+          "html": "={{ $json.html }}",
+          "options": {}
+        },
+        "id": "d5119adc-d119-4ba4-b212-a8d287ae60d8",
+        "name": "Send Hot Signal Alert",
+        "type": "n8n-nodes-base.emailSend",
+        "typeVersion": 2.1,
+        "position": [
+          2400,
+          544
+        ],
+        "webhookId": "80722603-48ce-424f-ba1f-a0230ff032a4",
+        "credentials": {
+          "smtp": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "SMTP Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      }
+    ],
+    "connections": {
+      "Every 6 Hours": {
+        "main": [
+          [
+            {
+              "node": "Select Search Query",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Select Search Query": {
+        "main": [
+          [
+            {
+              "node": "Search Job Postings",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Search Job Postings": {
+        "main": [
+          [
+            {
+              "node": "Extract Job Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Job Data": {
+        "main": [
+          [
+            {
+              "node": "Deduplicate & Pre-Filter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Deduplicate & Pre-Filter": {
+        "main": [
+          [
+            {
+              "node": "Process One By One",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process One By One": {
+        "main": [
+          [
+            {
+              "node": "Collect All Results",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Detect Tech Stack",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Detect Tech Stack": {
+        "main": [
+          [
+            {
+              "node": "AI Score This Job",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Score This Job": {
+        "main": [
+          [
+            {
+              "node": "Parse AI Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse AI Response": {
+        "main": [
+          [
+            {
+              "node": "Accumulate Result",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Accumulate Result": {
+        "main": [
+          [
+            {
+              "node": "Process One By One",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Collect All Results": {
+        "main": [
+          [
+            {
+              "node": "Has Results?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Results?": {
+        "main": [
+          [
+            {
+              "node": "Log All Scanned",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Filter Qualified Leads",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter Qualified Leads": {
+        "main": [
+          [
+            {
+              "node": "Log to Signal Sheet",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Build Hot Alert Summary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Hot Alert Summary": {
+        "main": [
+          [
+            {
+              "node": "Has Hot Leads?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Hot Leads?": {
+        "main": [
+          [
+            {
+              "node": "Send Hot Signal Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timeSavedMode": "fixed",
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false,
+      "errorWorkflow": "xrUkLrRQonyzJ60p"
+    },
+    "staticData": {
+      "node:Every 6 Hours": {
+        "recurrenceRules": [
+          0
+        ]
+      },
+      "global": {
+        "_signalResults": [],
+        "_seenJobs": {
+          "https://us.jobrapido.com/jobpreview/3174901438656544768": 1776709874018,
+          "https://nreca.wd1.myworkdayjobs.com/en-US/External/job/Invoice-Processing-Specialist_R2026-860": 1776709874018,
+          "https://www.whatjobs.com/jobs/invoice-processing-specialist/rockville-maryland?id=2633233682": 1776709874018,
+          "https://www.glassdoor.com/job-listing/invoicing-specialist-alpha-solutions-traffic-and-safety-llc-JV_IC1130381_KO0,20_KE21,59.htm?jl=1010075713462": 1776709874018,
+          "https://www.jobleads.com/us/job/senior-accounts-payable-lead-master-of-invoices-pos--arlington--e6d47676475eb67a569831a2734e8d72b": 1776709874018,
+          "https://bebee.com/us/jobs/accounts-receivable-specialist-billing-coordinator-beacon-hill-alexandria-va--theirstack-655079721": 1776709874018,
+          "https://www.linkedin.com/jobs/view/senior-accounts-receivable-specialist-with-biometrics-billing-experience-at-edetek-inc-4388736804": 1776709874018,
+          "https://www.learn4good.com/jobs/tysons-corner/virginia/accounting/5024904632/e/": 1776709874018,
+          "https://www.linkedin.com/jobs/view/accounts-payable-specialist-federal-portfolio-at-insight-global-4402195465": 1776709874018,
+          "https://www.roberthalf.com/us/en/job/chantilly-va/accounts-payable-specialist/04560-0013421256-usen": 1776709874018,
+          "https://www.jobleads.com/us/job/billing-invoicing-specialist--warrenton--eeee2379875b566ea078b83c76ab16d71": 1776709874018,
+          "https://bebee.com/us/jobs/invoicing-specialist-part-time-telus-digital-ward-oh--theirstack-665350051": 1776709874018,
+          "https://www.learn4good.com/jobs/dundalk/maryland/accounting/5040833220/e/": 1776709874018,
+          "https://www.google.com/search?ibp=htl;jobs&q&htidocid=8ae05KWq5Qf8SamFAAAAAA%3D%3D&hl=en-US&shndl=37&shmd=H4sIAAAAAAAA_xXLsQrCQAwAUFz7CU4ZnER7RXDRqSKIgiAKXUt6HteTNDmaCP0R_1dd3vaKz6yoDokocQTkJ9R3eOTgE1JSgzVcpAMNOPoehOEkEinM971Z1p1zqlRGNbTkSy-DEw6dTO4lnf5ptccxZEIL7WZbTWXmuFw0abQ3EjTif1FY4cweEsNNTAb0K7gev45mN0-YAAAA&shmds=v1_ATWGeePT8KjojP5Lu9MoqOnksca1zOOwv7PxONcu0TRFf2o0hQ&source=sh/x/job/li/m1/1#fpstate=tldetail&htivrt=jobs&htiq&htidocid=8ae05KWq5Qf8SamFAAAAAA%3D%3D": 1776709874018,
+          "https://www.linkedin.com/jobs/view/senior-billing-specialist-at-sparks-group-4389764456": 1776709874018,
+          "https://www.jobleads.com/us/job/accounts-payable-specialist-fast-paced-invoicing-close--gaithersburg--eee5cadffaa680629bd1af226c9413a25": 1776709874018,
+          "https://bebee.com/us/jobs/billing-specialist-ensco-inc-springfield--indeed-9d335847a7a5bb16": 1776709874018,
+          "https://www.google.com/search?ibp=htl;jobs&q&htidocid=_9QcJ94XHglLQ-yoAAAAAA%3D%3D&hl=en-US&shndl=37&shmd=H4sIAAAAAAAA_xXLsQrCQAwAUFz7CU4ZXBTtieCimwiiIAhC13INxzWSJkcToV_hN6vL2171mVXLEzGTZHiWhBSZzGEDN-3AUhyxBxW4qGZO82PvXuwQghnX2Tw6YY06BJXU6RRe2tmf1vo4psLRU7vbb6e6SF4tGhr9HRkaxV9UMbgKAgk81HWIuIb7-QsZyOEykQAAAA&shmds=v1_ATWGeeMlJVgzgSNVOGkRkSLuqLYjZQfe1RCHMRXWAs9lu5YW7g&source=sh/x/job/li/m1/1#fpstate=tldetail&htivrt=jobs&htiq&htidocid=_9QcJ94XHglLQ-yoAAAAAA%3D%3D": 1776709874018,
+          "https://www.talent.com/view?id=614926101024612015": 1776709874018,
+          "https://www.indeed.com/viewjob?jk=26d06acdc138cd87": 1776709874018,
+          "https://www.jobleads.com/us/job/revenue-cycle-billing-specialist--columbia--e2273f2e28a3c7fb95a5494ae8bdfd62f": 1776709874018,
+          "https://www.google.com/search?ibp=htl;jobs&q&htidocid=ap5ho6hqlOMHVZe0AAAAAA%3D%3D&hl=en-US&shem=epsdc&shndl=37&shmd=H4sIAAAAAAAA_xXOsQrCMBCAYVz7CE43OYg2IrjoIIogCi4VXMs1Hmk03oVcWvpEPqd1-bcP_uI7KfZHH4JnB8hPqKgn7ggOql1CtgT3SNZj8JphCVdpQAmTbUEYziIu0HTX5hx1a4xqKJ1mzN6WVj5GmBoZzEsa_afWFhPFgJnq9WY1lJHdfPbwKXcY4CF2hMIKF7bgGSqx735cowXcTj8M4Q-BqQAAAA&shmds=v1_ATWGeeMQadNgKE7Q3HIfPQfA13onSGFGUVLbpTe2eSNTEcFnIQ&source=sh/x/job/li/m1/1#fpstate=tldetail&htivrt=jobs&htiq&htidocid=ap5ho6hqlOMHVZe0AAAAAA%3D%3D": 1776709874018,
+          "https://www.ziprecruiter.com/c/Offit-Kurman,-P.A./Job/Billing-Specialist/-in-Columbia,MD?jid=accb9e9a343fccff": 1776709874018,
+          "https://www.linkedin.com/jobs/view/accounts-payable-specialist-invoice-processing-at-oxford-global-resources-4399690226": 1776709874018,
+          "https://www.roberthalf.com/us/en/job/odenton-md/billingar-specialist/02010-0013318175-usen": 1776709874018,
+          "https://www.jobleads.com/us/job/billing-specialist--chantilly--ecd7a13fb1af6d2f6b7689e15eb9d6bf4": 1776709874018,
+          "https://www.talent.com/view?id=576718410557100990": 1776709874018,
+          "https://virginiaprofessionalgroup.com/careers/entry-level-medical-billing-specialist-herndon/": 1776709874018,
+          "https://www.jobleads.com/us/job/ap-ar-specialist-invoicing-payments-reconciliations--kutztown--e8597e88edf201596d38d0b83620a1fef": 1776709874018,
+          "https://bebee.com/us/jobs/invoicing-specialist-proautomated-newark-de--talent-365f7de66da4": 1776709874018,
+          "https://www.jobleads.com/us/job/accounts-payable-specialist-precise-invoicing-support--ambler--ed1e8a167e37e764cc12a0e2f1297d28f": 1776709874018,
+          "https://www.google.com/search?ibp=htl;jobs&q&htidocid=xhgcpdG5bxOZA2KTAAAAAA%3D%3D&hl=en-US&shndl=37&shmd=H4sIAAAAAAAA_xXNMQoCMRBAUWz3CFbTKpqIYKOVlayVKNguSRizkTgTMoOsV_DUxub_8nXfWbfo6c0pINwKhuRyEoU1nNmDoKthBCY4MceM88OoWmRvrUg2UdRpCibwyzKh58k-2cs_g4yuYslOcdjuNpMpFJdwqSyNUOjpwfKR9gCJ4NrwFdyPPzf-iAKNAAAA&shmds=v1_ATWGeeP7-yUvu2vRBwcfDaI8C1G1isdNzagjDhLfLCewdRs8pA&source=sh/x/job/li/m1/1#fpstate=tldetail&htivrt=jobs&htiq&htidocid=xhgcpdG5bxOZA2KTAAAAAA%3D%3D": 1776709874018,
+          "https://www.linkedin.com/jobs/view/billing-appeals-at-professional-care-home-care-agency-inc-4403840663": 1776709874018,
+          "https://www.jobleads.com/us/job/invoicing-revenue-data-specialist--florham-park--e20d3cb9641b92291c4871f68df0d7c4f": 1776709874018,
+          "https://www.indeed.com/viewjob?jk=0251cc841c7377c6": 1776709874018,
+          "https://www.learn4good.com/jobs/paterson/new-jersey/finance/5035320546/e/": 1776709874018,
+          "https://www.indeed.com/viewjob?jk=2d53a93146a80203": 1776709874018,
+          "https://www.learn4good.com/jobs/newark/new-jersey/sales/5038104607/e/": 1776709874018,
+          "https://www.jobleads.com/us/job/customer-master-data-invoicing-specialist--cranberry-township--e7754c65a53f86eade444ca9bd501014a": 1776709874018,
+          "https://www.roberthalf.com/us/en/job/hershey-pa/accounts-receivable-specialist/03750-9504320081-usen": 1776709874018,
+          "https://www.google.com/search?ibp=htl;jobs&q&htidocid=eT-2sWXD4X-isZzPAAAAAA%3D%3D&hl=en-US&shndl=37&shmd=H4sIAAAAAAAA_xWOsQrCMBBAce0nON0kKJqI4KKbi9DBpeBaLuGaRtJcyJ3Qz_CTbZc3vvea36bZP2JKMQfoCvmIKYrCCVp2IITVj8AZnswh0fY-qha5WSuSTBBFjd54nixncjzbDztZ0cuIlUpCpf5yPc-m5HDYrX6t3wk6xWFYi3ExV6IM72UBAx3h1f4BbVaeNpMAAAA&shmds=v1_ATWGeeM_zPNmq9SZPX3rccFLmid-lo7j-_NaBfzB_gFIU9-1KQ&source=sh/x/job/li/m1/1#fpstate=tldetail&htivrt=jobs&htiq&htidocid=eT-2sWXD4X-isZzPAAAAAA%3D%3D": 1776709874018,
+          "https://www.jobleads.com/us/job/detail-oriented-billing-invoicing-specialist--raleigh--e6fd333b290f56b46c15e17a7a816c7cc": 1776709874018,
+          "https://www.jobleads.com/us/job/remote-part-time-bookkeeper-quickbooks-expert-service--lancaster--e55741b4e6f6106ef11f4d85ccc9e478c": 1776709874018,
+          "https://www.jobleads.com/us/job/remote-multi-client-bookkeeper-quickbooks-online-expert--united-states--e2033a06a32792da0261a0ba413ee290c": 1776709874018,
+          "https://www.whatjobs.com/jobs/part-time-bookkeeper-quickbooks-online-nonprofit/seattle?id=2637500502": 1776709874018,
+          "https://www.ziprecruiter.com/c/Carrie-Rikon-&-Associates,-LLC./Job/Once-a-Month-Onsite-Bookkeeper/-in-New-York,NY?jid=70b078e225a7378f": 1776709874018,
+          "https://www.linkedin.com/jobs/view/part-time-bookkeeper-quickbooks-online-at-atlantic-partners-corporation-4394662337": 1776709874018,
+          "https://www.whatjobs.com/jobs/bookkeeper-quickbooks-online/wakefield-massachusetts?id=2642836056": 1776709874018,
+          "https://www.ziprecruiter.com/c/Needs-to-be-Private/Job/Quickbooks-Bookkeeper/-in-Millsboro,DE?jid=4912b9474a8bc60c": 1776709874018,
+          "https://www.google.com/search?ibp=htl;jobs&q&htidocid=3XOMg3kEMannP9NWAAAAAA%3D%3D&hl=en-US&shndl=37&shmd=H4sIAAAAAAAA_xXIsWoCQRAGYNL6CCnkr0IUvZOAjVYqKIgSIqaW3WW4G2_cOXZWvHQ-hI-SJ8qTBJuv-Hq_L73vA100E5aqTUPUUsL715VD8wzDZxSONMDf_YFN0luu8Ya1UMeehfMPxtiqh5FLoYZGbFQrodd5nXNrs7I0k6Ky7DKHIuil1Eheu_Ks3p6crHaJWnGZTh_TSVe0sRr2Vz7gmFw07CSAI5YsQomDG2G_-Acy1-artwAAAA&shmds=v1_ATWGeePcNhmZfuOlzJz8nh-5U4OhdH7OdPwTRie3fbG35u5_XQ&source=sh/x/job/li/m1/1#fpstate=tldetail&htivrt=jobs&htiq&htidocid=3XOMg3kEMannP9NWAAAAAA%3D%3D": 1776709874018,
+          "https://www.indeed.com/viewjob?jk=35d0ff1117e5921f": 1776709874018,
+          "https://bebee.com/us/jobs/bookkeeper-emmitsburg-md--theirstack-649351136": 1776709874018,
+          "https://www.google.com/search?ibp=htl;jobs&q&htidocid=ngXD5LPLygCjYPjZAAAAAA%3D%3D&hl=en-US&shndl=37&shmd=H4sIAAAAAAAA_xXKwQqCQBCAYbr6CJ3mWqRG0KVueUhCwiKKTrK7DrqpOzKzkkGv1DtWl__w8QefSZDkin14sR1C-tJsS9gRNQ1ijwxvOA3WNH8RyJkghANpEFRsaiAHe6Kqxem29r6XTRyLtFElXnlrIkNdTA41jfGDtPxTSK0Y-1Z5LFbr5Rj1rprPUsWaGM6kSrii8wOjQJYlYB3cfit7eroFHO9fqykRmLAAAAA&shmds=v1_ATWGeePX2IWWlxyteDnZFvHtsyuju3vuFx8UZJnUa3hWubioFA&source=sh/x/job/li/m1/1#fpstate=tldetail&htivrt=jobs&htiq&htidocid=ngXD5LPLygCjYPjZAAAAAA%3D%3D": 1776709874018,
+          "https://www.google.com/search?ibp=htl;jobs&q&htidocid=GHP_qhlMd_nDWZESAAAAAA%3D%3D&hl=en-US&shndl=37&shmd=H4sIAAAAAAAA_xWMMQrCQBAAsc0TrBZsVDQRwUYrbcRAFNE-XI41OXPuHrcbjM_yh8ZmimGY5DtKigNz2yIGjLCEa-ds-zcCF_KOEKb7EExED4Wh7mGsdtFRPRvanCsQNNE2wARH5trjeNeoBtlmmYhPa1GjzqaWXxkTVtxnT67kj1Ka4Rq8USzXm1WfBqrnk700Hj9wU3ybqAs4kU3BEdwjkjIt4Jz_AJNnMHS0AAAA&shmds=v1_ATWGeeP82OqZm9ADhQTQ6t6KXT6xbY0Qfd7KBRBK0Yh9g1am3w&source=sh/x/job/li/m1/1#fpstate=tldetail&htivrt=jobs&htiq&htidocid=GHP_qhlMd_nDWZESAAAAAA%3D%3D": 1776709874018,
+          "https://www.indeed.com/viewjob?jk=247bc71465cc85ab": 1776709874018,
+          "https://www.monster.com/job-openings/accounting-specialist-quickbooks-madison-heights-mi--2398ae8d-31b1-40a2-b50e-5e28ec3ea77e?mstr_dist=true": 1776709874018,
+          "https://bebee.com/us/jobs/bookkeeper-quickbooks-vlplus-llc-hauppauge--indeed-d4a080458623c8ad": 1776709874018,
+          "https://www.indeed.com/viewjob?jk=0e8c93de293d7ae7": 1776709874018,
+          "https://www.glassdoor.com/job-listing/bookkeeper-quickbooks-tyler-mechanical-services-JV_IC1153255_KO0,21_KE22,47.htm?jl=1010091542100": 1776709874018,
+          "https://www.ziprecruiter.com/c/Burris-and-Thomas/Job/Quickbooks-Bookkeeper/-in-Las-Vegas,NV?jid=45687ddbc2e07b1a": 1776709874018,
+          "https://www.linkedin.com/jobs/view/bookkeeper-real-estate-accounting-quickbooks-appfolio-required-at-mez-investment-group-inc-4394701628": 1776709874018,
+          "https://www.ziprecruiter.com/c/Thrive/Job/Full-Charge-Bookkeeper/-in-Louisville,KY?jid=7c7020e3b498c395": 1776709874018,
+          "https://www.simplyhired.com/job/X29FoSi2ATL-eIvxmRZ6kf0wLz2w08dNz9BpVFbG9hGmG3gqfZE8PQ": 1776709874018,
+          "https://www.indeed.com/viewjob?jk=fdb5ac329ece15c3": 1776709874018,
+          "https://www.kforce.com/jobs/1696~AQG~2170311P1~99/": 1776709874018,
+          "https://www.ziprecruiter.com/c/Ultimate-Staffing-Services/Job/Part-Time-Bookkeeper/-in-Branford,CT?jid=8b6a48eb8422223c": 1776709874018,
+          "https://bebee.com/us/jobs/part-time-bookkeeper-rubicon-real-estate-auburndale-ma--theirstack-665842642": 1776709874018,
+          "https://www.google.com/search?ibp=htl;jobs&q&htidocid=hjI0KmGM0-bRvjizAAAAAA%3D%3D&hl=en-US&shndl=37&shmd=H4sIAAAAAAAA_xXNsRLBQBSF4dF6BNWpFIaNMaOhCkMwo6BRZpJ1J4msvTu5i1B5CA_jeTyJpDnFV5y_--10oyMlBivxiScsmMuSyFGF3_uDw63QZWuCPkLn1mwKxgg7TiGUVDoHW0TMmaHePPfeySwIRIzK2r9CK83XgC2lXAcXTqWdWPKkImeaXjyZjmvlbDYY7-mFrb2T-CtZj6jimxs2ohUKi1Pj2LAxzwfzeYhl-AcrmCNiuwAAAA&shmds=v1_ATWGeeNgrVCt_w5jVp6uKJ9E1Vmertxkj_3uOIzQM6h6c_6jbQ&source=sh/x/job/li/m1/1#fpstate=tldetail&htivrt=jobs&htiq&htidocid=hjI0KmGM0-bRvjizAAAAAA%3D%3D": 1776709874018,
+          "https://formaka.fr/jobs/job/bookkeeper-quickbooks-at-northpoint-search-group-greenville-sc-ZmtFM1c2VnVUMUFlYVY3Z1MvYnRaYTIx": 1776709874018,
+          "https://www.indeed.com/viewjob?jk=2f6589bf5c6478a6": 1776709874018,
+          "https://www.glassdoor.com/job-listing/bookkeeper-operations-administrative-asst-must-have-quickbooks-exp-schwaller-s-painting-staining-JV_IC1133677_KO0,66_KE67,96.htm?jl=1006096969094": 1776709874018,
+          "https://www.roberthalf.com/us/en/job/east-syracuse-ny/bookkeeper/02890-0013409376-usen": 1776709874018,
+          "https://www.google.com/search?ibp=htl;jobs&q&htidocid=DFV9Shbk7jJ27PKAAAAAAA%3D%3D&hl=en-US&shndl=37&shmd=H4sIAAAAAAAA_0WOuw7CMAwAxconMHlG0CAkFthgQEI8JXaUBrc1DXYUu6Ifx8cBE8sNt9wN34Ph_uyzTa_0RDgKpywVGaxF2hYxYYYXWQOXjkL7kwonjsQIU9hJCYo-hwaEYStSRxytGrOkS-dUY1GreaNQBHk6YSyldw8p9YebNj5jit7wNl_M-iJxPXYHYkYV87CRjgNFkOp_pUAM6-y_-XyfwOH4AYK70nW_AAAA&shmds=v1_ATWGeeMOt85v77GJVVXAXkf2RF6dGli7a8RWK9t7frhXM9uw_w&source=sh/x/job/li/m1/1#fpstate=tldetail&htivrt=jobs&htiq&htidocid=DFV9Shbk7jJ27PKAAAAAAA%3D%3D": 1776709874018,
+          "https://www.ziprecruiter.com/c/Rochas-Bookkeeping-Services/Job/Quickbooks-Bookkeeper/-in-Hialeah,FL?jid=3b4fcb258b0a9a62": 1776709874018,
+          "https://bebee.com/us/jobs/quickbooks-bookkeeper-confidential-south-holland-il--theirstack-655347488": 1776709874018,
+          "https://www.google.com/search?ibp=htl;jobs&q&htidocid=aUevsuSjLVCsBvq4AAAAAA%3D%3D&hl=en-US&shndl=37&shmd=H4sIAAAAAAAA_xWNzQqCQBSFaesjtLqEq8ifhBbVLhdhGSY9QIzDRaeZ7hXvBPZePWC6ORy-A98Jfougrih6GI9wU6RaHODEbC1iP9UI6o_RdiYCFTlDuIFwn9oo3GapnfYLNyCoBt0BE5yZW4fLY-d9L4ckEXFxK155o2PN74QJGx6TFzcyx1M6NWDvlMdntkvHuKd2vbrmcFfOoRcoSIMhyIfvJHFQKjv9F-UfenaC7bcAAAA&shmds=v1_ATWGeeOhQHVSR7ZnuA3oCri_DkGOxgPviV2_DG9rPUTAmxai-w&source=sh/x/job/li/m1/1#fpstate=tldetail&htivrt=jobs&htiq&htidocid=aUevsuSjLVCsBvq4AAAAAA%3D%3D": 1776709874018,
+          "https://www.ziprecruiter.com/c/Bookkeeping-&-Accounting-of-Fl/Job/Quickbooks-Bookkeeper/-in-Jacksonville,FL?jid=42383a5f9099288d": 1776709874018,
+          "https://bebee.com/us/jobs/senior-quickbooks-bookkeeper-full-time-lsn-crossville--talent-d6bd59173622": 1776709874018,
+          "https://www.jobleads.com/us/job/part-time-bookkeeper-quickbooks-pro-onsite-denver--abilene--e266654a18e03a45383e8775707364d2c": 1776709874018,
+          "https://formaka.fr/jobs/job/quickbooks-bookkeeper-at-the-va-group-las-vegas-nv-ZjBRMFU2WmxUbE1hYkZyalR2WHZacTIzQ1E9PQ==": 1776709874018,
+          "https://www.snelling.com/jobs/baton-rouge-bookkeeper-and-accounts-payable/": 1776709874018,
+          "https://www.learn4good.com/jobs/sacramento/california/accounting/5022217492/e/": 1776709874018,
+          "https://jobs.tpistaffing.com/jb/Accounting-Clerk-QuickBooks-Jobs-in-Houston-TX/13716860": 1776709874018,
+          "https://bebee.com/us/jobs/experienced-quickbooks-bookkeeper-accountant-fort-myers-beach-fl--theirstack-651468280": 1776709874018,
+          "https://www.jobleads.com/us/job/accounting-manager-multi-entity-quickbooks-hybrid--newnan--e42c06b57038d1da8865f8cb6e4d06c64": 1776709874018,
+          "https://www.jobleads.com/us/job/remote-data-entry-admin-support--batavia--ea263420c8070b3aa7c96ef5a6799698e": 1776709874018,
+          "https://dailyremote.com/remote-job/data-entry-clerk-applicants-within-usa-only-4846677": 1776709874018,
+          "https://www.jobleads.com/us/job/administrator-data-entry-remote--sacramento--e8cef3fcc7f4835c9d3188bf9a7302ca7": 1776709874018,
+          "https://hirevector.liveblog365.com/job/experienced-administrative-assistant-data-entry-clerk-remote-opportunity-at-arenaflex-5": 1776709874018,
+          "https://jobgether.com/offer/69ca50e75bd3b40540a1e295-remote-data-entry-operator-part-time": 1776709874018,
+          "https://theelitejob.com/job/18770/remote-administrative-assistant-data-entry-clerk": 1776709874018,
+          "https://flexjobs.zya.me/job/online-data-entry-assistant-teens-to-years-old-30": 1776709874018,
+          "https://www.jobleads.com/us/job/remote-data-entry-admin-specialist-flexible-hours--austin--eba10de8527b5bde8d1a9fa8e455df227": 1776709874018,
+          "https://hirevector.liveblog365.com/job/experienced-remote-data-entry-administrative-assistant-flexible-work-from-home-opportunity-2": 1776709874018,
+          "https://jobflarely.liveblog365.com/job/experienced-data-entry-operator-data-entry-clerk-admin-assistant-usa-only-based-remote-3": 1776709874018,
+          "https://workharborline.com/job/1712181": 1776709874018,
+          "https://www.jobleads.com/us/job/administrative-assistant-online-support-remote--dallas--e405c1d67341c905567e895bf6f1465a9": 1776709874018,
+          "https://hirevector.liveblog365.com/job/experienced-remote-data-entry-clerk-administrative-assistant-in-penn-hills-pa": 1776709874018,
+          "https://flexjobs.zya.me/job/experienced-virtual-assistant-for-calls-emails-data-entry-and-websites-remote-opportunity-at-arenafl": 1776709874018,
+          "https://hireza.wuaze.com/job/experienced-data-entry-specialist-remote-administrative-assistant-opportunity-at-arenaflex-2": 1776709874018,
+          "https://hirevector.liveblog365.com/job/experienced-administrative-assistant-data-entry-expert-needed-in-huron-sd-at-arenaflex": 1776709874018,
+          "https://hirevector.liveblog365.com/job/experienced-work-at-home-data-entry-agent-entry-level-opportunity-with-arenaflex": 1776709874018,
+          "https://jobflarely.liveblog365.com/job/experienced-remote-data-entry-clerk-typist-flexible-work-schedule-career-growth-opportunities-at-hir": 1776709874018,
+          "https://jobflarely.liveblog365.com/job/virtual-assistant-data-entry-specialist-par": 1776709874018,
+          "https://hirevector.liveblog365.com/job/experienced-bilingual-administrative-assistant-data-entry-specialist-entry-level-opportunity-in-new": 1776709874018,
+          "https://jobs4wfh.wuaze.com/job/remote-fedex-data-entry-jobs-25-hour": 1776709874018
+        }
+      }
+    },
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "pinData": {},
+    "versionId": "7300b72e-ab39-4db9-aca8-1b3e2509824d",
+    "activeVersionId": "dce39b81-9a30-4667-834e-c169749a2d14",
+    "versionCounter": 111,
+    "triggerCount": 1,
+    "shared": [
+      {
+        "updatedAt": "2026-03-09T05:32:25.597Z",
+        "createdAt": "2026-03-09T05:32:25.597Z",
+        "role": "workflow:owner",
+        "workflowId": "Yj3VcpnN2GL4N1cW",
+        "projectId": "4z38v6JO6ntgY8gF",
+        "project": {
+          "updatedAt": "2026-01-13T19:13:51.671Z",
+          "createdAt": "2026-01-13T19:11:25.659Z",
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "YOUR_NAME <your-email@example.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+        }
+      }
+    ],
+    "tags": [],
+    "activeVersion": {
+      "updatedAt": "2026-03-09T07:21:38.628Z",
+      "createdAt": "2026-03-09T07:21:38.628Z",
+      "versionId": "dce39b81-9a30-4667-834e-c169749a2d14",
+      "workflowId": "Yj3VcpnN2GL4N1cW",
+      "nodes": [
+        {
+          "parameters": {
+            "rule": {
+              "interval": [
+                {
+                  "field": "hours",
+                  "hoursInterval": 6
+                }
+              ]
+            }
+          },
+          "id": "d247483b-ddb7-4612-b4e7-aca2370c92f6",
+          "name": "Every 6 Hours",
+          "type": "n8n-nodes-base.scheduleTrigger",
+          "typeVersion": 1.3,
+          "position": [
+            0,
+            0
+          ]
+        },
+        {
+          "parameters": {
+            "jsCode": "// Fire 3 search queries per run for broader coverage.\n// Time-based rotation: each 6-hour window starts at a different offset.\n// With 14 queries and 3 per run, full keyword coverage every ~2 days.\n\nconst queries = [\n  'data entry clerk',\n  'operations coordinator',\n  'manual reporting specialist',\n  'spreadsheet management',\n  'CRM coordinator',\n  'invoicing specialist',\n  'bookkeeper QuickBooks',\n  'administrative assistant data entry',\n  'accounts payable clerk',\n  'order entry processor',\n  'sales operations coordinator',\n  'office coordinator CRM',\n  'data migration specialist',\n  'invoice processing clerk'\n];\n\nconst SIX_HOURS_MS = 6 * 60 * 60 * 1000;\nconst baseIdx = Math.floor(Date.now() / SIX_HOURS_MS) % queries.length;\n\n// Return 3 queries â€” the HTTP Request node will fire once per item\nconst selected = [];\nfor (let i = 0; i < 3; i++) {\n  const idx = (baseIdx + i) % queries.length;\n  selected.push({ json: { search_query: queries[idx], query_index: idx } });\n}\nreturn selected;"
+          },
+          "id": "16061353-a446-44e2-847c-8f698afe5761",
+          "name": "Select Search Query",
+          "type": "n8n-nodes-base.code",
+          "typeVersion": 2,
+          "position": [
+            240,
+            0
+          ]
+        },
+        {
+          "parameters": {
+            "url": "https://jsearch.p.rapidapi.com/search",
+            "authentication": "genericCredentialType",
+            "genericAuthType": "httpHeaderAuth",
+            "sendQuery": true,
+            "queryParameters": {
+              "parameters": [
+                {
+                  "name": "query",
+                  "value": "={{ $json.search_query }}"
+                },
+                {
+                  "name": "page",
+                  "value": "1"
+                },
+                {
+                  "name": "num_pages",
+                  "value": "5"
+                },
+                {
+                  "name": "date_posted",
+                  "value": "month"
+                },
+                {
+                  "name": "country",
+                  "value": "us"
+                },
+                {
+                  "name": "language",
+                  "value": "en"
+                }
+              ]
+            },
+            "sendHeaders": true,
+            "headerParameters": {
+              "parameters": [
+                {
+                  "name": "X-RapidAPI-Host",
+                  "value": "jsearch.p.rapidapi.com"
+                }
+              ]
+            },
+            "options": {}
+          },
+          "id": "7002207a-2bc2-4e1e-ba6e-0783a2b50efa",
+          "name": "Search Job Postings",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 4.2,
+          "position": [
+            480,
+            0
+          ],
+          "credentials": {
+            "httpHeaderAuth": {
+              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+              "name": "RapidAPI â€” JSearch"
+            }
+          },
+          "onError": "continueRegularOutput"
+        },
+        {
+          "parameters": {
+            "jsCode": "// Merge jobs from ALL API responses (multiple search queries per run).\n// Clear accumulated results at pipeline start.\nconst staticData = $getWorkflowStaticData('global');\nstaticData._signalResults = [];\n\nconst items = $input.all();\nif (!items || items.length === 0) {\n  return [{ json: { _no_data: true, message: 'No input received' } }];\n}\n\n// Collect jobs from ALL API responses\nconst allJobs = [];\nfor (const item of items) {\n  const inputJson = item.json;\n  if (inputJson.data && Array.isArray(inputJson.data)) {\n    for (const job of inputJson.data) {\n      allJobs.push(job);\n    }\n  }\n}\n\nif (allJobs.length === 0) {\n  return [{ json: { _no_data: true, message: 'All API responses returned 0 job listings' } }];\n}\n\nfunction cleanMarkdown(str) {\n  if (!str) return '';\n  return str\n    .replace(/\\*\\*/g, '')\n    .replace(/__/g, '')\n    .replace(/^#+\\s*/gm, '')\n    .replace(/\\*([^*]+)\\*/g, '$1')\n    .replace(/_([^_]+)_/g, '$1')\n    .replace(/`([^`]+)`/g, '$1')\n    .replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, '$1')\n    .trim();\n}\n\nconst jobBoardNames = [\n  'remoterockethub', 'remote rockethub', 'remote rocket hub',\n  'jobmatrix', 'totalh', 'talentify', 'jobrapido', 'jooble',\n  'neuvoo', 'recruit.net', 'jobleads', 'careerjet', 'jobomas',\n  'jobvertise', 'postjobfree', 'jobdiagnosis', 'lensa',\n  'zippia', 'simplyhired', 'snagajob', 'whatjobs', 'jobcase',\n  'arbeitnow', 'jobgether', 'adzuna', 'getwork',\n  'talent.com', 'linkedin', 'indeed', 'glassdoor', 'ziprecruiter',\n  'dice', 'monster', 'careerbuilder', 'hired', 'angel.co',\n  'wellfound', 'remotive', 'weworkremotely', 'flexjobs',\n  'remote.co', 'builtin', 'themuse', 'idealist',\n  'virtualvocations', 'workingnomads', 'nodesk',\n  'remotejobs', 'remote ok', 'remoteok', 'jobspresso',\n  'pangian', 'dynamitejobs', 'himalayas', 'rocketpunch',\n  'crossover', 'toptal', 'gun.io', 'andela', 'turing',\n  'dailyremote'\n];\n\nconst staffingAgencies = [\n  'asg', 'robert half', 'randstad', 'adecco', 'manpower',\n  'kelly services', 'hays', 'kforce', 'insight global',\n  'teksystems', 'tek systems', 'apex systems', 'aerotek',\n  'beacon hill', 'cybercoders', 'creative circle',\n  'aquent', 'onward search', 'mastech', 'collabera',\n  'infosys bpo', 'cognizant', 'wipro staffing',\n  'allegis', 'expresspros', 'express employment',\n  'spherion', 'volt', 'yoh', 'modis'\n];\n\nfunction isJobBoard(name) {\n  if (!name) return false;\n  const lower = name.toLowerCase().trim();\n  for (const board of jobBoardNames) {\n    if (lower.includes(board)) return true;\n  }\n  if (/^[a-z0-9][a-z0-9-]*\\.[a-z]{2,}$/i.test(lower)) return true;\n  return false;\n}\n\nfunction isStaffingAgency(name, companyType) {\n  if (!name) return false;\n  const lower = name.toLowerCase().trim();\n  const typeL = (companyType || '').toLowerCase();\n  if (typeL.includes('staffing') || typeL.includes('recruiting') || typeL.includes('placement')) return true;\n  for (const agency of staffingAgencies) {\n    if (lower === agency || lower.includes(agency)) return true;\n  }\n  return false;\n}\n\nfunction extractRealEmployer(description) {\n  if (!description) return null;\n  const patterns = [\n    /(?:Company|Employer|Client|Organization)\\s*:\\s*([A-Z][A-Za-z0-9&'. -]{2,40})/i,\n    /(?:Our client|our client),?\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:[,.]|\\s+is)/i,\n    /(?:on behalf of|partnered with|working with)\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:[,.]|\\s+to)/i,\n    /([A-Z][A-Za-z0-9&'. -]{2,40})\\s+is\\s+(?:looking|hiring|seeking|searching)\\s+(?:for|a|an)/,\n    /(?:Work|work)\\s+(?:at|for|with)\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:\\s*[,!.]|\\s*\\n|\\s+and\\b)/,\n    /(?:Welcome to|welcome to)\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:\\s*[!.]|\\s*\\n)/,\n    /(?:About|about)\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:\\s*\\n|\\s*-|\\s*:)/,\n    /(?:Join|join)\\s+([A-Z][A-Za-z0-9&'. -]{2,40})(?:\\s+as\\b|\\s+and\\b|\\s+today|!|,|\\.|\\s*\\n)/\n  ];\n\n  const skipWords = [\n    'the', 'our', 'this', 'that', 'your', 'their', 'some',\n    'you', 'we', 'us', 'my', 'its', 'his', 'her', 'who',\n    'what', 'when', 'where', 'how', 'why', 'all', 'any',\n    'each', 'every', 'both', 'few', 'more', 'most', 'other',\n    'remote', 'full time', 'part time', 'position', 'role',\n    'team', 'department', 'company', 'organization', 'about',\n    'summary', 'overview', 'description', 'responsibilities',\n    'requirements', 'qualifications', 'benefits', 'salary',\n    'join us', 'apply now', 'click here', 'learn more',\n    'location', 'schedule', 'compensation', 'duties',\n    'job summary', 'job description', 'job title',\n    'equal opportunity', 'disclaimer'\n  ];\n\n  for (const pattern of patterns) {\n    const match = description.match(pattern);\n    if (match && match[1]) {\n      const candidate = match[1].trim();\n      if (candidate.length < 3) continue;\n      const lower = candidate.toLowerCase();\n      if (skipWords.includes(lower)) continue;\n      if (isJobBoard(candidate)) continue;\n      if (isInvalidCompanyName(candidate)) continue;\n      if (candidate.split(/\\s+/).length === 1 && lower.length < 5 && !/[A-Z]{2,}/.test(candidate)) continue;\n      return candidate;\n    }\n  }\n  return null;\n}\n\n// Data quality: filter company names that are actually skill/category tags\nfunction isInvalidCompanyName(name) {\n  if (!name) return true;\n  const lower = name.toLowerCase().trim();\n  // Common patterns where a skill/category gets misread as a company\n  const skillTagPatterns = [\n    /^(it|hr|qa|ui|ux)\\s+(excel|word|testing|design|support|skills)/i,\n    /^(microsoft|ms)\\s+(excel|word|powerpoint|outlook|office|teams)/i,\n    /^(google|apple|amazon)\\s+(sheets|docs|drive|search)/i,\n    /^(data|remote|online|digital|virtual)\\s+(entry|work|job|position)/i\n  ];\n  for (const pattern of skillTagPatterns) {\n    if (pattern.test(name)) return true;\n  }\n  return false;\n}\n\nfunction isSpamEmployer(name, website) {\n  if (!name || name.length < 2) return true;\n  if (isInvalidCompanyName(name)) return true;\n  const lower = name.toLowerCase().trim();\n  const ws = (website || '').toLowerCase();\n\n  const invalidNames = [\n    'you', 'we', 'us', 'they', 'them', 'me', 'he', 'she', 'it',\n    'the', 'this', 'that', 'here', 'there', 'now', 'today',\n    'who', 'what', 'when', 'where', 'how', 'why'\n  ];\n  if (invalidNames.includes(lower)) return true;\n\n  const spamDomains = [\n    'jobmatrix', 'totalh', 'jobrapido', 'jobomas',\n    'jobvertise', 'postjobfree', 'jobdiagnosis',\n    'zippia', 'salary.com', 'whatjobs', 'jobcase',\n    'upwork', 'fiverr', 'freelancer'\n  ];\n  for (const spam of spamDomains) {\n    if (lower.includes(spam) || ws.includes(spam)) return true;\n  }\n  if (/^[^a-zA-Z]*$/.test(name)) return true;\n  if (lower.length <= 2 && !/^[a-z]{2}$/i.test(lower)) return true;\n  const genericNames = [\n    'work from home', 'remote position', 'hiring now', 'apply today',\n    'urgent hiring', 'immediate start', 'easy work', 'home based',\n    'online job', 'virtual assistant hiring'\n  ];\n  for (const generic of genericNames) {\n    if (lower.includes(generic)) return true;\n  }\n  return false;\n}\n\nfunction buildLocation(city, state, country) {\n  city = (city || '').trim();\n  state = (state || '').trim();\n  country = (country || '').trim();\n  if (city && state) return city + ', ' + state;\n  if (state) return state;\n  if (city) return city;\n  if (country) return country;\n  return 'Remote / Not specified';\n}\n\nfunction pickBestUrl(job) {\n  const applyLink = (job.job_apply_link || '').trim();\n  const googleLink = (job.job_google_link || '').trim();\n  const aggregatorDomains = [\n    'dailyremote.com', 'remoterockethub.com', 'jooble.org',\n    'talentify.io', 'jobrapido.com', 'neuvoo.com', 'adzuna.com',\n    'getwork.com', 'lensa.com', 'zippia.com', 'whatjobs.com',\n    'jobcase.com', 'arbeitnow.com', 'jobgether.com'\n  ];\n  function isGoogleFragment(url) {\n    if (!url) return false;\n    return url.includes('google.com/search') && (url.includes('#vhid=') || url.includes('udm=8'));\n  }\n  function isAggregator(url) {\n    if (!url) return false;\n    const lower = url.toLowerCase();\n    for (const agg of aggregatorDomains) {\n      if (lower.includes(agg)) return true;\n    }\n    return false;\n  }\n  if (applyLink && !isAggregator(applyLink) && !isGoogleFragment(applyLink)) return applyLink;\n  if (googleLink && !isGoogleFragment(googleLink)) return googleLink;\n  if (applyLink && !isGoogleFragment(applyLink)) return applyLink;\n  if (applyLink) return applyLink;\n  if (googleLink) return googleLink;\n  return '';\n}\n\nconst results = [];\nfor (const job of allJobs) {\n  let companyName = cleanMarkdown(job.employer_name || '');\n  const companyWebsite = (job.employer_website || '').trim();\n  const rawDescription = job.job_description || '';\n  const description = cleanMarkdown(rawDescription.substring(0, 2000));\n  const title = cleanMarkdown(job.job_title || '');\n  const companyType = (job.employer_company_type || '').trim();\n  let employerSource = 'direct';\n\n  if (isJobBoard(companyName)) {\n    const extracted = extractRealEmployer(rawDescription);\n    if (extracted) {\n      companyName = extracted;\n      employerSource = 'extracted_from_description';\n    } else {\n      continue;\n    }\n  } else if (isStaffingAgency(companyName, companyType)) {\n    const extracted = extractRealEmployer(rawDescription);\n    if (extracted) {\n      employerSource = 'extracted_from_agency:' + companyName;\n      companyName = extracted;\n    } else {\n      employerSource = 'staffing_agency';\n    }\n  }\n\n  if (isSpamEmployer(companyName, companyWebsite)) continue;\n\n  const city = (job.job_city || '').trim();\n  const state = (job.job_state || '').trim();\n  const country = (job.job_country || '').trim();\n\n  results.push({\n    json: {\n      job_title: title,\n      company_name: companyName,\n      company_website: companyWebsite,\n      job_description: description,\n      job_city: city,\n      job_state: state,\n      job_country: country,\n      job_location: buildLocation(city, state, country),\n      employer_company_type: companyType,\n      job_posting_url: pickBestUrl(job),\n      date_posted: job.job_posted_at_datetime_utc || '',\n      job_publisher: (job.job_publisher || '').trim(),\n      employer_source: employerSource\n    }\n  });\n}\n\nif (results.length > 0) {\n  return results;\n}\nreturn [{ json: { _no_data: true, message: 'All ' + allJobs.length + ' jobs filtered out' } }];"
+          },
+          "id": "c4bb14e5-548c-47c8-92bf-8348031f5bdf",
+          "name": "Extract Job Data",
+          "type": "n8n-nodes-base.code",
+          "typeVersion": 2,
+          "position": [
+            720,
+            0
+          ]
+        },
+        {
+          "parameters": {
+            "jsCode": "// Deduplication, pre-filtering, and title-based exclusion\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData._seenJobs) {\n  staticData._seenJobs = {};\n}\n\nconst now = Date.now();\nconst sevenDays = 7 * 24 * 60 * 60 * 1000;\nfor (const url of Object.keys(staticData._seenJobs)) {\n  if (now - staticData._seenJobs[url] > sevenDays) {\n    delete staticData._seenJobs[url];\n  }\n}\n\nconst excludeKeywords = [\n  // Physical / blue collar\n  'forklift', 'warehouse', 'nurse', 'nursing', 'construction',\n  'truck driver', 'cdl', 'janitor', 'custodian', 'security guard',\n  'electrician', 'plumber', 'hvac', 'welder', 'mechanic',\n  'physical therapist', 'registered nurse', 'licensed practical',\n  'certified nursing', 'phlebotom', 'radiology', 'surgical',\n  'teacher', 'teaching', 'professor', 'sous chef', 'line cook',\n  'barista', 'cashier', 'retail associate',\n  // Scam / gig postings\n  'research study', 'focus group', 'paid survey', 'paid studies',\n  '$790/wk', '$800/wk', '$1000/wk', 'earn up to',\n  'get paid to share your opinion', 'mystery shopper',\n  'product testing', 'clinical trial', 'test products at home',\n  'be your own boss', 'unlimited earning', 'work when you want',\n  'side hustle', 'gig economy', 'flexible schedule with no',\n  'anyone can apply', 'start immediately no experience',\n  // Senior / strategic roles (NOT automation targets)\n  'it manager', 'it operations manager', 'operations manager',\n  'project manager', 'program manager', 'product manager',\n  'director of', 'vice president', 'vp of',\n  'head of it', 'head of operations', 'head of engineering',\n  'chief information officer', 'chief technology officer',\n  'chief operating officer', 'chief revenue officer',\n  'systems administrator', 'network administrator',\n  'network engineer', 'infrastructure engineer',\n  'devops manager', 'security analyst', 'security engineer',\n  // Engineering / dev roles\n  'software developer', 'software engineer', 'frontend developer',\n  'backend developer', 'full stack developer', 'full-stack developer',\n  'devops engineer', 'solutions architect', 'principal engineer',\n  'staff engineer', 'machine learning engineer', 'data scientist',\n  'senior developer', 'lead developer', 'engineering manager',\n  // QA / testing (not automation targets)\n  'qa tester', 'qa engineer', 'quality assurance engineer',\n  'test engineer', 'automation engineer',\n  // Sales leadership\n  'account executive', 'vp of sales', 'vice president of sales',\n  'chief revenue officer', 'chief technology officer',\n  'sales director', 'sales manager'\n];\n\nconst items = $input.all();\nconst filtered = [];\n\nfor (const item of items) {\n  // Skip sentinel items from Extract Job Data\n  if (item.json._no_data || item.json._error) continue;\n\n  const url = item.json.job_posting_url || '';\n  const desc = (item.json.job_description || '').toLowerCase();\n  const title = (item.json.job_title || '').toLowerCase();\n  const company = (item.json.company_name || '').trim();\n  const combined = title + ' ' + desc;\n\n  if (!company || company.length < 2) continue;\n  if (url && staticData._seenJobs[url]) continue;\n\n  let excluded = false;\n  for (const kw of excludeKeywords) {\n    // For title-level exclusions (manager, director, vp), check title only\n    // For description-level exclusions (scam, physical), check combined\n    if (['it manager', 'it operations manager', 'operations manager',\n         'project manager', 'program manager', 'product manager',\n         'director of', 'vice president', 'vp of',\n         'head of it', 'head of operations', 'head of engineering',\n         'sales director', 'sales manager'].includes(kw)) {\n      if (title.includes(kw)) { excluded = true; break; }\n    } else {\n      if (combined.includes(kw)) { excluded = true; break; }\n    }\n  }\n  if (excluded) continue;\n\n  if (url) {\n    staticData._seenJobs[url] = now;\n  }\n\n  filtered.push(item);\n}\n\nreturn filtered.length > 0 ? filtered : [];"
+          },
+          "id": "7c26e58d-bbba-4413-9b4f-33dd7106aeea",
+          "name": "Deduplicate & Pre-Filter",
+          "type": "n8n-nodes-base.code",
+          "typeVersion": 2,
+          "position": [
+            960,
+            0
+          ]
+        },
+        {
+          "parameters": {
+            "options": {}
+          },
+          "id": "ddd1f049-41cf-41ec-b26b-ecaf0c0f8202",
+          "name": "Process One By One",
+          "type": "n8n-nodes-base.splitInBatches",
+          "typeVersion": 3,
+          "position": [
+            1200,
+            0
+          ],
+          "onError": "continueErrorOutput"
+        },
+        {
+          "parameters": {
+            "mode": "runOnceForEachItem",
+            "jsCode": "// ISSUE 6 FIX: Expanded tool detection with 60+ tools,\n// searches title + description, and properly detects multiple tools.\nconst desc = ($json.job_description || '').toLowerCase();\nconst title = ($json.job_title || '').toLowerCase();\nconst combined = title + ' ' + desc;\n\nconst toolPatterns = [\n  // CRM\n  { name: 'Salesforce', pattern: 'salesforce' },\n  { name: 'HubSpot', pattern: 'hubspot' },\n  { name: 'Zoho CRM', pattern: 'zoho' },\n  { name: 'Pipedrive', pattern: 'pipedrive' },\n  { name: 'Dynamics 365', pattern: 'dynamics 365' },\n  { name: 'Freshsales', pattern: 'freshsales' },\n  { name: 'Copper CRM', pattern: 'copper crm' },\n  // E-commerce\n  { name: 'Shopify', pattern: 'shopify' },\n  { name: 'WooCommerce', pattern: 'woocommerce' },\n  { name: 'Magento', pattern: 'magento' },\n  { name: 'BigCommerce', pattern: 'bigcommerce' },\n  // Accounting/Finance\n  { name: 'QuickBooks', pattern: 'quickbooks' },\n  { name: 'Xero', pattern: /\\bxero\\b/ },\n  { name: 'FreshBooks', pattern: 'freshbooks' },\n  { name: 'Sage', pattern: /\\bsage\\b/ },\n  { name: 'NetSuite', pattern: 'netsuite' },\n  { name: 'Bill.com', pattern: 'bill.com' },\n  // Project Management\n  { name: 'Monday.com', pattern: 'monday.com' },\n  { name: 'Jira', pattern: /\\bjira\\b/ },\n  { name: 'Asana', pattern: /\\basana\\b/ },\n  { name: 'Trello', pattern: /\\btrello\\b/ },\n  { name: 'ClickUp', pattern: 'clickup' },\n  { name: 'Basecamp', pattern: 'basecamp' },\n  { name: 'Wrike', pattern: /\\bwrike\\b/ },\n  { name: 'Smartsheet', pattern: 'smartsheet' },\n  // Support/Helpdesk\n  { name: 'Zendesk', pattern: 'zendesk' },\n  { name: 'Freshdesk', pattern: 'freshdesk' },\n  { name: 'ServiceNow', pattern: 'servicenow' },\n  { name: 'Intercom', pattern: 'intercom' },\n  // Communication\n  { name: 'Slack', pattern: /\\bslack\\b/ },\n  { name: 'Microsoft Teams', pattern: 'microsoft teams' },\n  { name: 'Twilio', pattern: 'twilio' },\n  // Spreadsheets/Data\n  { name: 'Google Sheets', pattern: 'google sheets' },\n  { name: 'Excel', pattern: /\\bexcel\\b/ },\n  { name: 'Airtable', pattern: 'airtable' },\n  { name: 'Notion', pattern: /\\bnotion\\b/ },\n  // Analytics/BI\n  { name: 'Tableau', pattern: 'tableau' },\n  { name: 'Power BI', pattern: 'power bi' },\n  { name: 'Looker', pattern: /\\blooker\\b/ },\n  { name: 'Google Analytics', pattern: 'google analytics' },\n  // Marketing/Email\n  { name: 'Mailchimp', pattern: 'mailchimp' },\n  { name: 'ActiveCampaign', pattern: 'activecampaign' },\n  { name: 'Klaviyo', pattern: 'klaviyo' },\n  { name: 'Constant Contact', pattern: 'constant contact' },\n  { name: 'Marketo', pattern: 'marketo' },\n  { name: 'Pardot', pattern: 'pardot' },\n  // Automation\n  { name: 'Zapier', pattern: 'zapier' },\n  { name: 'Power Automate', pattern: 'power automate' },\n  { name: 'Make/Integromat', pattern: /\\b(make\\.com|integromat)\\b/ },\n  // ERP/Legacy\n  { name: 'SAP', pattern: /\\bsap\\b/ },\n  { name: 'AS400', pattern: /as\\/?400/ },\n  { name: 'Oracle', pattern: /\\boracle\\b/ },\n  // Salesforce ecosystem\n  { name: 'Einstein Analytics', pattern: 'einstein' },\n  // Payments\n  { name: 'Stripe', pattern: /\\bstripe\\b/ },\n  { name: 'PayPal', pattern: 'paypal' },\n  { name: 'Square', pattern: /\\bsquare\\b(?!\\s+feet|\\s+ft|\\s+meter|\\s+mile)/ },\n  // Documents/Signing\n  { name: 'DocuSign', pattern: 'docusign' },\n  { name: 'PandaDoc', pattern: 'pandadoc' },\n  // Phone/Contact Center\n  { name: 'Amazon Connect', pattern: 'amazon connect' },\n  { name: 'RingCentral', pattern: 'ringcentral' },\n  { name: 'Five9', pattern: 'five9' },\n  { name: 'Dialpad', pattern: 'dialpad' },\n  // Web/CMS\n  { name: 'WordPress', pattern: 'wordpress' },\n  { name: 'Webflow', pattern: 'webflow' }\n];\n\nconst detected = [];\nfor (const tool of toolPatterns) {\n  let found = false;\n  if (typeof tool.pattern === 'string') {\n    found = combined.includes(tool.pattern);\n  } else {\n    found = tool.pattern.test(combined);\n  }\n  if (found && !detected.includes(tool.name)) {\n    detected.push(tool.name);\n  }\n}\n\nreturn {\n  json: {\n    ...$json,\n    detected_tools: detected.join(', ') || 'None detected',\n    detected_tool_count: detected.length\n  }\n};"
+          },
+          "id": "22a3d72c-4a0f-4338-8772-09551fa73ac5",
+          "name": "Detect Tech Stack",
+          "type": "n8n-nodes-base.code",
+          "typeVersion": 2,
+          "position": [
+            1440,
+            0
+          ]
+        },
+        {
+          "parameters": {
+            "method": "POST",
+            "url": "https://api.openai.com/v1/chat/completions",
+            "authentication": "genericCredentialType",
+            "genericAuthType": "httpHeaderAuth",
+            "sendBody": true,
+            "specifyBody": "json",
+            "jsonBody": "={\n  \"model\": \"gpt-4o-mini\",\n  \"max_tokens\": 650,\n  \"temperature\": 0,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": {{ JSON.stringify(\"You are a B2B sales intelligence analyst specializing in workflow automation opportunities.\\n\\nYour job: analyze a job posting and determine whether the company actually needs a PERSON for this role, or whether they need AUTOMATION (specifically n8n workflow automation).\\n\\nCONTEXT YOU RECEIVE:\\n- Company name and employer type\\n- Pre-detected software tools found in the job description\\n- The full job description\\n\\nSigns that a company needs automation instead of a person:\\n- The job involves repetitive data transfer between systems\\n- The job involves manually checking things that could be monitored automatically\\n- The job involves copying data from emails/forms into spreadsheets or CRMs\\n- The job involves sending routine notifications or follow-ups\\n- The job involves generating reports from multiple data sources\\n- The job description mentions specific software tools that could be connected via APIs\\n- Multiple integrable tools detected = stronger signal\\n- Tasks like 'update records', 'process invoices', 'route tickets', 'generate reports' are strong automation signals\\n\\nSigns that this is a legitimate human-only role (NOT an automation opportunity):\\n- The job requires complex human judgment, creativity, or relationship building\\n- The job is for a senior strategic role (VP, Director)\\n- The job requires physical presence or manual labor\\n- The job is primarily about managing other people\\n- The role requires CRM STRATEGY, stakeholder management, or cross-functional leadership\\n- The role is at a tech vendor selling the software (Salesforce employee, HubSpot employee) â€” these are NOT automation prospects\\n\\nSCORING CALIBRATION â€” you MUST use the full 1-10 range:\\n- Score 9-10: Textbook automation. The job explicitly lists tasks like 'copy data from emails into spreadsheet', 'generate weekly reports from multiple systems', 'monitor inbox and route tickets', or 'transfer orders between platforms.' Multiple named software tools with known APIs. Almost every listed duty could be an n8n workflow.\\n- Score 7-8: Strong automation signals. The role is mostly repetitive data/process work. Mentions specific integrable tools. Company is clearly hiring a human to do work a well-designed workflow could handle.\\n- Score 5-6: Moderate signals. Some tasks could be automated but the role also requires meaningful human judgment, client communication, or coordination that cannot be fully automated.\\n- Score 3-4: Weak signals. Primarily a human role with only minor repetitive elements.\\n- Score 1-2: No automation opportunity. Senior strategic role, creative role, people management, physical labor, or tech vendor employee.\\n\\nCRITICAL RULES:\\n- Do NOT default to 5 or 6. Be decisive.\\n- A 'Salesforce Administrator' role that focuses on user training, stakeholder requirements, and CRM strategy is a 3-4, NOT a 7-8.\\n- A 'Bookkeeper' who manually copies invoices between QuickBooks and a CRM is an 8-9.\\n- An 'Operations Coordinator' who manually enters orders from email into a spreadsheet and then into an ERP is a 9.\\n- A 'Data Entry Clerk' copying information between two systems is an 8-9.\\n- A 'VP of Sales' at a CRM vendor is a 1.\\n- An 'Account Executive' at any company is a 2.\\n- If the company IS a tech/software vendor (like Salesforce, HubSpot, etc.), the score should be 1-2 regardless of job duties.\\n- If automation_score is 2 or below, set outreach_message to 'N/A'.\\n\\nRespond ONLY in this exact JSON format with no other text:\\n{\\n  \\\"automation_score\\\": <number 1-10>,\\n  \\\"pain_category\\\": \\\"<one of: Lead Ops, Data/Integration, Customer Ops, Financial Ops, People Ops, Content/Marketing, Other>\\\",\\n  \\\"reasoning\\\": \\\"<one sentence explaining your score>\\\",\\n  \\\"estimated_company_size\\\": \\\"<your estimate: Small (1-20), Medium (20-100), Large (100-500), Enterprise (500+)>\\\",\\n  \\\"automation_suggestion\\\": \\\"<one sentence describing what n8n workflow could replace this role>\\\",\\n  \\\"outreach_message\\\": \\\"<one personalized sentence for cold outreach based on the specific job and company, or N/A if score is 2 or below>\\\"\\n}\") }}\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify(\"Analyze this job posting:\\n\\nCompany: \" + $json.company_name + \"\\nEmployer Type: \" + ($json.employer_company_type || 'Not specified') + \"\\nJob Title: \" + $json.job_title + \"\\nLocation: \" + $json.job_location + \"\\nDetected Software Tools: \" + $json.detected_tools + \"\\n\\nJob Description:\\n\" + $json.job_description) }}\n    }\n  ]\n}",
+            "options": {}
+          },
+          "id": "d4668d9c-2085-416a-b681-d5eb69e6b002",
+          "name": "AI Score This Job",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 4.2,
+          "position": [
+            1680,
+            0
+          ],
+          "retryOnFail": true,
+          "maxTries": 3,
+          "waitBetweenTries": 5000,
+          "credentials": {
+            "httpHeaderAuth": {
+              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+              "name": "Header Auth OpenAI"
+            }
+          },
+          "onError": "continueRegularOutput"
+        },
+        {
+          "parameters": {
+            "mode": "runOnceForEachItem",
+            "jsCode": "// ISSUE 1 FIX: Parse AI response and merge with job data from Detect Tech Stack.\n// Uses HTTP Request response format: choices[0].message.content\n\nlet content = '';\nconst input = $json;\n\n// Handle OpenAI API HTTP response format\nif (input.choices && input.choices[0] && input.choices[0].message) {\n  content = String(input.choices[0].message.content || '');\n} else if (input.message && input.message.content) {\n  content = String(input.message.content);\n} else if (input.text) {\n  content = String(input.text);\n}\n\nconst clean = content.replace(/```json\\s*/g, '').replace(/```\\s*/g, '').trim();\n\n// Get the original job data from Detect Tech Stack node\nlet job = {};\ntry {\n  job = $('Detect Tech Stack').item.json || {};\n} catch(e) {\n  try {\n    job = $('Process One By One').item.json || {};\n  } catch(e2) {\n    job = {};\n  }\n}\n\nlet score = 0;\nlet cat = 'Unknown';\nlet reason = 'No response';\nlet size = 'Unknown';\nlet suggest = 'N/A';\nlet outreach = '';\n\ntry {\n  const m = clean.match(/\\{[\\s\\S]*\\}/);\n  if (m) {\n    const p = JSON.parse(m[0]);\n    score = parseInt(p.automation_score, 10) || 0;\n    cat = String(p.pain_category || 'Unknown');\n    reason = String(p.reasoning || '');\n    size = String(p.estimated_company_size || 'Unknown');\n    suggest = String(p.automation_suggestion || '');\n    outreach = String(p.outreach_message || '');\n  }\n} catch(e) {\n  reason = 'Parse error: ' + e.message;\n}\n\nif (score < 0) score = 0;\nif (score > 10) score = 10;\nif (score <= 2) outreach = 'N/A';\n\nreturn {\n  json: {\n    job_title: String(job.job_title || ''),\n    company_name: String(job.company_name || ''),\n    company_website: String(job.company_website || ''),\n    job_description: String(job.job_description || ''),\n    job_city: String(job.job_city || ''),\n    job_state: String(job.job_state || ''),\n    job_location: String(job.job_location || ''),\n    job_posting_url: String(job.job_posting_url || ''),\n    employer_company_type: String(job.employer_company_type || ''),\n    detected_tools: String(job.detected_tools || ''),\n    detected_tool_count: Number(job.detected_tool_count || 0),\n    employer_source: String(job.employer_source || 'direct'),\n    automation_score: score,\n    pain_category: cat,\n    reasoning: reason,\n    estimated_company_size: size,\n    automation_suggestion: suggest,\n    outreach_message: outreach,\n    detected_date: new Date().toISOString().split('T')[0]\n  }\n};"
+          },
+          "id": "f3576417-56de-42ab-afd5-833104e0e51f",
+          "name": "Parse AI Response",
+          "type": "n8n-nodes-base.code",
+          "typeVersion": 2,
+          "position": [
+            1920,
+            0
+          ]
+        },
+        {
+          "parameters": {
+            "mode": "runOnceForEachItem",
+            "jsCode": "// Accumulate each processed result into staticData\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData._signalResults) {\n  staticData._signalResults = [];\n}\n\nconst item = $json;\n\nstaticData._signalResults.push({\n  job_title: String(item.job_title || ''),\n  company_name: String(item.company_name || ''),\n  company_website: String(item.company_website || ''),\n  job_description: String(item.job_description || ''),\n  job_city: String(item.job_city || ''),\n  job_state: String(item.job_state || ''),\n  job_location: String(item.job_location || ''),\n  job_posting_url: String(item.job_posting_url || ''),\n  employer_company_type: String(item.employer_company_type || ''),\n  detected_tools: String(item.detected_tools || ''),\n  detected_tool_count: Number(item.detected_tool_count || 0),\n  employer_source: String(item.employer_source || 'direct'),\n  automation_score: Number(item.automation_score) || 0,\n  pain_category: String(item.pain_category || ''),\n  reasoning: String(item.reasoning || ''),\n  estimated_company_size: String(item.estimated_company_size || ''),\n  automation_suggestion: String(item.automation_suggestion || ''),\n  outreach_message: String(item.outreach_message || ''),\n  detected_date: String(item.detected_date || new Date().toISOString().split('T')[0])\n});\n\nreturn { json: { accumulated: true, count: staticData._signalResults.length } };"
+          },
+          "id": "f865f477-9165-455b-a215-f9e206fea44b",
+          "name": "Accumulate Result",
+          "type": "n8n-nodes-base.code",
+          "typeVersion": 2,
+          "position": [
+            2160,
+            0
+          ]
+        },
+        {
+          "parameters": {
+            "jsCode": "// ISSUE 1 FIX: Collect all accumulated results after the batch loop completes.\n// SplitInBatches output 0 fires when ALL batches are done.\nconst staticData = $getWorkflowStaticData('global');\nconst results = staticData._signalResults || [];\n\n// Clear for next run\nstaticData._signalResults = [];\n\nif (results.length === 0) {\n  return [{ json: { _no_results: true, automation_score: 0 } }];\n}\n\nreturn results.map(item => ({ json: item }));"
+          },
+          "id": "2ca78cac-4882-487d-968e-e77505a0e71c",
+          "name": "Collect All Results",
+          "type": "n8n-nodes-base.code",
+          "typeVersion": 2,
+          "position": [
+            1200,
+            304
+          ]
+        },
+        {
+          "parameters": {
+            "conditions": {
+              "combinator": "and",
+              "conditions": [
+                {
+                  "id": "c1",
+                  "leftValue": "={{ $json.company_name }}",
+                  "operator": {
+                    "operation": "exists",
+                    "type": "string"
+                  },
+                  "rightValue": ""
+                }
+              ],
+              "options": {
+                "version": 2,
+                "leftValue": "",
+                "caseSensitive": true,
+                "typeValidation": "loose"
+              }
+            },
+            "options": {}
+          },
+          "id": "3390b8f8-9069-4bab-a3f4-ae21b9083419",
+          "name": "Has Results?",
+          "type": "n8n-nodes-base.if",
+          "typeVersion": 2.3,
+          "position": [
+            1440,
+            304
+          ]
+        },
+        {
+          "parameters": {
+            "authentication": "serviceAccount",
+            "columns": {
+              "mappingMode": "defineBelow",
+              "schema": [
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Scan Date",
+                  "id": "Scan Date",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Company Name",
+                  "id": "Company Name",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Job Title",
+                  "id": "Job Title",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Location",
+                  "id": "Location",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Employer Type",
+                  "id": "Employer Type",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "AI Score",
+                  "id": "AI Score",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Pain Category",
+                  "id": "Pain Category",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Reasoning",
+                  "id": "Reasoning",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Detected Tools",
+                  "id": "Detected Tools",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Automation Suggestion",
+                  "id": "Automation Suggestion",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Source URL",
+                  "id": "Source URL",
+                  "required": false,
+                  "type": "string"
+                }
+              ],
+              "value": {
+                "AI Score": "={{ $json.automation_score }}",
+                "Automation Suggestion": "={{ $json.automation_suggestion }}",
+                "Company Name": "={{ $json.company_name }}",
+                "Detected Tools": "={{ $json.detected_tools }}",
+                "Employer Type": "={{ $json.employer_company_type }}",
+                "Job Title": "={{ $json.job_title }}",
+                "Location": "={{ $json.job_location }}",
+                "Pain Category": "={{ $json.pain_category }}",
+                "Reasoning": "={{ $json.reasoning }}",
+                "Scan Date": "={{ $json.detected_date }}",
+                "Source URL": "={{ $json.job_posting_url }}"
+              }
+            },
+            "documentId": {
+              "__rl": true,
+              "mode": "id",
+              "value": "171oeM44bH3FyBHOvzS-icqR11QnSXkpxgsxMokCbrKE"
+            },
+            "operation": "append",
+            "options": {},
+            "sheetName": {
+              "__rl": true,
+              "mode": "name",
+              "value": "All Scanned"
+            }
+          },
+          "id": "572e856a-9d17-4523-ab58-f3653e057883",
+          "name": "Log All Scanned",
+          "type": "n8n-nodes-base.googleSheets",
+          "typeVersion": 4.5,
+          "position": [
+            1680,
+            208
+          ],
+          "credentials": {
+            "googleApi": {
+              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+              "name": "Google Service Account"
+            }
+          },
+          "onError": "continueRegularOutput"
+        },
+        {
+          "parameters": {
+            "conditions": {
+              "options": {
+                "version": 2,
+                "leftValue": "",
+                "caseSensitive": true,
+                "typeValidation": "strict"
+              },
+              "combinator": "and",
+              "conditions": [
+                {
+                  "id": "c2",
+                  "leftValue": "={{ $json.automation_score }}",
+                  "rightValue": 6,
+                  "operator": {
+                    "type": "number",
+                    "operation": "gte"
+                  }
+                }
+              ]
+            },
+            "options": {}
+          },
+          "id": "79c49e68-a509-4f4a-bf59-15e4726d3d44",
+          "name": "Filter Qualified Leads",
+          "type": "n8n-nodes-base.if",
+          "typeVersion": 2.3,
+          "position": [
+            1680,
+            432
+          ]
+        },
+        {
+          "parameters": {
+            "authentication": "serviceAccount",
+            "columns": {
+              "mappingMode": "defineBelow",
+              "schema": [
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Date Detected",
+                  "id": "Date Detected",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Company Name",
+                  "id": "Company Name",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Company Website",
+                  "id": "Company Website",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Signal Type",
+                  "id": "Signal Type",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Signal Detail",
+                  "id": "Signal Detail",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Pain Category",
+                  "id": "Pain Category",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "AI Score (1-10)",
+                  "id": "AI Score (1-10)",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "AI Reasoning",
+                  "id": "AI Reasoning",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Estimated Company Size",
+                  "id": "Estimated Company Size",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Detected Tools",
+                  "id": "Detected Tools",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Source URL",
+                  "id": "Source URL",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Outreach Message",
+                  "id": "Outreach Message",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Status",
+                  "id": "Status",
+                  "required": false,
+                  "type": "string"
+                },
+                {
+                  "canBeUsedToMatch": true,
+                  "defaultMatch": false,
+                  "display": true,
+                  "displayName": "Notes",
+                  "id": "Notes",
+                  "required": false,
+                  "type": "string"
+                }
+              ],
+              "value": {
+                "AI Reasoning": "={{ $json.reasoning }}",
+                "AI Score (1-10)": "={{ $json.automation_score }}",
+                "Company Name": "={{ $json.company_name }}",
+                "Company Website": "={{ $json.company_website }}",
+                "Date Detected": "={{ $json.detected_date }}",
+                "Detected Tools": "={{ $json.detected_tools }}",
+                "Estimated Company Size": "={{ $json.estimated_company_size }}",
+                "Notes": "",
+                "Outreach Message": "={{ $json.outreach_message }}",
+                "Pain Category": "={{ $json.pain_category }}",
+                "Signal Detail": "={{ $json.job_title }}",
+                "Signal Type": "Job Posting",
+                "Source URL": "={{ $json.job_posting_url }}",
+                "Status": "New"
+              }
+            },
+            "documentId": {
+              "__rl": true,
+              "mode": "id",
+              "value": "171oeM44bH3FyBHOvzS-icqR11QnSXkpxgsxMokCbrKE"
+            },
+            "operation": "append",
+            "options": {},
+            "sheetName": {
+              "__rl": true,
+              "mode": "name",
+              "value": "Signal Log"
+            }
+          },
+          "id": "8f1a6c45-a335-4392-8e77-8e622cff2775",
+          "name": "Log to Signal Sheet",
+          "type": "n8n-nodes-base.googleSheets",
+          "typeVersion": 4.5,
+          "position": [
+            1920,
+            320
+          ],
+          "credentials": {
+            "googleApi": {
+              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+              "name": "Google Service Account"
+            }
+          },
+          "onError": "continueRegularOutput"
+        },
+        {
+          "parameters": {
+            "jsCode": "// Build email alert â€” only for score >= 8 (hot leads per guideline)\nconst items = $input.all();\nconst hotLeads = items.filter(item => (Number(item.json.automation_score) || 0) >= 8);\n\nif (hotLeads.length === 0) {\n  return [{ json: { has_hot_leads: false, count: 0, subject: '', html: '' } }];\n}\n\nlet html = '<h2>\\uD83D\\uDD25 ' + hotLeads.length + ' Hot Automation Prospect(s) Detected!</h2>';\nhtml += '<p>The following leads scored <strong>8+/10</strong> on the automation opportunity scale:</p><hr/>';\n\nfor (const lead of hotLeads) {\n  const j = lead.json;\n  html += '<div style=\"margin-bottom:20px;padding:15px;border:1px solid #ddd;border-radius:8px;\">';\n  html += '<h3>' + (j.company_name || 'Unknown') + ' \\u2014 ' + (j.job_title || 'Unknown') + '</h3>';\n  if (j.employer_source && j.employer_source !== 'direct') {\n    html += '<p style=\"color:#e67e22;\"><strong>\\u26A0\\uFE0F Note:</strong> Company name was ' + j.employer_source + '</p>';\n  }\n  html += '<p><strong>Location:</strong> ' + (j.job_location || 'Not specified') + '</p>';\n  html += '<p><strong>AI Score:</strong> ' + j.automation_score + '/10</p>';\n  html += '<p><strong>Pain Category:</strong> ' + (j.pain_category || '') + '</p>';\n  html += '<p><strong>Company Size:</strong> ' + (j.estimated_company_size || '') + '</p>';\n  html += '<p><strong>Detected Tools (' + (j.detected_tool_count || 0) + '):</strong> ' + (j.detected_tools || 'None') + '</p>';\n  html += '<p><strong>Why this is hot:</strong> ' + (j.reasoning || '') + '</p>';\n  html += '<p><strong>Suggested automation:</strong> ' + (j.automation_suggestion || '') + '</p>';\n  if (j.outreach_message && j.outreach_message !== 'N/A') {\n    html += '<p><strong>\\uD83D\\uDCE7 Outreach:</strong> <em>' + j.outreach_message + '</em></p>';\n  }\n  html += '<p><a href=\"' + (j.job_posting_url || '#') + '\">View Original Posting</a>';\n  if (j.company_website) {\n    html += ' | <a href=\"' + j.company_website + '\">Company Website</a>';\n  }\n  html += '</p>';\n  html += '</div>';\n}\n\nhtml += '<hr/><p><strong>\\uD83D\\uDC49 Action:</strong> Review these prospects and consider outreach.</p>';\n\nconst subject = hotLeads.length === 1\n  ? '\\uD83D\\uDD25 Hot Prospect: ' + hotLeads[0].json.company_name + ' (Score: ' + hotLeads[0].json.automation_score + '/10)'\n  : '\\uD83D\\uDD25 ' + hotLeads.length + ' Hot Prospects Detected (Scores 8+/10)';\n\nreturn [{ json: { has_hot_leads: true, count: hotLeads.length, subject: subject, html: html } }];"
+          },
+          "id": "48059dad-dbc7-46da-b531-a69dae2ea7ae",
+          "name": "Build Hot Alert Summary",
+          "type": "n8n-nodes-base.code",
+          "typeVersion": 2,
+          "position": [
+            1920,
+            544
+          ]
+        },
+        {
+          "parameters": {
+            "conditions": {
+              "options": {
+                "version": 2,
+                "leftValue": "",
+                "caseSensitive": true,
+                "typeValidation": "strict"
+              },
+              "conditions": [
+                {
+                  "id": "c4",
+                  "leftValue": "={{ $json.count }}",
+                  "rightValue": 0,
+                  "operator": {
+                    "type": "number",
+                    "operation": "gt"
+                  }
+                }
+              ],
+              "combinator": "and"
+            },
+            "options": {}
+          },
+          "id": "f6336044-6c16-4a0b-905f-552da689f9cc",
+          "name": "Has Hot Leads?",
+          "type": "n8n-nodes-base.if",
+          "typeVersion": 2.3,
+          "position": [
+            2160,
+            544
+          ]
+        },
+        {
+          "parameters": {
+            "fromEmail": "your-email@example.com",
+            "toEmail": "your-email@example.com",
+            "subject": "={{ $json.subject }}",
+            "html": "={{ $json.html }}",
+            "options": {}
+          },
+          "id": "d5119adc-d119-4ba4-b212-a8d287ae60d8",
+          "name": "Send Hot Signal Alert",
+          "type": "n8n-nodes-base.emailSend",
+          "typeVersion": 2.1,
+          "position": [
+            2400,
+            544
+          ],
+          "webhookId": "80722603-48ce-424f-ba1f-a0230ff032a4",
+          "credentials": {
+            "smtp": {
+              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+              "name": "SMTP Account"
+            }
+          },
+          "onError": "continueRegularOutput"
+        }
+      ],
+      "connections": {
+        "Every 6 Hours": {
+          "main": [
+            [
+              {
+                "node": "Select Search Query",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Select Search Query": {
+          "main": [
+            [
+              {
+                "node": "Search Job Postings",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Search Job Postings": {
+          "main": [
+            [
+              {
+                "node": "Extract Job Data",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Extract Job Data": {
+          "main": [
+            [
+              {
+                "node": "Deduplicate & Pre-Filter",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Deduplicate & Pre-Filter": {
+          "main": [
+            [
+              {
+                "node": "Process One By One",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Process One By One": {
+          "main": [
+            [
+              {
+                "node": "Collect All Results",
+                "type": "main",
+                "index": 0
+              }
+            ],
+            [
+              {
+                "node": "Detect Tech Stack",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Detect Tech Stack": {
+          "main": [
+            [
+              {
+                "node": "AI Score This Job",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "AI Score This Job": {
+          "main": [
+            [
+              {
+                "node": "Parse AI Response",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Parse AI Response": {
+          "main": [
+            [
+              {
+                "node": "Accumulate Result",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Accumulate Result": {
+          "main": [
+            [
+              {
+                "node": "Process One By One",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Collect All Results": {
+          "main": [
+            [
+              {
+                "node": "Has Results?",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Has Results?": {
+          "main": [
+            [
+              {
+                "node": "Log All Scanned",
+                "type": "main",
+                "index": 0
+              },
+              {
+                "node": "Filter Qualified Leads",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Filter Qualified Leads": {
+          "main": [
+            [
+              {
+                "node": "Log to Signal Sheet",
+                "type": "main",
+                "index": 0
+              },
+              {
+                "node": "Build Hot Alert Summary",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Build Hot Alert Summary": {
+          "main": [
+            [
+              {
+                "node": "Has Hot Leads?",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Has Hot Leads?": {
+          "main": [
+            [
+              {
+                "node": "Send Hot Signal Alert",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        }
+      },
+      "authors": "YOUR_NAME",
+      "name": null,
+      "description": null,
+      "autosaved": false,
+      "workflowPublishHistory": [
+        {
+          "createdAt": "2026-03-09T07:21:38.704Z",
+          "id": 134,
+          "workflowId": "Yj3VcpnN2GL4N1cW",
+          "versionId": "dce39b81-9a30-4667-834e-c169749a2d14",
+          "event": "activated",
+          "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+        }
+      ]
+    }
+  }
+}

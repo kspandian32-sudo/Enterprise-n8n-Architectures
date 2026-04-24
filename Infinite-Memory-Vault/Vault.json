@@ -1,0 +1,2350 @@
+﻿{
+    "updatedAt":  "2026-04-15T18:25:52.021Z",
+    "createdAt":  "2026-04-14T16:46:34.875Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "Infinite-Memory-Vault-v2.1w 7",
+    "description":  null,
+    "active":  true,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "updates":  [
+                                                         "message"
+                                                     ],
+                                         "additionalFields":  {
+
+                                                              }
+                                     },
+                      "type":  "n8n-nodes-base.telegramTrigger",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       -1296,
+                                       528
+                                   ],
+                      "id":  "edbd84a4-9a0a-4fa1-bfaa-54da97942864",
+                      "name":  "Telegram Trigger",
+                      "webhookId":  "86021a6f-12b0-4a51-a885-7250a52e9005",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "Telegram Account Memory Vault"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "cmd-remember",
+                                                                                   "leftValue":  "={{ $json.message.text }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "startsWith",
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                   "rightValue":  "/remember"
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  false,
+                                                                            "typeValidation":  "strict"
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       -1072,
+                                       528
+                                   ],
+                      "id":  "bf0d1584-b07d-481c-8aa4-4aa8f107e794",
+                      "name":  "Is /remember command?"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const text = $input.first().json.message.text;\nconst content = text.replace(\u0027/remember\u0027, \u0027\u0027).trim();\nconst userId = String($input.first().json.message.from.id);\nconst chatId = $input.first().json.message.chat.id;\nreturn [{ json: { content, user_id: userId, chat_id: chatId } }];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -848,
+                                       256
+                                   ],
+                      "id":  "fd67fbe4-87bb-4899-9c67-750e663e9358",
+                      "name":  "Extract Remember Content"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.openai.com/v1/embeddings",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ input: $(\u0027Extract Remember Content\u0027).first().json.content, model: \u0027text-embedding-3-small\u0027 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       -624,
+                                       256
+                                   ],
+                      "id":  "2625bc86-7997-49a1-a86a-17ac396581df",
+                      "name":  "Embed /remember Content",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "OpenAI Header Auth"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "=https://eqvyicflhfwaropzqbai.supabase.co/rest/v1/memory",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "apikey",
+                                                                                         "value":  "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Authorization",
+                                                                                         "value":  "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Prefer",
+                                                                                         "value":  "return=representation"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ content: $(\u0027Extract Remember Content\u0027).first().json.content, embedding: $(\u0027Embed /remember Content\u0027).first().json.data[0].embedding, metadata: { timestamp: new Date().toISOString(), source: \u0027manual_command\u0027, user_id: $(\u0027Extract Remember Content\u0027).first().json.user_id, importance_score: $(\u0027Analyze Importance \u0026 Branch\u0027).first().json.importance_score, category: \u0027manual\u0027 } }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       48,
+                                       368
+                                   ],
+                      "id":  "4cac9411-3b7b-4be6-8406-d4efa138553b",
+                      "name":  "Insert /remember to Supabase"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "cmd-forget",
+                                                                                   "leftValue":  "={{ $json.message.text }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "startsWith",
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                   "rightValue":  "/forget"
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  false,
+                                                                            "typeValidation":  "strict"
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       -848,
+                                       624
+                                   ],
+                      "id":  "edbb1481-4a93-4ebc-b6ee-923e7af26ca6",
+                      "name":  "Is /forget command?"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const text = $input.first().json.message.text;\nconst keyword = text.replace(\u0027/forget\u0027, \u0027\u0027).trim();\nconst chatId = $input.first().json.message.chat.id;\nreturn [{ json: { keyword, chat_id: chatId } }];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -624,
+                                       768
+                                   ],
+                      "id":  "db99caf2-72f6-4d70-93d5-dee8bb33f1d7",
+                      "name":  "Extract Forget Keyword"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "DELETE",
+                                         "url":  "=https://eqvyicflhfwaropzqbai.supabase.co/rest/v1/memory?content=ilike.*{{ encodeURIComponent($json.keyword) }}*",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "apikey",
+                                                                                         "value":  "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Authorization",
+                                                                                         "value":  "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Prefer",
+                                                                                         "value":  "return=representation"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       -400,
+                                       768
+                                   ],
+                      "id":  "7b44b5da-fb46-4da4-b1f8-01d13010b3f8",
+                      "name":  "Delete /forget from Supabase"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "voice-check",
+                                                                                   "leftValue":  "={{ $json.message.voice }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "exists",
+                                                                                                    "singleValue":  true,
+                                                                                                    "type":  "object"
+                                                                                                },
+                                                                                   "rightValue":  ""
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       -624,
+                                       528
+                                   ],
+                      "id":  "9d239e44-d973-4605-9bd5-6073862dc5f6",
+                      "name":  "Is Voice Note?"
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "=https://api.telegram.org/bot8763826442:AAFAJ1ksi4g0J6QKGAOs4hyWAMloPnhcNgA/getFile?file_id={{ $json.message.voice.file_id }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       -400,
+                                       448
+                                   ],
+                      "id":  "b3f27240-3ed6-4a23-8b4d-1060010b61cd",
+                      "name":  "Get Voice File Path"
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "=https://api.telegram.org/file/bot8763826442:AAFAJ1ksi4g0J6QKGAOs4hyWAMloPnhcNgA/{{ $json.result.file_path }}",
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "responseFormat":  "file"
+                                                                                       }
+                                                                      }
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       -176,
+                                       448
+                                   ],
+                      "id":  "8bff9a0c-5c60-4cbf-b095-2bbee8e6f730",
+                      "name":  "Download Voice File"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.openai.com/v1/audio/transcriptions",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendBody":  true,
+                                         "contentType":  "multipart-form-data",
+                                         "bodyParameters":  {
+                                                                "parameters":  [
+                                                                                   {
+                                                                                       "name":  "model",
+                                                                                       "value":  "whisper-1"
+                                                                                   },
+                                                                                   {
+                                                                                       "parameterType":  "formBinaryData",
+                                                                                       "name":  "file",
+                                                                                       "inputDataFieldName":  "data"
+                                                                                   }
+                                                                               ]
+                                                            },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       48,
+                                       448
+                                   ],
+                      "id":  "fe54faa2-4175-48fa-91bb-7fd6b044e687",
+                      "name":  "Whisper Transcription",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "OpenAI Header Auth"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const triggerData = $(\u0027Telegram Trigger\u0027).first().json;\nconst isVoice = !!triggerData.message.voice;\nlet messageText;\nif (isVoice) {\n  messageText = $input.first().json.text; // Whisper output\n} else {\n  messageText = triggerData.message.text;\n}\nreturn [{ json: {\n  message_text: messageText,\n  user_id: String(triggerData.message.from.id),\n  chat_id: triggerData.message.chat.id,\n  first_name: triggerData.message.from.first_name || \u0027\u0027\n} }];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       272,
+                                       528
+                                   ],
+                      "id":  "ac6b4602-5c53-4ed2-b00f-765a07e6340e",
+                      "name":  "Normalise Message Text"
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "https://cloud.flowiseai.com/api/v1/chatflows"
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       496,
+                                       528
+                                   ],
+                      "id":  "917b24e1-d432-4ed3-96f5-9f09b638ebd7",
+                      "name":  "Flowise Health Check",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "Flowise Header Auth"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.openai.com/v1/embeddings",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ input: $(\u0027Normalise Message Text\u0027).first().json.message_text, model: \u0027text-embedding-3-small\u0027 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       720,
+                                       336
+                                   ],
+                      "id":  "abd9ab60-15fc-4316-a7a1-aced1d91b8af",
+                      "name":  "Embed User Message",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "OpenAI Header Auth"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "=https://eqvyicflhfwaropzqbai.supabase.co/rest/v1/rpc/match_documents",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "apikey",
+                                                                                         "value":  "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Authorization",
+                                                                                         "value":  "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ query_embedding: $json.data[0].embedding, match_threshold: 0.6, match_count: 3 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       944,
+                                       336
+                                   ],
+                      "id":  "fad054dc-27fe-4283-a601-e9cceff1c8ef",
+                      "name":  "Proactive Memory Fetch",
+                      "alwaysOutputData":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const items = $input.all();\nconst normalised = $(\u0027Normalise Message Text\u0027).first().json;\nconst messageText = normalised.message_text;\nconst userId = normalised.user_id;\nconst chatId = normalised.chat_id;\n\nlet memoryContext = \u0027\u0027;\nif (items \u0026\u0026 items.length \u003e 0 \u0026\u0026 Object.keys(items[0].json).length \u003e 0) {\n  memoryContext = \u0027DATABASE MEMORIES (STRICTLY USE THESE TO ANSWER THE QUESTION):\\\\n\u0027 +\n    items.map((item, i) =\u003e {\n      const m = item.json;\n      const sim = m.similarity || 0;\n      const label = sim \u003e= 0.6 ? \u0027[High confidence]\u0027 : \u0027[Low confidence â€” verify before using]\u0027;\n      return `${i+1}. ${label} [${(sim*100).toFixed(0)}% match] ${m.content}`;\n    }).join(\u0027\\\\n\u0027) + \u0027\\\\n\\\\n\u0027;\n}\n\nconst brandPersona = \u0027You are a D2C brand intelligence assistant for Pure Remedy skincare. \u0027\n  + \u0027You have permanent memory of all past conversations. \u0027\n  + \u0027Always reference relevant past memories in your response. \u0027\n  + \u0027Save important brand info, supplier details, pricing, and customer insights automatically.\u0027;\n\n// INJECT MEMORY INTO QUESTION TO FORCE FLOWISE TO READ IT INSTEAD OF RELYING ON SYSTEM PROMPT OR TOOLS\nconst finalQuestion = memoryContext ? (memoryContext + \u0027USER QUESTION:\\\\n\u0027 + messageText) : messageText;\n\nreturn [{ json: {\n  question: finalQuestion,\n  session_id: userId,\n  system_message: brandPersona,\n  chat_id: chatId\n} }];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       1168,
+                                       336
+                                   ],
+                      "id":  "ee09cd4a-c095-4baf-9121-56f5037d2929",
+                      "name":  "Build Flowise Payload with Memories"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://cloud.flowiseai.com/api/v1/prediction/8ecde65e-6a5a-4915-92a9-c0f85235b68d",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ question: $json.question, sessionId: $json.session_id, overrideConfig: { systemMessage: $json.system_message } }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       1392,
+                                       336
+                                   ],
+                      "id":  "4c1dcb02-cef4-4f53-b0b7-174ba5a7f0f0",
+                      "name":  "Call Flowise Tool Agent",
+                      "retryOnFail":  true,
+                      "maxTries":  3,
+                      "waitBetweenTries":  5000,
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "Flowise Header Auth"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "=https://eqvyicflhfwaropzqbai.supabase.co/rest/v1/memory_log",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "apikey",
+                                                                                         "value":  "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Authorization",
+                                                                                         "value":  "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ operation: \u0027conversation\u0027, content_preview: $(\u0027Build Flowise Payload with Memories\u0027).first().json.question.substring(0,120), user_id: $(\u0027Build Flowise Payload with Memories\u0027).first().json.session_id, timestamp: new Date().toISOString() }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       1616,
+                                       336
+                                   ],
+                      "id":  "09a8dcd8-b92c-40cb-83a9-50ba620257f8",
+                      "name":  "Append to memory_log"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "=https://eqvyicflhfwaropzqbai.supabase.co/rest/v1/rpc/match_documents",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "apikey",
+                                                                                         "value":  "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Authorization",
+                                                                                         "value":  "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ query_embedding: $(\u0027Embed /remember Content\u0027).first().json.data[0].embedding, match_threshold: 0.92, match_count: 1 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "08b08493-28da-40c7-a933-33c607fe8609",
+                      "name":  "Check Existing Memory",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       -400,
+                                       160
+                                   ],
+                      "alwaysOutputData":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "5f7bd4af-5c1a-46da-b097-769b76c8d76c",
+                                                                                   "leftValue":  "={{ $json.id }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "notEmpty",
+                                                                                                    "singleValue":  true,
+                                                                                                    "type":  "number"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "loose"
+                                                                        },
+                                                            "conditions[0]":  {
+                                                                                  "operator":  {
+                                                                                                   "type":  "number"
+                                                                                               }
+                                                                              }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "077eaa77-2d84-4340-93b0-4cd88f1cf9b1",
+                      "name":  "Is Duplicate Memory?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       -176,
+                                       160
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.openai.com/v1/chat/completions",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ JSON.stringify({ model: \u0027gpt-4o-mini\u0027, messages: [ { role: \u0027system\u0027, content: \u0027Score the importance of this memory for a D2C brand on a scale of 1-10. 10 = critical (pricing, product specs), 1 = trivial (greetings). Return ONLY the number.\u0027 }, { role: \u0027user\u0027, content: $json.content } ], temperature: 0.1 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "a0d44052-bd81-48fe-a481-3b7b7bcb74cc",
+                      "name":  "Score Memory Importance",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       -736,
+                                       112
+                                   ],
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "OpenAI Header Auth"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const item = $input.first().json;\nconst scoreText = item.choices[0].message.content.trim();\nconst score = parseInt(scoreText);\nconst isImportant = !isNaN(score) \u0026\u0026 score \u003e= 6;\n\nreturn [{ json: { \n  is_important: isImportant, \n  importance_score: isImportant ? score : (isNaN(score) ? 0 : score),\n  gpt_raw_response: scoreText\n} }];"
+                                     },
+                      "id":  "bd4d22dd-2d94-4688-a630-2d5589f46ea7",
+                      "name":  "Analyze Importance \u0026 Branch",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -496,
+                                       112
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "check-important-flag-v3",
+                                                                                   "leftValue":  "={{ $json.is_important }}",
+                                                                                   "operator":  {
+                                                                                                    "type":  "boolean",
+                                                                                                    "operation":  "true",
+                                                                                                    "singleValue":  true
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and",
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "4c15542e-61c3-426b-aef2-1ee159ba3284",
+                      "name":  "Branch on Importance",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       -240,
+                                       112
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                         "text":  "={{ $(\u0027Call Flowise Tool Agent\u0027).first().json.text }}",
+                                         "additionalFields":  {
+
+                                                              },
+                                         "operation":  "sendMessage"
+                                     },
+                      "id":  "9f485632-12b2-4cc4-a886-fb326e9e1d52",
+                      "name":  "Send Final Reply",
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1856,
+                                       336
+                                   ],
+                      "webhookId":  "755b83c2-475e-4010-a411-222211a03644",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "Telegram Account Memory Vault"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                         "text":  "=âœ… Memory saved (Importance: {{ $(\u0027Analyze Importance \u0026 Branch\u0027).first().json.importance_score }}/10): {{ $(\u0027Extract Remember Content\u0027).first().json.content }}",
+                                         "additionalFields":  {
+
+                                                              },
+                                         "operation":  "sendMessage"
+                                     },
+                      "id":  "7a676b7d-d55b-40e0-8777-6a3455bffe11",
+                      "name":  "Confirm /remember",
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1,
+                      "position":  [
+                                       272,
+                                       368
+                                   ],
+                      "webhookId":  "34fffc62-72d1-495b-8f21-8109e20edcfd",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "Telegram Account Memory Vault"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                         "text":  "=âš ï¸ I already have a very similar memory in the vault, so I skipped saving this duplicate: \n\n\"{{ $(\u0027Check Existing Memory\u0027).first().json.content }}\"",
+                                         "additionalFields":  {
+
+                                                              },
+                                         "operation":  "sendMessage"
+                                     },
+                      "id":  "82d5a1a7-7768-4687-a7aa-062aacb641e9",
+                      "name":  "Duplicate Alert",
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1,
+                      "position":  [
+                                       48,
+                                       160
+                                   ],
+                      "webhookId":  "c6a06ab6-28df-43a5-8392-48b5814c7cfe",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "Telegram Account Memory Vault"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                         "text":  "=âš ï¸ This memory was deemed too trivial to save in the long-term vault (Importance Score: {{ $(\u0027Analyze Importance \u0026 Branch\u0027).first().json.importance_score }}/10)",
+                                         "additionalFields":  {
+
+                                                              },
+                                         "operation":  "sendMessage"
+                                     },
+                      "id":  "5d7635ad-0025-4f48-bfea-6037d572c1a0",
+                      "name":  "Reject Trivial Memory",
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1,
+                      "position":  [
+                                       48,
+                                       32
+                                   ],
+                      "webhookId":  "29b85407-a07a-477f-8951-6a33be744a8c",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "Telegram Account Memory Vault"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                         "text":  "=ðŸ¤ Understood. I\u0027ve cleared relevant memories about \"{{ $(\u0027Extract Forget Keyword\u0027).first().json.keyword }}\" from the vault.",
+                                         "additionalFields":  {
+
+                                                              },
+                                         "operation":  "sendMessage"
+                                     },
+                      "id":  "bf71865f-ea31-4abb-82e4-34542edf8c5a",
+                      "name":  "Forget Success",
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -176,
+                                       736
+                                   ],
+                      "webhookId":  "59125fc1-52be-4c2c-8e42-e58de09f67cf",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "Telegram Account Memory Vault"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                         "text":  "=âš ï¸ I\u0027m having trouble reaching my memory system right now. Please try again in a few moments. If the issue persists, it will be flagged to the team.",
+                                         "additionalFields":  {
+
+                                                              },
+                                         "operation":  "sendMessage"
+                                     },
+                      "id":  "b1013c40-50dd-4a47-887c-8cc540c3bb81",
+                      "name":  "Flowise Down User Reply",
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1,
+                      "position":  [
+                                       720,
+                                       688
+                                   ],
+                      "webhookId":  "12128aef-b394-4514-b376-fd963796f5ea",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "Telegram Account Memory Vault"
+                                                          }
+                                      }
+                  }
+              ],
+    "connections":  {
+                        "Telegram Trigger":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Is /remember command?",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "Is /remember command?":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Extract Remember Content",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ],
+                                                                   [
+                                                                       {
+                                                                           "node":  "Is /forget command?",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Is /forget command?":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Extract Forget Keyword",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ],
+                                                                 [
+                                                                     {
+                                                                         "node":  "Is Voice Note?",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Extract Forget Keyword":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "Delete /forget from Supabase",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Is Voice Note?":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Get Voice File Path",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ],
+                                                            [
+                                                                {
+                                                                    "node":  "Normalise Message Text",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Get Voice File Path":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Download Voice File",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Download Voice File":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Whisper Transcription",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Whisper Transcription":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Normalise Message Text",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Normalise Message Text":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "Flowise Health Check",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Flowise Health Check":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Embed User Message",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ],
+                                                                  [
+                                                                      {
+                                                                          "node":  "Flowise Down User Reply",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Embed User Message":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Proactive Memory Fetch",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Proactive Memory Fetch":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "Build Flowise Payload with Memories",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Build Flowise Payload with Memories":  {
+                                                                    "main":  [
+                                                                                 [
+                                                                                     {
+                                                                                         "node":  "Call Flowise Tool Agent",
+                                                                                         "type":  "main",
+                                                                                         "index":  0
+                                                                                     }
+                                                                                 ]
+                                                                             ]
+                                                                },
+                        "Call Flowise Tool Agent":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "Append to memory_log",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ],
+                                                                     [
+                                                                         {
+                                                                             "node":  "Flowise Down User Reply",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "Embed /remember Content":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "Check Existing Memory",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "Check Existing Memory":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Is Duplicate Memory?",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Is Duplicate Memory?":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Duplicate Alert",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ],
+                                                                  [
+                                                                      {
+                                                                          "node":  "Insert /remember to Supabase",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Extract Remember Content":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "Score Memory Importance",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "Score Memory Importance":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "Analyze Importance \u0026 Branch",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "Analyze Importance \u0026 Branch":  {
+                                                                 "main":  [
+                                                                              [
+                                                                                  {
+                                                                                      "node":  "Branch on Importance",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ]
+                                                                          ]
+                                                             },
+                        "Branch on Importance":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Embed /remember Content",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ],
+                                                                  [
+                                                                      {
+                                                                          "node":  "Reject Trivial Memory",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Append to memory_log":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Send Final Reply",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Insert /remember to Supabase":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "node":  "Confirm /remember",
+                                                                                  "type":  "main",
+                                                                                  "index":  0
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         },
+                        "Delete /forget from Supabase":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "node":  "Forget Success",
+                                                                                  "type":  "main",
+                                                                                  "index":  0
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate",
+                     "timeSavedMode":  "fixed",
+                     "errorWorkflow":  "Gada0T8rzuzLSEte",
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false
+                 },
+    "staticData":  null,
+    "meta":  null,
+    "pinData":  {
+
+                },
+    "versionId":  "36642977-91a3-4133-aee1-a19ac3033646",
+    "activeVersionId":  "36642977-91a3-4133-aee1-a19ac3033646",
+    "versionCounter":  269,
+    "triggerCount":  1,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-14T16:46:34.879Z",
+                       "createdAt":  "2026-04-14T16:46:34.879Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "4gTo7TCi3beUutsv",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  {
+                          "updatedAt":  "2026-04-15T18:25:52.023Z",
+                          "createdAt":  "2026-04-15T18:25:52.023Z",
+                          "versionId":  "36642977-91a3-4133-aee1-a19ac3033646",
+                          "workflowId":  "4gTo7TCi3beUutsv",
+                          "nodes":  [
+                                        {
+                                            "parameters":  {
+                                                               "updates":  [
+                                                                               "message"
+                                                                           ],
+                                                               "additionalFields":  {
+
+                                                                                    }
+                                                           },
+                                            "type":  "n8n-nodes-base.telegramTrigger",
+                                            "typeVersion":  1.2,
+                                            "position":  [
+                                                             -1296,
+                                                             528
+                                                         ],
+                                            "id":  "edbd84a4-9a0a-4fa1-bfaa-54da97942864",
+                                            "name":  "Telegram Trigger",
+                                            "webhookId":  "86021a6f-12b0-4a51-a885-7250a52e9005",
+                                            "credentials":  {
+                                                                "telegramApi":  {
+                                                                                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                    "name":  "Telegram Account Memory Vault"
+                                                                                }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "conditions":  {
+                                                                                  "combinator":  "and",
+                                                                                  "conditions":  [
+                                                                                                     {
+                                                                                                         "id":  "cmd-remember",
+                                                                                                         "leftValue":  "={{ $json.message.text }}",
+                                                                                                         "operator":  {
+                                                                                                                          "operation":  "startsWith",
+                                                                                                                          "type":  "string"
+                                                                                                                      },
+                                                                                                         "rightValue":  "/remember"
+                                                                                                     }
+                                                                                                 ],
+                                                                                  "options":  {
+                                                                                                  "version":  2,
+                                                                                                  "leftValue":  "",
+                                                                                                  "caseSensitive":  false,
+                                                                                                  "typeValidation":  "strict"
+                                                                                              }
+                                                                              },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.if",
+                                            "typeVersion":  2.3,
+                                            "position":  [
+                                                             -1072,
+                                                             528
+                                                         ],
+                                            "id":  "bf0d1584-b07d-481c-8aa4-4aa8f107e794",
+                                            "name":  "Is /remember command?"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "const text = $input.first().json.message.text;\nconst content = text.replace(\u0027/remember\u0027, \u0027\u0027).trim();\nconst userId = String($input.first().json.message.from.id);\nconst chatId = $input.first().json.message.chat.id;\nreturn [{ json: { content, user_id: userId, chat_id: chatId } }];"
+                                                           },
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             -848,
+                                                             256
+                                                         ],
+                                            "id":  "fd67fbe4-87bb-4899-9c67-750e663e9358",
+                                            "name":  "Extract Remember Content"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "https://api.openai.com/v1/embeddings",
+                                                               "authentication":  "genericCredentialType",
+                                                               "genericAuthType":  "httpHeaderAuth",
+                                                               "sendBody":  true,
+                                                               "specifyBody":  "json",
+                                                               "jsonBody":  "={{ JSON.stringify({ input: $(\u0027Extract Remember Content\u0027).first().json.content, model: \u0027text-embedding-3-small\u0027 }) }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             -624,
+                                                             256
+                                                         ],
+                                            "id":  "2625bc86-7997-49a1-a86a-17ac396581df",
+                                            "name":  "Embed /remember Content",
+                                            "credentials":  {
+                                                                "httpHeaderAuth":  {
+                                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                       "name":  "OpenAI Header Auth"
+                                                                                   }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "=https://eqvyicflhfwaropzqbai.supabase.co/rest/v1/memory",
+                                                               "sendHeaders":  true,
+                                                               "headerParameters":  {
+                                                                                        "parameters":  [
+                                                                                                           {
+                                                                                                               "name":  "apikey",
+                                                                                                               "value":  "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Authorization",
+                                                                                                               "value":  "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Content-Type",
+                                                                                                               "value":  "application/json"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Prefer",
+                                                                                                               "value":  "return=representation"
+                                                                                                           }
+                                                                                                       ]
+                                                                                    },
+                                                               "sendBody":  true,
+                                                               "specifyBody":  "json",
+                                                               "jsonBody":  "={{ JSON.stringify({ content: $(\u0027Extract Remember Content\u0027).first().json.content, embedding: $(\u0027Embed /remember Content\u0027).first().json.data[0].embedding, metadata: { timestamp: new Date().toISOString(), source: \u0027manual_command\u0027, user_id: $(\u0027Extract Remember Content\u0027).first().json.user_id, importance_score: $(\u0027Analyze Importance \u0026 Branch\u0027).first().json.importance_score, category: \u0027manual\u0027 } }) }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             48,
+                                                             368
+                                                         ],
+                                            "id":  "4cac9411-3b7b-4be6-8406-d4efa138553b",
+                                            "name":  "Insert /remember to Supabase"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "conditions":  {
+                                                                                  "combinator":  "and",
+                                                                                  "conditions":  [
+                                                                                                     {
+                                                                                                         "id":  "cmd-forget",
+                                                                                                         "leftValue":  "={{ $json.message.text }}",
+                                                                                                         "operator":  {
+                                                                                                                          "operation":  "startsWith",
+                                                                                                                          "type":  "string"
+                                                                                                                      },
+                                                                                                         "rightValue":  "/forget"
+                                                                                                     }
+                                                                                                 ],
+                                                                                  "options":  {
+                                                                                                  "version":  2,
+                                                                                                  "leftValue":  "",
+                                                                                                  "caseSensitive":  false,
+                                                                                                  "typeValidation":  "strict"
+                                                                                              }
+                                                                              },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.if",
+                                            "typeVersion":  2.3,
+                                            "position":  [
+                                                             -848,
+                                                             624
+                                                         ],
+                                            "id":  "edbb1481-4a93-4ebc-b6ee-923e7af26ca6",
+                                            "name":  "Is /forget command?"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "const text = $input.first().json.message.text;\nconst keyword = text.replace(\u0027/forget\u0027, \u0027\u0027).trim();\nconst chatId = $input.first().json.message.chat.id;\nreturn [{ json: { keyword, chat_id: chatId } }];"
+                                                           },
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             -624,
+                                                             768
+                                                         ],
+                                            "id":  "db99caf2-72f6-4d70-93d5-dee8bb33f1d7",
+                                            "name":  "Extract Forget Keyword"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "DELETE",
+                                                               "url":  "=https://eqvyicflhfwaropzqbai.supabase.co/rest/v1/memory?content=ilike.*{{ encodeURIComponent($json.keyword) }}*",
+                                                               "sendHeaders":  true,
+                                                               "headerParameters":  {
+                                                                                        "parameters":  [
+                                                                                                           {
+                                                                                                               "name":  "apikey",
+                                                                                                               "value":  "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Authorization",
+                                                                                                               "value":  "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Content-Type",
+                                                                                                               "value":  "application/json"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Prefer",
+                                                                                                               "value":  "return=representation"
+                                                                                                           }
+                                                                                                       ]
+                                                                                    },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             -400,
+                                                             768
+                                                         ],
+                                            "id":  "7b44b5da-fb46-4da4-b1f8-01d13010b3f8",
+                                            "name":  "Delete /forget from Supabase"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "conditions":  {
+                                                                                  "combinator":  "and",
+                                                                                  "conditions":  [
+                                                                                                     {
+                                                                                                         "id":  "voice-check",
+                                                                                                         "leftValue":  "={{ $json.message.voice }}",
+                                                                                                         "operator":  {
+                                                                                                                          "operation":  "exists",
+                                                                                                                          "singleValue":  true,
+                                                                                                                          "type":  "object"
+                                                                                                                      },
+                                                                                                         "rightValue":  ""
+                                                                                                     }
+                                                                                                 ],
+                                                                                  "options":  {
+                                                                                                  "version":  2,
+                                                                                                  "leftValue":  "",
+                                                                                                  "caseSensitive":  true,
+                                                                                                  "typeValidation":  "strict"
+                                                                                              }
+                                                                              },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.if",
+                                            "typeVersion":  2.3,
+                                            "position":  [
+                                                             -624,
+                                                             528
+                                                         ],
+                                            "id":  "9d239e44-d973-4605-9bd5-6073862dc5f6",
+                                            "name":  "Is Voice Note?"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "url":  "=https://api.telegram.org/bot8763826442:AAFAJ1ksi4g0J6QKGAOs4hyWAMloPnhcNgA/getFile?file_id={{ $json.message.voice.file_id }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             -400,
+                                                             448
+                                                         ],
+                                            "id":  "b3f27240-3ed6-4a23-8b4d-1060010b61cd",
+                                            "name":  "Get Voice File Path"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "url":  "=https://api.telegram.org/file/bot8763826442:AAFAJ1ksi4g0J6QKGAOs4hyWAMloPnhcNgA/{{ $json.result.file_path }}",
+                                                               "options":  {
+                                                                               "response":  {
+                                                                                                "response":  {
+                                                                                                                 "responseFormat":  "file"
+                                                                                                             }
+                                                                                            }
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             -176,
+                                                             448
+                                                         ],
+                                            "id":  "8bff9a0c-5c60-4cbf-b095-2bbee8e6f730",
+                                            "name":  "Download Voice File"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "https://api.openai.com/v1/audio/transcriptions",
+                                                               "authentication":  "genericCredentialType",
+                                                               "genericAuthType":  "httpHeaderAuth",
+                                                               "sendBody":  true,
+                                                               "contentType":  "multipart-form-data",
+                                                               "bodyParameters":  {
+                                                                                      "parameters":  [
+                                                                                                         {
+                                                                                                             "name":  "model",
+                                                                                                             "value":  "whisper-1"
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "parameterType":  "formBinaryData",
+                                                                                                             "name":  "file",
+                                                                                                             "inputDataFieldName":  "data"
+                                                                                                         }
+                                                                                                     ]
+                                                                                  },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             48,
+                                                             448
+                                                         ],
+                                            "id":  "fe54faa2-4175-48fa-91bb-7fd6b044e687",
+                                            "name":  "Whisper Transcription",
+                                            "credentials":  {
+                                                                "httpHeaderAuth":  {
+                                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                       "name":  "OpenAI Header Auth"
+                                                                                   }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "const triggerData = $(\u0027Telegram Trigger\u0027).first().json;\nconst isVoice = !!triggerData.message.voice;\nlet messageText;\nif (isVoice) {\n  messageText = $input.first().json.text; // Whisper output\n} else {\n  messageText = triggerData.message.text;\n}\nreturn [{ json: {\n  message_text: messageText,\n  user_id: String(triggerData.message.from.id),\n  chat_id: triggerData.message.chat.id,\n  first_name: triggerData.message.from.first_name || \u0027\u0027\n} }];"
+                                                           },
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             272,
+                                                             528
+                                                         ],
+                                            "id":  "ac6b4602-5c53-4ed2-b00f-765a07e6340e",
+                                            "name":  "Normalise Message Text"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "url":  "https://cloud.flowiseai.com/api/v1/chatflows"
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             496,
+                                                             528
+                                                         ],
+                                            "id":  "917b24e1-d432-4ed3-96f5-9f09b638ebd7",
+                                            "name":  "Flowise Health Check",
+                                            "credentials":  {
+                                                                "httpHeaderAuth":  {
+                                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                       "name":  "Flowise Header Auth"
+                                                                                   }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "https://api.openai.com/v1/embeddings",
+                                                               "authentication":  "genericCredentialType",
+                                                               "genericAuthType":  "httpHeaderAuth",
+                                                               "sendBody":  true,
+                                                               "specifyBody":  "json",
+                                                               "jsonBody":  "={{ JSON.stringify({ input: $(\u0027Normalise Message Text\u0027).first().json.message_text, model: \u0027text-embedding-3-small\u0027 }) }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             720,
+                                                             336
+                                                         ],
+                                            "id":  "abd9ab60-15fc-4316-a7a1-aced1d91b8af",
+                                            "name":  "Embed User Message",
+                                            "credentials":  {
+                                                                "httpHeaderAuth":  {
+                                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                       "name":  "OpenAI Header Auth"
+                                                                                   }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "=https://eqvyicflhfwaropzqbai.supabase.co/rest/v1/rpc/match_documents",
+                                                               "sendHeaders":  true,
+                                                               "headerParameters":  {
+                                                                                        "parameters":  [
+                                                                                                           {
+                                                                                                               "name":  "apikey",
+                                                                                                               "value":  "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Authorization",
+                                                                                                               "value":  "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Content-Type",
+                                                                                                               "value":  "application/json"
+                                                                                                           }
+                                                                                                       ]
+                                                                                    },
+                                                               "sendBody":  true,
+                                                               "specifyBody":  "json",
+                                                               "jsonBody":  "={{ JSON.stringify({ query_embedding: $json.data[0].embedding, match_threshold: 0.6, match_count: 3 }) }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             944,
+                                                             336
+                                                         ],
+                                            "id":  "fad054dc-27fe-4283-a601-e9cceff1c8ef",
+                                            "name":  "Proactive Memory Fetch",
+                                            "alwaysOutputData":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "const items = $input.all();\nconst normalised = $(\u0027Normalise Message Text\u0027).first().json;\nconst messageText = normalised.message_text;\nconst userId = normalised.user_id;\nconst chatId = normalised.chat_id;\n\nlet memoryContext = \u0027\u0027;\nif (items \u0026\u0026 items.length \u003e 0 \u0026\u0026 Object.keys(items[0].json).length \u003e 0) {\n  memoryContext = \u0027DATABASE MEMORIES (STRICTLY USE THESE TO ANSWER THE QUESTION):\\\\n\u0027 +\n    items.map((item, i) =\u003e {\n      const m = item.json;\n      const sim = m.similarity || 0;\n      const label = sim \u003e= 0.6 ? \u0027[High confidence]\u0027 : \u0027[Low confidence â€” verify before using]\u0027;\n      return `${i+1}. ${label} [${(sim*100).toFixed(0)}% match] ${m.content}`;\n    }).join(\u0027\\\\n\u0027) + \u0027\\\\n\\\\n\u0027;\n}\n\nconst brandPersona = \u0027You are a D2C brand intelligence assistant for Pure Remedy skincare. \u0027\n  + \u0027You have permanent memory of all past conversations. \u0027\n  + \u0027Always reference relevant past memories in your response. \u0027\n  + \u0027Save important brand info, supplier details, pricing, and customer insights automatically.\u0027;\n\n// INJECT MEMORY INTO QUESTION TO FORCE FLOWISE TO READ IT INSTEAD OF RELYING ON SYSTEM PROMPT OR TOOLS\nconst finalQuestion = memoryContext ? (memoryContext + \u0027USER QUESTION:\\\\n\u0027 + messageText) : messageText;\n\nreturn [{ json: {\n  question: finalQuestion,\n  session_id: userId,\n  system_message: brandPersona,\n  chat_id: chatId\n} }];"
+                                                           },
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             1168,
+                                                             336
+                                                         ],
+                                            "id":  "ee09cd4a-c095-4baf-9121-56f5037d2929",
+                                            "name":  "Build Flowise Payload with Memories"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "https://cloud.flowiseai.com/api/v1/prediction/8ecde65e-6a5a-4915-92a9-c0f85235b68d",
+                                                               "authentication":  "genericCredentialType",
+                                                               "genericAuthType":  "httpHeaderAuth",
+                                                               "sendBody":  true,
+                                                               "specifyBody":  "json",
+                                                               "jsonBody":  "={{ JSON.stringify({ question: $json.question, sessionId: $json.session_id, overrideConfig: { systemMessage: $json.system_message } }) }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             1392,
+                                                             336
+                                                         ],
+                                            "id":  "4c1dcb02-cef4-4f53-b0b7-174ba5a7f0f0",
+                                            "name":  "Call Flowise Tool Agent",
+                                            "retryOnFail":  true,
+                                            "maxTries":  3,
+                                            "waitBetweenTries":  5000,
+                                            "credentials":  {
+                                                                "httpHeaderAuth":  {
+                                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                       "name":  "Flowise Header Auth"
+                                                                                   }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "=https://eqvyicflhfwaropzqbai.supabase.co/rest/v1/memory_log",
+                                                               "sendHeaders":  true,
+                                                               "headerParameters":  {
+                                                                                        "parameters":  [
+                                                                                                           {
+                                                                                                               "name":  "apikey",
+                                                                                                               "value":  "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Authorization",
+                                                                                                               "value":  "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Content-Type",
+                                                                                                               "value":  "application/json"
+                                                                                                           }
+                                                                                                       ]
+                                                                                    },
+                                                               "sendBody":  true,
+                                                               "specifyBody":  "json",
+                                                               "jsonBody":  "={{ JSON.stringify({ operation: \u0027conversation\u0027, content_preview: $(\u0027Build Flowise Payload with Memories\u0027).first().json.question.substring(0,120), user_id: $(\u0027Build Flowise Payload with Memories\u0027).first().json.session_id, timestamp: new Date().toISOString() }) }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             1616,
+                                                             336
+                                                         ],
+                                            "id":  "09a8dcd8-b92c-40cb-83a9-50ba620257f8",
+                                            "name":  "Append to memory_log"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "=https://eqvyicflhfwaropzqbai.supabase.co/rest/v1/rpc/match_documents",
+                                                               "sendHeaders":  true,
+                                                               "headerParameters":  {
+                                                                                        "parameters":  [
+                                                                                                           {
+                                                                                                               "name":  "apikey",
+                                                                                                               "value":  "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Authorization",
+                                                                                                               "value":  "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxdnlpY2ZsaGZ3YXJvcHpxYmFpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5OTM4MiwiZXhwIjoyMDkxNjc1MzgyfQ.5bWUc6sl30W8-2NAkt-qQX-FTBRisDnHGyNRh6992Zo"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Content-Type",
+                                                                                                               "value":  "application/json"
+                                                                                                           }
+                                                                                                       ]
+                                                                                    },
+                                                               "sendBody":  true,
+                                                               "specifyBody":  "json",
+                                                               "jsonBody":  "={{ JSON.stringify({ query_embedding: $(\u0027Embed /remember Content\u0027).first().json.data[0].embedding, match_threshold: 0.92, match_count: 1 }) }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "08b08493-28da-40c7-a933-33c607fe8609",
+                                            "name":  "Check Existing Memory",
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             -400,
+                                                             160
+                                                         ],
+                                            "alwaysOutputData":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "conditions":  {
+                                                                                  "combinator":  "and",
+                                                                                  "conditions":  [
+                                                                                                     {
+                                                                                                         "id":  "5f7bd4af-5c1a-46da-b097-769b76c8d76c",
+                                                                                                         "leftValue":  "={{ $json.id }}",
+                                                                                                         "operator":  {
+                                                                                                                          "operation":  "notEmpty",
+                                                                                                                          "singleValue":  true,
+                                                                                                                          "type":  "number"
+                                                                                                                      }
+                                                                                                     }
+                                                                                                 ],
+                                                                                  "options":  {
+                                                                                                  "version":  2,
+                                                                                                  "leftValue":  "",
+                                                                                                  "caseSensitive":  true,
+                                                                                                  "typeValidation":  "loose"
+                                                                                              },
+                                                                                  "conditions[0]":  {
+                                                                                                        "operator":  {
+                                                                                                                         "type":  "number"
+                                                                                                                     }
+                                                                                                    }
+                                                                              },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "077eaa77-2d84-4340-93b0-4cd88f1cf9b1",
+                                            "name":  "Is Duplicate Memory?",
+                                            "type":  "n8n-nodes-base.if",
+                                            "typeVersion":  2.3,
+                                            "position":  [
+                                                             -176,
+                                                             160
+                                                         ]
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "https://api.openai.com/v1/chat/completions",
+                                                               "authentication":  "genericCredentialType",
+                                                               "genericAuthType":  "httpHeaderAuth",
+                                                               "sendBody":  true,
+                                                               "specifyBody":  "json",
+                                                               "jsonBody":  "={{ JSON.stringify({ model: \u0027gpt-4o-mini\u0027, messages: [ { role: \u0027system\u0027, content: \u0027Score the importance of this memory for a D2C brand on a scale of 1-10. 10 = critical (pricing, product specs), 1 = trivial (greetings). Return ONLY the number.\u0027 }, { role: \u0027user\u0027, content: $json.content } ], temperature: 0.1 }) }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "a0d44052-bd81-48fe-a481-3b7b7bcb74cc",
+                                            "name":  "Score Memory Importance",
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             -736,
+                                                             112
+                                                         ],
+                                            "credentials":  {
+                                                                "httpHeaderAuth":  {
+                                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                       "name":  "OpenAI Header Auth"
+                                                                                   }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "const item = $input.first().json;\nconst scoreText = item.choices[0].message.content.trim();\nconst score = parseInt(scoreText);\nconst isImportant = !isNaN(score) \u0026\u0026 score \u003e= 6;\n\nreturn [{ json: { \n  is_important: isImportant, \n  importance_score: isImportant ? score : (isNaN(score) ? 0 : score),\n  gpt_raw_response: scoreText\n} }];"
+                                                           },
+                                            "id":  "bd4d22dd-2d94-4688-a630-2d5589f46ea7",
+                                            "name":  "Analyze Importance \u0026 Branch",
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             -496,
+                                                             112
+                                                         ]
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "conditions":  {
+                                                                                  "conditions":  [
+                                                                                                     {
+                                                                                                         "id":  "check-important-flag-v3",
+                                                                                                         "leftValue":  "={{ $json.is_important }}",
+                                                                                                         "operator":  {
+                                                                                                                          "type":  "boolean",
+                                                                                                                          "operation":  "true",
+                                                                                                                          "singleValue":  true
+                                                                                                                      }
+                                                                                                     }
+                                                                                                 ],
+                                                                                  "combinator":  "and",
+                                                                                  "options":  {
+                                                                                                  "version":  2,
+                                                                                                  "leftValue":  "",
+                                                                                                  "caseSensitive":  true,
+                                                                                                  "typeValidation":  "strict"
+                                                                                              }
+                                                                              },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "4c15542e-61c3-426b-aef2-1ee159ba3284",
+                                            "name":  "Branch on Importance",
+                                            "type":  "n8n-nodes-base.if",
+                                            "typeVersion":  2.3,
+                                            "position":  [
+                                                             -240,
+                                                             112
+                                                         ]
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                                               "text":  "={{ $(\u0027Call Flowise Tool Agent\u0027).first().json.text }}",
+                                                               "additionalFields":  {
+
+                                                                                    }
+                                                           },
+                                            "id":  "9f485632-12b2-4cc4-a886-fb326e9e1d52",
+                                            "name":  "Send Final Reply",
+                                            "type":  "n8n-nodes-base.telegram",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             1856,
+                                                             336
+                                                         ],
+                                            "webhookId":  "755b83c2-475e-4010-a411-222211a03644",
+                                            "credentials":  {
+                                                                "telegramApi":  {
+                                                                                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                    "name":  "Telegram Account Memory Vault"
+                                                                                }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                                               "text":  "=âœ… Memory saved (Importance: {{ $(\u0027Analyze Importance \u0026 Branch\u0027).first().json.importance_score }}/10): {{ $(\u0027Extract Remember Content\u0027).first().json.content }}",
+                                                               "additionalFields":  {
+
+                                                                                    }
+                                                           },
+                                            "id":  "7a676b7d-d55b-40e0-8777-6a3455bffe11",
+                                            "name":  "Confirm /remember",
+                                            "type":  "n8n-nodes-base.telegram",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             272,
+                                                             368
+                                                         ],
+                                            "webhookId":  "34fffc62-72d1-495b-8f21-8109e20edcfd",
+                                            "credentials":  {
+                                                                "telegramApi":  {
+                                                                                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                    "name":  "Telegram Account Memory Vault"
+                                                                                }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                                               "text":  "=âš ï¸ I already have a very similar memory in the vault, so I skipped saving this duplicate: \n\n\"{{ $(\u0027Check Existing Memory\u0027).first().json.content }}\"",
+                                                               "additionalFields":  {
+
+                                                                                    }
+                                                           },
+                                            "id":  "82d5a1a7-7768-4687-a7aa-062aacb641e9",
+                                            "name":  "Duplicate Alert",
+                                            "type":  "n8n-nodes-base.telegram",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             48,
+                                                             160
+                                                         ],
+                                            "webhookId":  "c6a06ab6-28df-43a5-8392-48b5814c7cfe",
+                                            "credentials":  {
+                                                                "telegramApi":  {
+                                                                                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                    "name":  "Telegram Account Memory Vault"
+                                                                                }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                                               "text":  "=âš ï¸ This memory was deemed too trivial to save in the long-term vault (Importance Score: {{ $(\u0027Analyze Importance \u0026 Branch\u0027).first().json.importance_score }}/10)",
+                                                               "additionalFields":  {
+
+                                                                                    }
+                                                           },
+                                            "id":  "5d7635ad-0025-4f48-bfea-6037d572c1a0",
+                                            "name":  "Reject Trivial Memory",
+                                            "type":  "n8n-nodes-base.telegram",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             48,
+                                                             32
+                                                         ],
+                                            "webhookId":  "29b85407-a07a-477f-8951-6a33be744a8c",
+                                            "credentials":  {
+                                                                "telegramApi":  {
+                                                                                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                    "name":  "Telegram Account Memory Vault"
+                                                                                }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                                               "text":  "=ðŸ¤ Understood. I\u0027ve cleared relevant memories about \"{{ $(\u0027Extract Forget Keyword\u0027).first().json.keyword }}\" from the vault.",
+                                                               "additionalFields":  {
+
+                                                                                    }
+                                                           },
+                                            "id":  "bf71865f-ea31-4abb-82e4-34542edf8c5a",
+                                            "name":  "Forget Success",
+                                            "type":  "n8n-nodes-base.telegram",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -176,
+                                                             736
+                                                         ],
+                                            "webhookId":  "59125fc1-52be-4c2c-8e42-e58de09f67cf",
+                                            "credentials":  {
+                                                                "telegramApi":  {
+                                                                                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                    "name":  "Telegram Account Memory Vault"
+                                                                                }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "chatId":  "={{ $(\u0027Telegram Trigger\u0027).first().json.message.chat.id }}",
+                                                               "text":  "=âš ï¸ I\u0027m having trouble reaching my memory system right now. Please try again in a few moments. If the issue persists, it will be flagged to the team.",
+                                                               "additionalFields":  {
+
+                                                                                    }
+                                                           },
+                                            "id":  "b1013c40-50dd-4a47-887c-8cc540c3bb81",
+                                            "name":  "Flowise Down User Reply",
+                                            "type":  "n8n-nodes-base.telegram",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             720,
+                                                             688
+                                                         ],
+                                            "webhookId":  "12128aef-b394-4514-b376-fd963796f5ea",
+                                            "credentials":  {
+                                                                "telegramApi":  {
+                                                                                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                    "name":  "Telegram Account Memory Vault"
+                                                                                }
+                                                            }
+                                        }
+                                    ],
+                          "connections":  {
+                                              "Telegram Trigger":  {
+                                                                       "main":  [
+                                                                                    [
+                                                                                        {
+                                                                                            "node":  "Is /remember command?",
+                                                                                            "type":  "main",
+                                                                                            "index":  0
+                                                                                        }
+                                                                                    ]
+                                                                                ]
+                                                                   },
+                                              "Is /remember command?":  {
+                                                                            "main":  [
+                                                                                         [
+                                                                                             {
+                                                                                                 "node":  "Extract Remember Content",
+                                                                                                 "type":  "main",
+                                                                                                 "index":  0
+                                                                                             }
+                                                                                         ],
+                                                                                         [
+                                                                                             {
+                                                                                                 "node":  "Is /forget command?",
+                                                                                                 "type":  "main",
+                                                                                                 "index":  0
+                                                                                             }
+                                                                                         ]
+                                                                                     ]
+                                                                        },
+                                              "Is /forget command?":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "Extract Forget Keyword",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ],
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "Is Voice Note?",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      },
+                                              "Extract Forget Keyword":  {
+                                                                             "main":  [
+                                                                                          [
+                                                                                              {
+                                                                                                  "node":  "Delete /forget from Supabase",
+                                                                                                  "type":  "main",
+                                                                                                  "index":  0
+                                                                                              }
+                                                                                          ]
+                                                                                      ]
+                                                                         },
+                                              "Is Voice Note?":  {
+                                                                     "main":  [
+                                                                                  [
+                                                                                      {
+                                                                                          "node":  "Get Voice File Path",
+                                                                                          "type":  "main",
+                                                                                          "index":  0
+                                                                                      }
+                                                                                  ],
+                                                                                  [
+                                                                                      {
+                                                                                          "node":  "Normalise Message Text",
+                                                                                          "type":  "main",
+                                                                                          "index":  0
+                                                                                      }
+                                                                                  ]
+                                                                              ]
+                                                                 },
+                                              "Get Voice File Path":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "Download Voice File",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      },
+                                              "Download Voice File":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "Whisper Transcription",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      },
+                                              "Whisper Transcription":  {
+                                                                            "main":  [
+                                                                                         [
+                                                                                             {
+                                                                                                 "node":  "Normalise Message Text",
+                                                                                                 "type":  "main",
+                                                                                                 "index":  0
+                                                                                             }
+                                                                                         ]
+                                                                                     ]
+                                                                        },
+                                              "Normalise Message Text":  {
+                                                                             "main":  [
+                                                                                          [
+                                                                                              {
+                                                                                                  "node":  "Flowise Health Check",
+                                                                                                  "type":  "main",
+                                                                                                  "index":  0
+                                                                                              }
+                                                                                          ]
+                                                                                      ]
+                                                                         },
+                                              "Flowise Health Check":  {
+                                                                           "main":  [
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Embed User Message",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ],
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Flowise Down User Reply",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ]
+                                                                                    ]
+                                                                       },
+                                              "Embed User Message":  {
+                                                                         "main":  [
+                                                                                      [
+                                                                                          {
+                                                                                              "node":  "Proactive Memory Fetch",
+                                                                                              "type":  "main",
+                                                                                              "index":  0
+                                                                                          }
+                                                                                      ]
+                                                                                  ]
+                                                                     },
+                                              "Proactive Memory Fetch":  {
+                                                                             "main":  [
+                                                                                          [
+                                                                                              {
+                                                                                                  "node":  "Build Flowise Payload with Memories",
+                                                                                                  "type":  "main",
+                                                                                                  "index":  0
+                                                                                              }
+                                                                                          ]
+                                                                                      ]
+                                                                         },
+                                              "Build Flowise Payload with Memories":  {
+                                                                                          "main":  [
+                                                                                                       [
+                                                                                                           {
+                                                                                                               "node":  "Call Flowise Tool Agent",
+                                                                                                               "type":  "main",
+                                                                                                               "index":  0
+                                                                                                           }
+                                                                                                       ]
+                                                                                                   ]
+                                                                                      },
+                                              "Call Flowise Tool Agent":  {
+                                                                              "main":  [
+                                                                                           [
+                                                                                               {
+                                                                                                   "node":  "Append to memory_log",
+                                                                                                   "type":  "main",
+                                                                                                   "index":  0
+                                                                                               }
+                                                                                           ],
+                                                                                           [
+                                                                                               {
+                                                                                                   "node":  "Flowise Down User Reply",
+                                                                                                   "type":  "main",
+                                                                                                   "index":  0
+                                                                                               }
+                                                                                           ]
+                                                                                       ]
+                                                                          },
+                                              "Embed /remember Content":  {
+                                                                              "main":  [
+                                                                                           [
+                                                                                               {
+                                                                                                   "node":  "Check Existing Memory",
+                                                                                                   "type":  "main",
+                                                                                                   "index":  0
+                                                                                               }
+                                                                                           ]
+                                                                                       ]
+                                                                          },
+                                              "Check Existing Memory":  {
+                                                                            "main":  [
+                                                                                         [
+                                                                                             {
+                                                                                                 "node":  "Is Duplicate Memory?",
+                                                                                                 "type":  "main",
+                                                                                                 "index":  0
+                                                                                             }
+                                                                                         ]
+                                                                                     ]
+                                                                        },
+                                              "Is Duplicate Memory?":  {
+                                                                           "main":  [
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Duplicate Alert",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ],
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Insert /remember to Supabase",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ]
+                                                                                    ]
+                                                                       },
+                                              "Extract Remember Content":  {
+                                                                               "main":  [
+                                                                                            [
+                                                                                                {
+                                                                                                    "node":  "Score Memory Importance",
+                                                                                                    "type":  "main",
+                                                                                                    "index":  0
+                                                                                                }
+                                                                                            ]
+                                                                                        ]
+                                                                           },
+                                              "Score Memory Importance":  {
+                                                                              "main":  [
+                                                                                           [
+                                                                                               {
+                                                                                                   "node":  "Analyze Importance \u0026 Branch",
+                                                                                                   "type":  "main",
+                                                                                                   "index":  0
+                                                                                               }
+                                                                                           ]
+                                                                                       ]
+                                                                          },
+                                              "Analyze Importance \u0026 Branch":  {
+                                                                                       "main":  [
+                                                                                                    [
+                                                                                                        {
+                                                                                                            "node":  "Branch on Importance",
+                                                                                                            "type":  "main",
+                                                                                                            "index":  0
+                                                                                                        }
+                                                                                                    ]
+                                                                                                ]
+                                                                                   },
+                                              "Branch on Importance":  {
+                                                                           "main":  [
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Embed /remember Content",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ],
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Reject Trivial Memory",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ]
+                                                                                    ]
+                                                                       },
+                                              "Append to memory_log":  {
+                                                                           "main":  [
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Send Final Reply",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ]
+                                                                                    ]
+                                                                       },
+                                              "Insert /remember to Supabase":  {
+                                                                                   "main":  [
+                                                                                                [
+                                                                                                    {
+                                                                                                        "node":  "Confirm /remember",
+                                                                                                        "type":  "main",
+                                                                                                        "index":  0
+                                                                                                    }
+                                                                                                ]
+                                                                                            ]
+                                                                               },
+                                              "Delete /forget from Supabase":  {
+                                                                                   "main":  [
+                                                                                                [
+                                                                                                    {
+                                                                                                        "node":  "Forget Success",
+                                                                                                        "type":  "main",
+                                                                                                        "index":  0
+                                                                                                    }
+                                                                                                ]
+                                                                                            ]
+                                                                               }
+                                          },
+                          "authors": "YOUR_NAME",
+                          "name":  null,
+                          "description":  null,
+                          "autosaved":  false,
+                          "workflowPublishHistory":  [
+                                                         {
+                                                             "createdAt":  "2026-04-15T18:25:53.950Z",
+                                                             "id":  934,
+                                                             "workflowId":  "4gTo7TCi3beUutsv",
+                                                             "versionId":  "36642977-91a3-4133-aee1-a19ac3033646",
+                                                             "event":  "activated",
+                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                                         },
+                                                         {
+                                                             "createdAt":  "2026-04-15T18:25:52.743Z",
+                                                             "id":  933,
+                                                             "workflowId":  "4gTo7TCi3beUutsv",
+                                                             "versionId":  "36642977-91a3-4133-aee1-a19ac3033646",
+                                                             "event":  "deactivated",
+                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                                         }
+                                                     ]
+                      }
+}

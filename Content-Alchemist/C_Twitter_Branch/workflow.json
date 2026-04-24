@@ -1,0 +1,368 @@
+﻿{
+    "updatedAt":  "2026-04-11T07:52:54.884Z",
+    "createdAt":  "2026-04-09T19:25:16.363Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "ðŸ¦ Content Alchemist â€” Workflow C (Twitter/X Branch)",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "inputSource":  "passthrough"
+                                     },
+                      "id":  "3df4d07b-f7cf-49c2-9003-157cb6b238e1",
+                      "name":  "Workflow Input",
+                      "position":  [
+                                       480,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.executeWorkflowTrigger",
+                      "typeVersion":  1.1
+                  },
+                  {
+                      "parameters":  {
+                                         "fieldToSplitOut":  "twitterposts",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "98c4e0eb-b09a-44ec-866a-90d075f9cb2e",
+                      "name":  "Split Twitter Posts",
+                      "position":  [
+                                       704,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.splitOut",
+                      "typeVersion":  1
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "chat",
+                                         "chatModel":  "gpt-4o",
+                                         "prompt":  {
+                                                        "messages":  [
+                                                                         {
+                                                                             "role":  "system",
+                                                                             "content":  "You are a visual content strategist for Twitter/X. Write a DALL-E 3 image generation prompt for a bold, high-contrast, eye-catching image that fits the theme of a tweet. No text overlays, no human faces. Return ONLY the image prompt, nothing else."
+                                                                         },
+                                                                         {
+                                                                             "content":  "={{ \u0027Write a DALL-E 3 image prompt for this Twitter/X post. Return only the prompt:\\n\\n\u0027 + $json.twitterposts }}"
+                                                                         }
+                                                                     ]
+                                                    },
+                                         "options":  {
+                                                         "maxTokens":  300,
+                                                         "temperature":  0.9
+                                                     },
+                                         "requestOptions":  {
+
+                                                            }
+                                     },
+                      "id":  "d31cc47f-01b2-405f-980d-b791a117817b",
+                      "name":  "Build Image Prompt (Twitter)",
+                      "position":  [
+                                       1184,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.openAi",
+                      "typeVersion":  1.1,
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                            "name":  "Content Alchemist - OpenAI"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "image",
+                                         "prompt":  "={{ $json.message.content }}",
+                                         "options":  {
+
+                                                     },
+                                         "requestOptions":  {
+
+                                                            }
+                                     },
+                      "id":  "85a6a2a7-7015-4cfc-bcc7-cd842682d107",
+                      "name":  "Generate Image (Twitter)",
+                      "position":  [
+                                       1424,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.openAi",
+                      "typeVersion":  1.1,
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                            "name":  "Content Alchemist - OpenAI"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "name":  "={{ \u0027twitter_img_\u0027 + ($runIndex + 1) + \u0027_\u0027 + $(\u0027Workflow Input\u0027).item.json.timestamp.replace(/:/g,\u0027-\u0027).substring(0,19) + \u0027.png\u0027 }}",
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Workflow Input\u0027).item.json.postImagesFolderId || \u0027REPLACE_WITH_YOUR_FOLDER_ID\u0027 }}"
+                                                      },
+                                         "options":  {
+
+                                                     },
+                                         "operation":  "upload"
+                                     },
+                      "id":  "420d822d-1b1f-4b90-9c7e-1814a2ab7f6b",
+                      "name":  "Upload Twitter Image to Drive",
+                      "position":  [
+                                       1664,
+                                       192
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "createFromText",
+                                         "content":  "={{ $json.twitterposts }}",
+                                         "name":  "={{ \u0027twitter_post_\u0027 + ($runIndex + 1) + \u0027_\u0027 + $(\u0027Workflow Input\u0027).item.json.timestamp.replace(/:/g, \u0027-\u0027).substring(0, 19) + \u0027.txt\u0027 }}",
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Workflow Input\u0027).item.json.twitterFolderId || \u0027REPLACE_WITH_YOUR_FOLDER_ID\u0027 }}"
+                                                      },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "03c75239-1ab2-458e-b629-0d27481f6dc7",
+                      "name":  "Save Twitter Post .txt",
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       944,
+                                       192
+                                   ],
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      }
+                  },
+                  {
+                      "id":  "loop-twitter",
+                      "name":  "Loop Twitter Posts",
+                      "type":  "n8n-nodes-base.splitInBatches",
+                      "typeVersion":  3,
+                      "position":  [
+                                       1784,
+                                       192
+                                   ],
+                      "parameters":  {
+                                         "batchSize":  1,
+                                         "options":  {
+
+                                                     }
+                                     }
+                  },
+                  {
+                      "id":  "1a142235-1d17-467d-9648-faf2405de64e",
+                      "name":  "Log to X Post Sheet",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.5,
+                      "position":  [
+                                       2044,
+                                       192
+                                   ],
+                      "parameters":  {
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "matchingColumns":  [
+
+                                                                             ],
+                                                         "schema":  [
+
+                                                                    ],
+                                                         "value":  {
+                                                                       "Content":  "={{ $(\u0027Split Twitter Posts\u0027).item.json.twitterposts }}",
+                                                                       "Image URL":  "={{ \u0027https://drive.google.com/file/d/\u0027 + $json.id + \u0027/view\u0027 }}",
+                                                                       "Timestamp":  "={{ $(\u0027Workflow Input\u0027).item.json.timestamp }}",
+                                                                       "Transcript":  "={{ $(\u0027Workflow Input\u0027).item.json.transcript.substring(0, 400) }}"
+                                                                   }
+                                                     },
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "={{ $(\u0027Workflow Input\u0027).item.json.sheetsId || \u0027REPLACE_WITH_YOUR_SPREADSHEET_ID\u0027 }}"
+                                                        },
+                                         "operation":  "append",
+                                         "options":  {
+
+                                                     },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "mode":  "name",
+                                                           "value":  "X Post"
+                                                       }
+                                     },
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      }
+                  }
+              ],
+    "connections":  {
+                        "Build Image Prompt (Twitter)":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "node":  "Generate Image (Twitter)",
+                                                                                  "type":  "main",
+                                                                                  "index":  0
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         },
+                        "Generate Image (Twitter)":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "Upload Twitter Image to Drive",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "Workflow Input":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Split Twitter Posts",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Split Twitter Posts":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Save Twitter Post .txt",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Save Twitter Post .txt":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "Build Image Prompt (Twitter)",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Upload Twitter Image to Drive":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "Loop Twitter Posts",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                        "Log to X Post Sheet":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Loop Twitter Posts",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Loop Twitter Posts":  {
+                                                   "main":  [
+                                                                [
+
+                                                                ],
+                                                                [
+                                                                    {
+                                                                        "node":  "Log to X Post Sheet",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "saveDataErrorExecution":  "all",
+                     "saveDataSuccessExecution":  "all",
+                     "saveManualExecutions":  true,
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  null,
+    "pinData":  {
+
+                },
+    "versionId":  "349fab47-0992-49ba-957f-971ba0714a73",
+    "activeVersionId":  null,
+    "versionCounter":  54,
+    "triggerCount":  0,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-09T19:25:16.366Z",
+                       "createdAt":  "2026-04-09T19:25:16.366Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "E3oeKmWu5WjSp3cU",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

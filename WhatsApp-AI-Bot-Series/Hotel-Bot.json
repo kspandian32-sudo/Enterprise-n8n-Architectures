@@ -1,0 +1,441 @@
+﻿{
+  "success": true,
+  "data": {
+    "updatedAt": "2026-03-06T04:21:37.509Z",
+    "createdAt": "2026-03-05T15:18:58.941Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name": "ðŸ¨ Hotel Maurya International - WhatsApp AI Bot",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "maurya-bot",
+          "options": {}
+        },
+        "id": "node-twilio-trigger",
+        "name": "Receive WhatsApp Message",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          0,
+          0
+        ],
+        "webhookId": "fc5c911a-1dd1-4983-876b-bd90fa1a2ba1"
+      },
+      {
+        "parameters": {
+          "jsCode": "const item = $input.first().json;\nconst body = item.body || item;\nconst incomingMsg = (body.Body || '').toString().trim();\nconst fromNumber = (body.From || '').toString().trim();\n\nif (!incomingMsg) {\n  throw new Error('No message body received. Raw: ' + JSON.stringify(item).substring(0, 500));\n}\nif (!fromNumber) {\n  throw new Error('No From number received. Raw: ' + JSON.stringify(item).substring(0, 500));\n}\n\nreturn [{ json: { message: incomingMsg, rawFrom: fromNumber } }];"
+        },
+        "id": "node-parse-message",
+        "name": "Parse Incoming Message",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          240,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const customerMessage = $input.first().json.message;\nconst rawFrom = $input.first().json.rawFrom;\n\nconst systemPrompt = 'You are Maya, the friendly WhatsApp assistant for Hotel Maurya International, Chennai. Reply warmly in English or Tamil based on what the customer uses. Keep replies short and WhatsApp-friendly (under 160 words). Use emojis. Always end with a helpful next step.\\n\\nHOTEL: Hotel Maurya International | 3-Star | 50 Rooms\\nADDRESS: 168/169 Arcot Road, Vadapalani, Chennai 600026\\nLANDMARKS: Opposite Nexus Vijaya Mall | 3-min walk to Vadapalani Metro\\nPHONE: +91 44 2365 0049 / +91 44 6664 6600\\nMOBILE: +91 99-8987-7188\\nEMAIL: contact@hotelmauryaintl.com\\nWEBSITE: hotelmauryaintl.com\\n\\nCHECK-IN: 2:00 PM | CHECK-OUT: 12:00 PM\\n24-hr stay option available for direct bookings\\n\\nROOMS AND RATES:\\nDeluxe Room (250sqft, King Bed, City View, max 2 adults)\\n- Breakfast only: Rs.3456/night (base Rs.3012 + tax Rs.444)\\n- Breakfast+Lunch/Dinner: Rs.4698/night (base Rs.4098 + tax Rs.600)\\n- Direct single: Rs.3200/night | Direct double: Rs.4000/night\\nSuite: Rs.4200/night\\nExecutive King/Twin: Call for rates\\n\\nROOM AMENITIES: AC, TV, Mini-bar, Tea/Coffee, Safe, WiFi, 24hr room service\\n\\nDINING:\\n- Maybelle Restaurant (Ground floor): North/South Indian, Mughlai, Chinese\\n- 70MM Bar (7th floor): Lounge bar\\n- Room service 24/7\\n\\nBANQUET:\\n- Merit Hall: 20-60 guests\\n- Main Hall: 100 seated / 150 floating\\n- Rooftop: 1500 sqft open-air\\n- Catering: Veg Rs.500-600/plate | Non-veg Rs.600-750/plate\\n\\nFACILITIES: Free WiFi, Free Parking, Valet, Travel Desk, Foreign Exchange, Doctor on call, Laundry, Airport Shuttle on request\\n\\nCANCELLATION: Free if cancelled 24-48hrs before. Within 24hrs = 100% charge.\\n\\nPOLICIES: Children under 5 free | ID required | No pets | Married couples welcome\\n\\nNEARBY: Nexus Vijaya Mall 250m | Metro 3-min | Temple 800m | SIMS Hospital 500m | Airport 12.5km (25-30min) | CMBT 4.5km\\n\\nCANNOT DO: Cannot confirm bookings or process refunds. Direct all to +91 99-8987-7188.';\n\nconst requestBody = {\n  model: 'gpt-4o-mini',\n  messages: [\n    { role: 'system', content: systemPrompt },\n    { role: 'user', content: customerMessage }\n  ],\n  max_tokens: 350,\n  temperature: 0.7\n};\n\nreturn [{ json: { requestBody: requestBody, rawFrom: rawFrom } }];"
+        },
+        "id": "node-build-prompt",
+        "name": "Build OpenAI Request",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          480,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/chat/completions",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "openAiApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify($json.requestBody) }}",
+          "options": {}
+        },
+        "id": "node-gemini",
+        "name": "Hotel Maurya AI Brain",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "retryOnFail": true,
+        "maxTries": 2,
+        "position": [
+          720,
+          0
+        ],
+        "credentials": {
+          "openAiApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "OpenAI - Hotel Maurya"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const response = $input.first().json;\nlet reply;\n\nif (response.error || !response.choices || !response.choices[0]) {\n  reply = 'Apologies! I am having a brief hiccup ðŸ¤–. Please call us at +91 99-8987-7188 for immediate help! ðŸ™';\n} else {\n  reply = response.choices[0]?.message?.content || 'Sorry, I could not process your request. Please call +91 99-8987-7188.';\n}\n\nconst rawFrom = $('Build OpenAI Request').first().json.rawFrom;\nreturn [{ json: { reply: reply.trim(), rawFrom: rawFrom } }];"
+        },
+        "id": "node-extract-reply",
+        "name": "Extract AI Reply",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          960,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.twilio.com/2010-04-01/Accounts/REPLACE_WITH_YOUR_ACCOUNT_SID/Messages.json",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "twilioApi",
+          "sendBody": true,
+          "contentType": "form-urlencoded",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "From",
+                "value": "whatsapp:+14155238886"
+              },
+              {
+                "name": "To",
+                "value": "={{ $json.rawFrom }}"
+              },
+              {
+                "name": "Body",
+                "value": "={{ $json.reply }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "node-send-whatsapp",
+        "name": "Send WhatsApp Reply",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "retryOnFail": true,
+        "maxTries": 2,
+        "position": [
+          1200,
+          0
+        ],
+        "credentials": {
+          "twilioApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Twilio - Hotel Maurya"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Receive WhatsApp Message": {
+        "main": [
+          [
+            {
+              "node": "Parse Incoming Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Incoming Message": {
+        "main": [
+          [
+            {
+              "node": "Build OpenAI Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build OpenAI Request": {
+        "main": [
+          [
+            {
+              "node": "Hotel Maurya AI Brain",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Hotel Maurya AI Brain": {
+        "main": [
+          [
+            {
+              "node": "Extract AI Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract AI Reply": {
+        "main": [
+          [
+            {
+              "node": "Send WhatsApp Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "saveDataErrorExecution": "all",
+      "saveDataSuccessExecution": "all",
+      "saveManualExecutions": true,
+      "saveExecutionProgress": true,
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "versionId": "95492115-e0ef-4dd0-89d1-2031b4547b0c",
+    "activeVersionId": "95492115-e0ef-4dd0-89d1-2031b4547b0c",
+    "versionCounter": 88,
+    "triggerCount": 1,
+    "shared": [
+      {
+        "updatedAt": "2026-03-05T15:18:58.949Z",
+        "createdAt": "2026-03-05T15:18:58.949Z",
+        "role": "workflow:owner",
+        "workflowId": "573iPNI6VESOgJ5O",
+        "projectId": "4z38v6JO6ntgY8gF",
+        "project": {
+          "updatedAt": "2026-01-13T19:13:51.671Z",
+          "createdAt": "2026-01-13T19:11:25.659Z",
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "YOUR_NAME <your-email@example.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+        }
+      }
+    ],
+    "tags": [],
+    "activeVersion": {
+      "updatedAt": "2026-03-06T04:22:01.000Z",
+      "createdAt": "2026-03-06T04:21:37.511Z",
+      "versionId": "95492115-e0ef-4dd0-89d1-2031b4547b0c",
+      "workflowId": "573iPNI6VESOgJ5O",
+      "nodes": [
+        {
+          "parameters": {
+            "httpMethod": "POST",
+            "path": "maurya-bot",
+            "options": {}
+          },
+          "id": "node-twilio-trigger",
+          "name": "Receive WhatsApp Message",
+          "type": "n8n-nodes-base.webhook",
+          "typeVersion": 2,
+          "position": [
+            0,
+            0
+          ],
+          "webhookId": "fc5c911a-1dd1-4983-876b-bd90fa1a2ba1"
+        },
+        {
+          "parameters": {
+            "jsCode": "const item = $input.first().json;\nconst body = item.body || item;\nconst incomingMsg = (body.Body || '').toString().trim();\nconst fromNumber = (body.From || '').toString().trim();\n\nif (!incomingMsg) {\n  throw new Error('No message body received. Raw: ' + JSON.stringify(item).substring(0, 500));\n}\nif (!fromNumber) {\n  throw new Error('No From number received. Raw: ' + JSON.stringify(item).substring(0, 500));\n}\n\nreturn [{ json: { message: incomingMsg, rawFrom: fromNumber } }];"
+          },
+          "id": "node-parse-message",
+          "name": "Parse Incoming Message",
+          "type": "n8n-nodes-base.code",
+          "typeVersion": 2,
+          "position": [
+            240,
+            0
+          ]
+        },
+        {
+          "parameters": {
+            "jsCode": "const customerMessage = $input.first().json.message;\nconst rawFrom = $input.first().json.rawFrom;\n\nconst systemPrompt = 'You are Maya, the friendly WhatsApp assistant for Hotel Maurya International, Chennai. Reply warmly in English or Tamil based on what the customer uses. Keep replies short and WhatsApp-friendly (under 160 words). Use emojis. Always end with a helpful next step.\\n\\nHOTEL: Hotel Maurya International | 3-Star | 50 Rooms\\nADDRESS: 168/169 Arcot Road, Vadapalani, Chennai 600026\\nLANDMARKS: Opposite Nexus Vijaya Mall | 3-min walk to Vadapalani Metro\\nPHONE: +91 44 2365 0049 / +91 44 6664 6600\\nMOBILE: +91 99-8987-7188\\nEMAIL: contact@hotelmauryaintl.com\\nWEBSITE: hotelmauryaintl.com\\n\\nCHECK-IN: 2:00 PM | CHECK-OUT: 12:00 PM\\n24-hr stay option available for direct bookings\\n\\nROOMS AND RATES:\\nDeluxe Room (250sqft, King Bed, City View, max 2 adults)\\n- Breakfast only: Rs.3456/night (base Rs.3012 + tax Rs.444)\\n- Breakfast+Lunch/Dinner: Rs.4698/night (base Rs.4098 + tax Rs.600)\\n- Direct single: Rs.3200/night | Direct double: Rs.4000/night\\nSuite: Rs.4200/night\\nExecutive King/Twin: Call for rates\\n\\nROOM AMENITIES: AC, TV, Mini-bar, Tea/Coffee, Safe, WiFi, 24hr room service\\n\\nDINING:\\n- Maybelle Restaurant (Ground floor): North/South Indian, Mughlai, Chinese\\n- 70MM Bar (7th floor): Lounge bar\\n- Room service 24/7\\n\\nBANQUET:\\n- Merit Hall: 20-60 guests\\n- Main Hall: 100 seated / 150 floating\\n- Rooftop: 1500 sqft open-air\\n- Catering: Veg Rs.500-600/plate | Non-veg Rs.600-750/plate\\n\\nFACILITIES: Free WiFi, Free Parking, Valet, Travel Desk, Foreign Exchange, Doctor on call, Laundry, Airport Shuttle on request\\n\\nCANCELLATION: Free if cancelled 24-48hrs before. Within 24hrs = 100% charge.\\n\\nPOLICIES: Children under 5 free | ID required | No pets | Married couples welcome\\n\\nNEARBY: Nexus Vijaya Mall 250m | Metro 3-min | Temple 800m | SIMS Hospital 500m | Airport 12.5km (25-30min) | CMBT 4.5km\\n\\nCANNOT DO: Cannot confirm bookings or process refunds. Direct all to +91 99-8987-7188.';\n\nconst requestBody = {\n  model: 'gpt-4o-mini',\n  messages: [\n    { role: 'system', content: systemPrompt },\n    { role: 'user', content: customerMessage }\n  ],\n  max_tokens: 350,\n  temperature: 0.7\n};\n\nreturn [{ json: { requestBody: requestBody, rawFrom: rawFrom } }];"
+          },
+          "id": "node-build-prompt",
+          "name": "Build OpenAI Request",
+          "type": "n8n-nodes-base.code",
+          "typeVersion": 2,
+          "position": [
+            480,
+            0
+          ]
+        },
+        {
+          "parameters": {
+            "method": "POST",
+            "url": "https://api.openai.com/v1/chat/completions",
+            "authentication": "predefinedCredentialType",
+            "nodeCredentialType": "openAiApi",
+            "sendBody": true,
+            "specifyBody": "json",
+            "jsonBody": "={{ JSON.stringify($json.requestBody) }}",
+            "options": {}
+          },
+          "id": "node-gemini",
+          "name": "Hotel Maurya AI Brain",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 4,
+          "retryOnFail": true,
+          "maxTries": 2,
+          "position": [
+            720,
+            0
+          ],
+          "credentials": {
+            "openAiApi": {
+              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+              "name": "OpenAI - Hotel Maurya"
+            }
+          },
+          "onError": "continueRegularOutput"
+        },
+        {
+          "parameters": {
+            "jsCode": "const response = $input.first().json;\nlet reply;\n\nif (response.error || !response.choices || !response.choices[0]) {\n  reply = 'Apologies! I am having a brief hiccup ðŸ¤–. Please call us at +91 99-8987-7188 for immediate help! ðŸ™';\n} else {\n  reply = response.choices[0]?.message?.content || 'Sorry, I could not process your request. Please call +91 99-8987-7188.';\n}\n\nconst rawFrom = $('Build OpenAI Request').first().json.rawFrom;\nreturn [{ json: { reply: reply.trim(), rawFrom: rawFrom } }];"
+          },
+          "id": "node-extract-reply",
+          "name": "Extract AI Reply",
+          "type": "n8n-nodes-base.code",
+          "typeVersion": 2,
+          "position": [
+            960,
+            0
+          ]
+        },
+        {
+          "parameters": {
+            "method": "POST",
+            "url": "https://api.twilio.com/2010-04-01/Accounts/REPLACE_WITH_YOUR_ACCOUNT_SID/Messages.json",
+            "authentication": "predefinedCredentialType",
+            "nodeCredentialType": "twilioApi",
+            "sendBody": true,
+            "contentType": "form-urlencoded",
+            "bodyParameters": {
+              "parameters": [
+                {
+                  "name": "From",
+                  "value": "whatsapp:+14155238886"
+                },
+                {
+                  "name": "To",
+                  "value": "={{ $json.rawFrom }}"
+                },
+                {
+                  "name": "Body",
+                  "value": "={{ $json.reply }}"
+                }
+              ]
+            },
+            "options": {}
+          },
+          "id": "node-send-whatsapp",
+          "name": "Send WhatsApp Reply",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 4,
+          "retryOnFail": true,
+          "maxTries": 2,
+          "position": [
+            1200,
+            0
+          ],
+          "credentials": {
+            "twilioApi": {
+              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+              "name": "Twilio - Hotel Maurya"
+            }
+          }
+        }
+      ],
+      "connections": {
+        "Receive WhatsApp Message": {
+          "main": [
+            [
+              {
+                "node": "Parse Incoming Message",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Parse Incoming Message": {
+          "main": [
+            [
+              {
+                "node": "Build OpenAI Request",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Build OpenAI Request": {
+          "main": [
+            [
+              {
+                "node": "Hotel Maurya AI Brain",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Hotel Maurya AI Brain": {
+          "main": [
+            [
+              {
+                "node": "Extract AI Reply",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Extract AI Reply": {
+          "main": [
+            [
+              {
+                "node": "Send WhatsApp Reply",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        }
+      },
+      "authors": "YOUR_NAME",
+      "name": "Version 95492115",
+      "description": "",
+      "autosaved": false,
+      "workflowPublishHistory": [
+        {
+          "createdAt": "2026-03-06T04:22:01.111Z",
+          "id": 112,
+          "workflowId": "573iPNI6VESOgJ5O",
+          "versionId": "95492115-e0ef-4dd0-89d1-2031b4547b0c",
+          "event": "activated",
+          "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+        }
+      ]
+    }
+  }
+}
+

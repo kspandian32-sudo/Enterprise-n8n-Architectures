@@ -1,0 +1,331 @@
+﻿{
+    "updatedAt":  "2026-04-10T21:18:52.716Z",
+    "createdAt":  "2026-04-10T21:18:52.716Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "ðŸ”§ Content Alchemist â€” Write Sheet Headers (Run Once)",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "id":  "hdr-trigger",
+                      "name":  "Manual Trigger",
+                      "type":  "n8n-nodes-base.manualTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       250,
+                                       300
+                                   ],
+                      "parameters":  {
+
+                                     }
+                  },
+                  {
+                      "id":  "hdr-li",
+                      "name":  "Write LinkedIn Post Headers",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.5,
+                      "position":  [
+                                       500,
+                                       300
+                                   ],
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "REPLACE_WITH_YOUR_SPREADSHEET_ID"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "mode":  "name",
+                                                           "value":  "LinkedIn Post"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "Timestamp":  "Timestamp",
+                                                                       "Transcript":  "Transcript",
+                                                                       "Content":  "Content",
+                                                                       "Image URL":  "Image URL"
+                                                                   },
+                                                         "matchingColumns":  [
+
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "displayName":  "Timestamp",
+                                                                            "id":  "Timestamp",
+                                                                            "removed":  false,
+                                                                            "required":  false,
+                                                                            "type":  "string"
+                                                                        },
+                                                                        {
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "displayName":  "Transcript",
+                                                                            "id":  "Transcript",
+                                                                            "removed":  false,
+                                                                            "required":  false,
+                                                                            "type":  "string"
+                                                                        },
+                                                                        {
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "displayName":  "Content",
+                                                                            "id":  "Content",
+                                                                            "removed":  false,
+                                                                            "required":  false,
+                                                                            "type":  "string"
+                                                                        },
+                                                                        {
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "displayName":  "Image URL",
+                                                                            "id":  "Image URL",
+                                                                            "removed":  false,
+                                                                            "required":  false,
+                                                                            "type":  "string"
+                                                                        }
+                                                                    ]
+                                                     },
+                                         "options":  {
+                                                         "useAppend":  false
+                                                     }
+                                     },
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "id":  "hdr-xpost",
+                      "name":  "Write X Post Headers",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.5,
+                      "position":  [
+                                       750,
+                                       300
+                                   ],
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "REPLACE_WITH_YOUR_SPREADSHEET_ID"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "mode":  "name",
+                                                           "value":  "X Post"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "Timestamp":  "Timestamp",
+                                                                       "Transcript":  "Transcript",
+                                                                       "Content":  "Content",
+                                                                       "Image URL":  "Image URL"
+                                                                   },
+                                                         "matchingColumns":  [
+
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "displayName":  "Timestamp",
+                                                                            "id":  "Timestamp",
+                                                                            "removed":  false,
+                                                                            "required":  false,
+                                                                            "type":  "string"
+                                                                        },
+                                                                        {
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "displayName":  "Transcript",
+                                                                            "id":  "Transcript",
+                                                                            "removed":  false,
+                                                                            "required":  false,
+                                                                            "type":  "string"
+                                                                        },
+                                                                        {
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "displayName":  "Content",
+                                                                            "id":  "Content",
+                                                                            "removed":  false,
+                                                                            "required":  false,
+                                                                            "type":  "string"
+                                                                        },
+                                                                        {
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "displayName":  "Image URL",
+                                                                            "id":  "Image URL",
+                                                                            "removed":  false,
+                                                                            "required":  false,
+                                                                            "type":  "string"
+                                                                        }
+                                                                    ]
+                                                     },
+                                         "options":  {
+                                                         "useAppend":  false
+                                                     }
+                                     },
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "id":  "hdr-hooks",
+                      "name":  "Write Hooks Headers",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.5,
+                      "position":  [
+                                       1000,
+                                       300
+                                   ],
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "REPLACE_WITH_YOUR_SPREADSHEET_ID"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "mode":  "name",
+                                                           "value":  "Hooks"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "Timestamp":  "Timestamp",
+                                                                       "Transcript":  "Transcript",
+                                                                       "Hook":  "Hook"
+                                                                   },
+                                                         "matchingColumns":  [
+
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "displayName":  "Timestamp",
+                                                                            "id":  "Timestamp",
+                                                                            "removed":  false,
+                                                                            "required":  false,
+                                                                            "type":  "string"
+                                                                        },
+                                                                        {
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "displayName":  "Transcript",
+                                                                            "id":  "Transcript",
+                                                                            "removed":  false,
+                                                                            "required":  false,
+                                                                            "type":  "string"
+                                                                        },
+                                                                        {
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "displayName":  "Hook",
+                                                                            "id":  "Hook",
+                                                                            "removed":  false,
+                                                                            "required":  false,
+                                                                            "type":  "string"
+                                                                        }
+                                                                    ]
+                                                     },
+                                         "options":  {
+                                                         "useAppend":  false
+                                                     }
+                                     },
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      }
+                  }
+              ],
+    "connections":  {
+                        "Manual Trigger":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Write LinkedIn Post Headers",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Write LinkedIn Post Headers":  {
+                                                            "main":  [
+                                                                         [
+                                                                             {
+                                                                                 "node":  "Write X Post Headers",
+                                                                                 "type":  "main",
+                                                                                 "index":  0
+                                                                             }
+                                                                         ]
+                                                                     ]
+                                                        },
+                        "Write X Post Headers":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Write Hooks Headers",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "saveManualExecutions":  true,
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false
+                 },
+    "staticData":  null,
+    "meta":  null,
+    "pinData":  null,
+    "versionId":  "909158bf-998c-483a-8786-5abb13e1223c",
+    "activeVersionId":  null,
+    "versionCounter":  1,
+    "triggerCount":  0,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-10T21:18:52.723Z",
+                       "createdAt":  "2026-04-10T21:18:52.723Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "PyO0nLnp7LtNdWPx",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

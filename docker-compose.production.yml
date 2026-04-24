@@ -1,0 +1,171 @@
+# =============================================================
+# Enterprise n8n Production Deployment
+# =============================================================
+# Architecture: Separate Main + Webhook + Worker instances
+# backed by PostgreSQL for persistence and Redis for queuing.
+#
+# This is the deployment pattern recommended by n8n for
+# high-throughput production workloads (220+ exec/sec).
+#
+# Hardware Targets:
+#   - Main:    2 vCPU, 4GB RAM (editor + API)
+#   - Webhook: 1 vCPU, 2GB RAM (inbound HTTP, low latency)
+#   - Worker:  4 vCPU, 8GB RAM (execution engine, CPU-bound)
+#   - Postgres: 2 vCPU, 4GB RAM (persistence)
+#   - Redis:    1 vCPU, 1GB RAM (queue broker)
+#
+# Estimated Monthly Cost: $150–350 (cloud VPS)
+# =============================================================
+
+version: "3.8"
+
+x-n8n-common: &n8n-common
+  image: n8nio/n8n:latest
+  restart: unless-stopped
+  environment: &n8n-env
+    # Database
+    DB_TYPE: postgresdb
+    DB_POSTGRESDB_HOST: postgres
+    DB_POSTGRESDB_PORT: 5432
+    DB_POSTGRESDB_DATABASE: n8n
+    DB_POSTGRESDB_USER: ${POSTGRES_USER:-n8n}
+    DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+
+    # Queue Mode (Redis)
+    EXECUTIONS_MODE: queue
+    QUEUE_BULL_REDIS_HOST: redis
+    QUEUE_BULL_REDIS_PORT: 6379
+
+    # Security
+    N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?Set N8N_ENCRYPTION_KEY in .env}
+    N8N_USER_MANAGEMENT_JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+
+    # Performance
+    EXECUTIONS_DATA_SAVE_ON_ERROR: all
+    EXECUTIONS_DATA_SAVE_ON_SUCCESS: all
+    EXECUTIONS_DATA_SAVE_ON_PROGRESS: true
+    EXECUTIONS_DATA_MAX_AGE: 336  # 14 days retention
+    GENERIC_TIMEZONE: ${TIMEZONE:-Asia/Kolkata}
+
+    # Observability
+    N8N_LOG_LEVEL: info
+    N8N_LOG_OUTPUT: console
+    N8N_METRICS: "true"
+    N8N_METRICS_PREFIX: n8n_
+  volumes:
+    - n8n_data:/home/node/.n8n
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  networks:
+    - n8n-network
+
+services:
+  # ===== MAIN (Editor + REST API) =====
+  n8n-main:
+    <<: *n8n-common
+    hostname: n8n-main
+    ports:
+      - "5678:5678"
+    environment:
+      <<: *n8n-env
+      N8N_ROLE: main
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G
+        reservations:
+          cpus: "1.0"
+          memory: 2G
+
+  # ===== WEBHOOK PROCESSOR (Low-latency inbound) =====
+  n8n-webhook:
+    <<: *n8n-common
+    hostname: n8n-webhook
+    ports:
+      - "5679:5678"
+    environment:
+      <<: *n8n-env
+      N8N_ROLE: webhook
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 1G
+
+  # ===== WORKER (Execution Engine — Scale Horizontally) =====
+  n8n-worker:
+    <<: *n8n-common
+    hostname: n8n-worker
+    command: worker
+    environment:
+      <<: *n8n-env
+      N8N_ROLE: worker
+      QUEUE_BULL_REDIS_TIMEOUT_THRESHOLD: 60000
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 8G
+        reservations:
+          cpus: "2.0"
+          memory: 4G
+
+  # ===== POSTGRESQL (Persistence) =====
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: n8n
+      POSTGRES_USER: ${POSTGRES_USER:-n8n}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-n8n}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G
+    networks:
+      - n8n-network
+
+  # ===== REDIS (Queue Broker) =====
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+    networks:
+      - n8n-network
+
+volumes:
+  n8n_data:
+  postgres_data:
+  redis_data:
+
+networks:
+  n8n-network:
+    driver: bridge

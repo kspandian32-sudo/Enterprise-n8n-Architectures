@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Environment & credentials (NEVER commit these)
+.env
+.env.*
+!.env.example
+service-account.json
+*-credentials.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Runtime artifacts
+standups/
+
+# Docker volumes
+postgres_data/
+redis_data/
+n8n_data/

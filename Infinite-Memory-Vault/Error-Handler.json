@@ -1,0 +1,219 @@
+﻿{
+    "updatedAt":  "2026-04-15T14:03:18.833Z",
+    "createdAt":  "2026-04-14T16:39:11.259Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "Infinite-Memory-Vault-Error-Workflow",
+    "description":  null,
+    "active":  true,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.errorTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       688,
+                                       192
+                                   ],
+                      "id":  "3abb6a68-494b-429b-8e5c-fa6a8880bbf5",
+                      "name":  "Error Trigger"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const execution = $input.first().json;\nconst workflowName = execution.workflow?.name || \u0027Infinite Memory Vault v2.1\u0027;\nconst nodeName = execution.execution?.lastNodeExecuted || \u0027Unknown node\u0027;\nconst errorMsg = execution.execution?.error?.message || \u0027Unknown error\u0027;\nconst errorStack = execution.execution?.error?.stack || \u0027\u0027;\nconst execId = execution.execution?.id || \u0027N/A\u0027;\nconst timestamp = new Date().toISOString();\n\nreturn [{ json: {\n  alert_text:\n    `ðŸš¨ *n8n Workflow Error Alert*\\n\\n`\n    + `Workflow: ${workflowName}\\n`\n    + `Execution ID: ${execId}\\n`\n    + `Failed Node: ${nodeName}\\n`\n    + `Error: ${errorMsg}\\n`\n    + `Time: ${timestamp}\\n\\n`\n    + `Check: https://n8n.pureremedysolutions.com`\n} }];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       928,
+                                       192
+                                   ],
+                      "id":  "202492d4-702e-4ca6-9665-5629837a2bce",
+                      "name":  "Format Error Details"
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "7392899748",
+                                         "text":  "={{ $json.alert_text }}",
+                                         "additionalFields":  {
+
+                                                              },
+                                         "operation":  "sendMessage"
+                                     },
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       1168,
+                                       192
+                                   ],
+                      "id":  "fcddea51-1727-4ee4-94c5-f0c231a49f68",
+                      "name":  "Send Error Alert to Founder",
+                      "webhookId":  "a0a8c6d3-2250-40f6-9dad-54fc7f55f23a",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "Telegram Account Memory Vault"
+                                                          }
+                                      }
+                  }
+              ],
+    "connections":  {
+                        "Error Trigger":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Format Error Details",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Format Error Details":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Send Error Alert to Founder",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate",
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false
+                 },
+    "staticData":  null,
+    "meta":  null,
+    "pinData":  {
+
+                },
+    "versionId":  "7d4f65df-87ba-48c9-bfd7-9fd717e92c87",
+    "activeVersionId":  "7d4f65df-87ba-48c9-bfd7-9fd717e92c87",
+    "versionCounter":  24,
+    "triggerCount":  0,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-14T16:39:11.265Z",
+                       "createdAt":  "2026-04-14T16:39:11.265Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "Gada0T8rzuzLSEte",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  {
+                          "updatedAt":  "2026-04-15T14:03:22.000Z",
+                          "createdAt":  "2026-04-15T14:03:18.833Z",
+                          "versionId":  "7d4f65df-87ba-48c9-bfd7-9fd717e92c87",
+                          "workflowId":  "Gada0T8rzuzLSEte",
+                          "nodes":  [
+                                        {
+                                            "parameters":  {
+
+                                                           },
+                                            "type":  "n8n-nodes-base.errorTrigger",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             688,
+                                                             192
+                                                         ],
+                                            "id":  "3abb6a68-494b-429b-8e5c-fa6a8880bbf5",
+                                            "name":  "Error Trigger"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "const execution = $input.first().json;\nconst workflowName = execution.workflow?.name || \u0027Infinite Memory Vault v2.1\u0027;\nconst nodeName = execution.execution?.lastNodeExecuted || \u0027Unknown node\u0027;\nconst errorMsg = execution.execution?.error?.message || \u0027Unknown error\u0027;\nconst errorStack = execution.execution?.error?.stack || \u0027\u0027;\nconst execId = execution.execution?.id || \u0027N/A\u0027;\nconst timestamp = new Date().toISOString();\n\nreturn [{ json: {\n  alert_text:\n    `ðŸš¨ *n8n Workflow Error Alert*\\n\\n`\n    + `Workflow: ${workflowName}\\n`\n    + `Execution ID: ${execId}\\n`\n    + `Failed Node: ${nodeName}\\n`\n    + `Error: ${errorMsg}\\n`\n    + `Time: ${timestamp}\\n\\n`\n    + `Check: https://n8n.pureremedysolutions.com`\n} }];"
+                                                           },
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             928,
+                                                             192
+                                                         ],
+                                            "id":  "202492d4-702e-4ca6-9665-5629837a2bce",
+                                            "name":  "Format Error Details"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "chatId":  "7392899748",
+                                                               "text":  "={{ $json.alert_text }}",
+                                                               "additionalFields":  {
+
+                                                                                    }
+                                                           },
+                                            "type":  "n8n-nodes-base.telegram",
+                                            "typeVersion":  1.2,
+                                            "position":  [
+                                                             1168,
+                                                             192
+                                                         ],
+                                            "id":  "fcddea51-1727-4ee4-94c5-f0c231a49f68",
+                                            "name":  "Send Error Alert to Founder",
+                                            "webhookId":  "a0a8c6d3-2250-40f6-9dad-54fc7f55f23a",
+                                            "credentials":  {
+                                                                "telegramApi":  {
+                                                                                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                                    "name":  "Telegram Account Memory Vault"
+                                                                                }
+                                                            }
+                                        }
+                                    ],
+                          "connections":  {
+                                              "Error Trigger":  {
+                                                                    "main":  [
+                                                                                 [
+                                                                                     {
+                                                                                         "node":  "Format Error Details",
+                                                                                         "type":  "main",
+                                                                                         "index":  0
+                                                                                     }
+                                                                                 ]
+                                                                             ]
+                                                                },
+                                              "Format Error Details":  {
+                                                                           "main":  [
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Send Error Alert to Founder",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ]
+                                                                                    ]
+                                                                       }
+                                          },
+                          "authors": "YOUR_NAME",
+                          "name":  "Version 7d4f65df",
+                          "description":  "",
+                          "autosaved":  true,
+                          "workflowPublishHistory":  [
+                                                         {
+                                                             "createdAt":  "2026-04-15T14:03:22.461Z",
+                                                             "id":  882,
+                                                             "workflowId":  "Gada0T8rzuzLSEte",
+                                                             "versionId":  "7d4f65df-87ba-48c9-bfd7-9fd717e92c87",
+                                                             "event":  "activated",
+                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                                         }
+                                                     ]
+                      }
+}

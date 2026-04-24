@@ -1,0 +1,1315 @@
+﻿{
+    "updatedAt":  "2026-04-20T10:50:01.230Z",
+    "createdAt":  "2026-04-20T06:42:35.827Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "v7.6 FIXED - WF-B Reply + Bounce + Dashboard (SMTP)",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "triggerAtHour":  10
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "id":  "a3d179e3-fcef-420f-a65f-2100ccd19e2b",
+                      "name":  "Daily 10 AM: Email 2 Due?",
+                      "position":  [
+                                       -3328,
+                                       352
+                                   ],
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "typeVersion":  1.3
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "1475293523"
+                                                       },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "2ecda3dc-27ed-4d8f-8d19-bceccbd1eeaa",
+                      "name":  "Fetch CRM",
+                      "position":  [
+                                       -3104,
+                                       352
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Filter: Status = \u0027Email 1 Sent\u0027 (or simulated) AND 3+ days elapsed.\nconst results = [];\nfor (const item of $input.all()) {\n  const status = (item.json.Status || \u0027\u0027).trim();\n  if (status !== \u0027Email 1 Sent\u0027 \u0026\u0026 status !== \u0027Email 1 Sent (Simulated)\u0027) continue;\n  const sentAt = item.json[\u0027Email 1 Sent At\u0027] || item.json.email1SentAt;\n  if (sentAt \u0026\u0026 (new Date() - new Date(sentAt)) \u003e= 3 * 24 * 60 * 60 * 1000) {\n    results.push({ json: item.json });\n  }\n}\nreturn results;"
+                                     },
+                      "id":  "bd21698c-1c39-4ee0-adc1-8a2a1eacb7fe",
+                      "name":  "Filter: 3+ Days Passed",
+                      "position":  [
+                                       -2880,
+                                       352
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "thread",
+                                         "limit":  1,
+                                         "filters":  {
+                                                         "q":  "={{ \u0027to:\u0027 + $json.Email + \u0027 OR from:\u0027 + $json.Email }}"
+                                                     }
+                                     },
+                      "id":  "f090481b-4ca2-40da-b94c-ac8ce53a6ead",
+                      "name":  "Get Gmail Thread",
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       -2656,
+                                       352
+                                   ],
+                      "webhookId":  "75c96b85-ac8d-4b63-b710-6faf51e18f06",
+                      "alwaysOutputData":  true,
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Lead Gen Machine Gmail OAuth2 (kspandian32 READ)"
+                                                          }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "operator":  {
+                                                                                                    "singleValue":  true,
+                                                                                                    "operation":  "notEmpty",
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                   "id":  "thread-exists-check-v1-new-wfb",
+                                                                                   "leftValue":  "={{ $json.id }}"
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        },
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "510287d4-7437-4028-9ba6-dba98a6a6718",
+                      "name":  "IF: Found Thread?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       -2432,
+                                       352
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "thread",
+                                         "operation":  "get",
+                                         "threadId":  "={{ $json.id }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "6b8e65ac-0ff6-4faa-aecb-2ae1fb78b862",
+                      "name":  "Fetch Thread Details",
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       -2208,
+                                       208
+                                   ],
+                      "webhookId":  "46079374-6c0c-484b-86a0-6576e308ede2",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Lead Gen Machine Gmail OAuth2 (kspandian32 READ)"
+                                                          }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const threads = $input.all();\nconst leads = $(\u0027Filter: 3+ Days Passed\u0027).all();\nconst myEmail = \u0027your-email@example.com\u0027;\n\nreturn threads.map((item, idx) =\u003e {\n  const thread = item.json;\n  const lead = leads[idx] ? leads[idx].json : {};\n  const messages = thread.messages || [];\n  \n  // A REAL reply MUST be from someone else\n  const externalMessages = messages.filter(m =\u003e {\n    const from = (m.From || m.from || \u0027\u0027).toLowerCase();\n    return !from.includes(myEmail.toLowerCase());\n  });\n\n  const hasRealReply = externalMessages.length \u003e 0;\n  \n  // Get the last message from the LEAD, not from me\n  const lastLeadMsg = externalMessages.length \u003e 0 ? externalMessages[externalMessages.length - 1] : null;\n  const replyBody = lastLeadMsg ? (lastLeadMsg.snippet || lastLeadMsg.text || \u0027\u0027).toLowerCase() : \u0027\u0027;\n  \n  const unsubKeywords = [\u0027unsubscribe\u0027, \u0027remove me\u0027, \u0027stop emailing\u0027, \u0027opt out\u0027];\n  const isUnsubscribe = unsubKeywords.some(kw =\u003e replyBody.includes(kw));\n\n  return { \n    json: { \n      ...lead, \n      _thread: thread, \n      hasRealReply, \n      isUnsubscribe, \n      isActionable: hasRealReply || isUnsubscribe \n    } \n  };\n});"
+                                     },
+                      "id":  "72ddcd69-e62c-4579-af34-8088c9093677",
+                      "name":  "Reply Gate (Email 2)",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -1984,
+                                       208
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "reply-check-flag-v3",
+                                                                                   "leftValue":  "={{ $json.isActionable }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "true",
+                                                                                                    "singleValue":  true,
+                                                                                                    "type":  "boolean"
+                                                                                                },
+                                                                                   "rightValue":  true
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "ef71c63e-735f-440d-bd5f-212a87759df1",
+                      "name":  "IF: Reply Detected?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       -1760,
+                                       208
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Check for bounce signals in reply body\nreturn $input.all().map(item =\u003e {\n  const replyBody = (item.json.replyBody || \u0027\u0027).toLowerCase();\n  const bounceSignals = [\u0027undeliverable\u0027, \u0027delivery failed\u0027, \u0027delivery status notification\u0027, \u0027returned mail\u0027, \u0027recipient address rejected\u0027, \u0027user unknown\u0027, \u0027no such user\u0027, \u0027mailbox full\u0027, \u0027address not found\u0027, \u0027does not exist\u0027];\n  const matchedSignal = bounceSignals.find(s =\u003e replyBody.includes(s));\n  return { json: { ...item.json, isBounce: !!matchedSignal, bounceSignal: matchedSignal || null } };\n});"
+                                     },
+                      "id":  "8dc96d19-705f-48ac-848a-92594c77aeaf",
+                      "name":  "Bounce Detection",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -1536,
+                                       160
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "bounce-check-flag-v3",
+                                                                                   "leftValue":  "={{ $json.isBounce }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "true",
+                                                                                                    "singleValue":  true,
+                                                                                                    "type":  "boolean"
+                                                                                                },
+                                                                                   "rightValue":  true
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "e2e35494-79da-4bcf-890b-dab3c5513072",
+                      "name":  "IF: Is Bounce?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       -1312,
+                                       160
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "487226189"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "schema":  [
+
+                                                                    ],
+                                                         "value":  [
+                                                                       {
+                                                                           "column":  "Email",
+                                                                           "value":  "={{ $json.Email }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Name",
+                                                                           "value":  "={{ ($json[\u0027First Name\u0027]||\u0027\u0027) + \u0027 \u0027 + ($json[\u0027Last Name\u0027]||\u0027\u0027) }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Reason",
+                                                                           "value":  "Bounce"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Signal",
+                                                                           "value":  "={{ $json.bounceSignal || \u0027undeliverable\u0027 }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Date",
+                                                                           "value":  "={{ new Date().toISOString() }}"
+                                                                       }
+                                                                   ]
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "fffd1261-a1be-4439-af24-ba3b3d2a9ba1",
+                      "name":  "Blacklist (Bounce)",
+                      "position":  [
+                                       -1088,
+                                       64
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "11003211"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "schema":  [
+
+                                                                    ],
+                                                         "value":  [
+                                                                       {
+                                                                           "column":  "Email",
+                                                                           "value":  "={{ $json.Email }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Name",
+                                                                           "value":  "={{ ($json[\u0027First Name\u0027]||\u0027\u0027) + \u0027 \u0027 + ($json[\u0027Last Name\u0027]||\u0027\u0027) }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Company",
+                                                                           "value":  "={{ $json[\u0027Company Name\u0027] || \u0027\u0027 }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Intent",
+                                                                           "value":  "BOUNCE"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Action",
+                                                                           "value":  "BLACKLISTED"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Bounce_Signal",
+                                                                           "value":  "={{ $json.bounceSignal || \u0027undeliverable\u0027 }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Timestamp",
+                                                                           "value":  "={{ new Date().toISOString() }}"
+                                                                       }
+                                                                   ]
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "db2b154a-dcdf-45be-aaab-760b5628a744",
+                      "name":  "Write Bounce to Replies Sheet",
+                      "position":  [
+                                       -864,
+                                       64
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "1475293523"
+                                                       },
+                                         "columnToMatchOn":  "Email",
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "valueToMatchOn":  "={{ $json.Email.toLowerCase().trim() }}",
+                                         "operation":  "update",
+                                         "fieldsUi":  {
+                                                          "values":  [
+                                                                         {
+                                                                             "fieldValue":  "Bounced",
+                                                                             "column":  "Status"
+                                                                         },
+                                                                         {
+                                                                             "fieldValue":  "={{ new Date().toISOString() }}",
+                                                                             "column":  "Last Updated"
+                                                                         }
+                                                                     ]
+                                                      }
+                                     },
+                      "id":  "434673fa-28f6-4fdd-9a52-7d8d446d74bd",
+                      "name":  "Update CRM: Bounced",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  3,
+                      "position":  [
+                                       -640,
+                                       64
+                                   ],
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "chat",
+                                         "prompt":  {
+                                                        "messages":  [
+                                                                         {
+                                                                             "role":  "system",
+                                                                             "content":  "You are a sales email reply classifier. Classify intent into exactly one of: INTERESTED, NOT_INTERESTED, UNSUBSCRIBE, OUT_OF_OFFICE, WRONG_PERSON. Respond ONLY with JSON, no markdown: {\"intent\":\"CATEGORY\",\"confidence\":0.9,\"summary\":\"one sentence\"}"
+                                                                         },
+                                                                         {
+                                                                             "content":  "=Classify this reply:\n\n{{ $json.replyBody || \u0027(no reply body)\u0027 }}"
+                                                                         }
+                                                                     ]
+                                                    },
+                                         "options":  {
+                                                         "maxTokens":  150,
+                                                         "temperature":  0.2
+                                                     },
+                                         "requestOptions":  {
+
+                                                            }
+                                     },
+                      "id":  "c88d4223-f819-4f79-a97a-1a0c3c97a313",
+                      "name":  "Classify Reply Intent",
+                      "position":  [
+                                       -1088,
+                                       256
+                                   ],
+                      "type":  "n8n-nodes-base.openAi",
+                      "typeVersion":  1.1,
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                            "name":  "OpenAI fresh-key"
+                                                        }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Parse classifier JSON and merge with lead data from Bounce Detection (non-bounce branch)\nconst aiItems = $input.all();\nconst leads = $(\u0027Bounce Detection\u0027).all();\nreturn aiItems.map((item, index) =\u003e {\n  const ai = item.json;\n  const lead = leads[index] ? leads[index].json : {};\n  if (lead.isBounce) return null;\n  let intentData = {};\n  try {\n    const content = ai.message?.content || ai.choices?.[0]?.message?.content || \u0027{}\u0027;\n    intentData = JSON.parse(String(content).replace(/```json\\n?/g,\u0027\u0027).replace(/```/g,\u0027\u0027).trim());\n  } catch(e) {\n    intentData = { intent: \u0027NOT_INTERESTED\u0027, summary: \u0027parse error\u0027, confidence: 0 };\n  }\n  return { json: {\n    ...lead,\n    intent: intentData.intent || \u0027NOT_INTERESTED\u0027,\n    summary: intentData.summary || \u0027\u0027,\n    confidence: intentData.confidence || 0,\n    \u0027AI Summary\u0027: intentData.summary || \u0027\u0027,\n    \u0027Replied At\u0027: new Date().toISOString()\n  } };\n}).filter(x =\u003e x !== null);"
+                                     },
+                      "id":  "667bec4e-eb2c-4d75-91b5-e3d840f21f96",
+                      "name":  "Parse Reply Intent",
+                      "position":  [
+                                       -864,
+                                       256
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "1828942124"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "schema":  [
+
+                                                                    ],
+                                                         "value":  [
+                                                                       {
+                                                                           "column":  "Email",
+                                                                           "value":  "={{ $json.Email }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Name",
+                                                                           "value":  "={{ ($json[\u0027First Name\u0027]||\u0027\u0027) + \u0027 \u0027 + ($json[\u0027Last Name\u0027]||\u0027\u0027) }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Company",
+                                                                           "value":  "={{ $json[\u0027Company Name\u0027] || \u0027\u0027 }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Intent",
+                                                                           "value":  "={{ $json.intent }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Summary",
+                                                                           "value":  "={{ $json.summary }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Confidence",
+                                                                           "value":  "={{ $json.confidence }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Replied_At",
+                                                                           "value":  "={{ $json[\u0027Replied At\u0027] }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Timestamp",
+                                                                           "value":  "={{ new Date().toISOString() }}"
+                                                                       }
+                                                                   ]
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "68bd049a-ba1d-4e69-9ae1-bc0f4b78541f",
+                      "name":  "Write Reply Dashboard",
+                      "position":  [
+                                       -640,
+                                       256
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "value":  "1475293523",
+                                                           "mode":  "id"
+                                                       },
+                                         "columnToMatchOn":  "Email",
+                                         "operation":  "update",
+                                         "fieldsUi":  {
+                                                          "values":  [
+                                                                         {
+                                                                             "fieldValue":  "Replied",
+                                                                             "column":  "Status"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Reply Intent",
+                                                                             "fieldValue":  "={{ $json.intent || \u0027\u0027 }}"
+                                                                         }
+                                                                     ]
+                                                      },
+                                         "valueToMatchOn":  "={{ $json.Email.toLowerCase().trim() }}"
+                                     },
+                      "id":  "83112b49-de5b-4286-aec9-48a934423472",
+                      "name":  "Update CRM: Reply Status",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  3,
+                      "position":  [
+                                       -416,
+                                       256
+                                   ],
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "combinator":  "and",
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "unsubscribe-check",
+                                                                                   "leftValue":  "={{ $json.intent }}",
+                                                                                   "operator":  {
+                                                                                                    "operation":  "equals",
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                   "rightValue":  "UNSUBSCRIBE"
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        }
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "dd813ec1-2986-4059-9e50-cd724617400e",
+                      "name":  "Is Unsubscribe?",
+                      "position":  [
+                                       -192,
+                                       256
+                                   ],
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "487226189"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "schema":  [
+
+                                                                    ],
+                                                         "value":  [
+                                                                       {
+                                                                           "column":  "Email",
+                                                                           "value":  "={{ $json.Email }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Name",
+                                                                           "value":  "={{ ($json[\u0027First Name\u0027]||\u0027\u0027) + \u0027 \u0027 + ($json[\u0027Last Name\u0027]||\u0027\u0027) }}"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Reason",
+                                                                           "value":  "Unsubscribed"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Signal",
+                                                                           "value":  "User requested removal"
+                                                                       },
+                                                                       {
+                                                                           "column":  "Date",
+                                                                           "value":  "={{ new Date().toISOString() }}"
+                                                                       }
+                                                                   ]
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "eb2a5a22-34e3-403c-b512-d11ea0acf09d",
+                      "name":  "Blacklist (Unsubscribe)",
+                      "position":  [
+                                       32,
+                                       160
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "7392899748",
+                                         "text":  "=ðŸ”¥ REPLY: {{ $node[\"Parse Reply Intent\"].json.intent }}\nName: {{ $node[\"Filter: 3+ Days Passed\"].json[\"First Name\"] || \u0027\u0027 }} {{ $node[\"Filter: 3+ Days Passed\"].json[\"Last Name\"] || \u0027\u0027 }}\nCompany: {{ $node[\"Filter: 3+ Days Passed\"].json[\"Company Name\"] || $node[\"Filter: 3+ Days Passed\"].json[\"Company\"] || \u0027\u0027 }}\nEmail: {{ $node[\"Filter: 3+ Days Passed\"].json.Email }}\nSummary: {{ $node[\"Parse Reply Intent\"].json.summary }}",
+                                         "operation":  "sendMessage"
+                                     },
+                      "id":  "68633c1c-06e5-4221-a8dc-e3cca9d2df8a",
+                      "name":  "Telegram: Hot Lead Alert",
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       32,
+                                       352
+                                   ],
+                      "webhookId":  "c8f8e91c-a2a7-4a70-a6bd-34f75f175737",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Lead Gen Machine Telegram account"
+                                                          }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "operator":  {
+                                                                                                    "operation":  "true",
+                                                                                                    "type":  "boolean",
+                                                                                                    "singleValue":  true
+                                                                                                },
+                                                                                   "leftValue":  "true",
+                                                                                   "rightValue":  true,
+                                                                                   "id":  "safe-mode-fixed-v1-new-wfb-fixed-security-bypass-v2"
+                                                                               }
+                                                                           ],
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true,
+                                                                            "typeValidation":  "strict"
+                                                                        },
+                                                            "combinator":  "and"
+                                                        }
+                                     },
+                      "id":  "a735db94-e71d-436c-b648-84689f465bbc",
+                      "name":  "SAFE MODE Check",
+                      "position":  [
+                                       -1536,
+                                       544
+                                   ],
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "return $input.all().map(item =\u003e ({\n  json: {\n    ...item.json,\n    simulated: true,\n    \u0027Simulated\u0027: \u0027YES\u0027,\n    safeNote: \u0027Email 2 SIMULATED\u0027,\n    \u0027Status\u0027: \u0027Email 2 Sent\u0027,\n    \u0027Email 2 Sent At\u0027: new Date().toISOString()\n  }\n}));"
+                                     },
+                      "id":  "9a5e525b-5c6b-401c-b3ae-5994df6c212d",
+                      "name":  "SAFE MODE (Email 2 Simulated)",
+                      "position":  [
+                                       -1088,
+                                       448
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "parameters":  {
+                                         "fromEmail":  "={{ $json[\u0027Sender Email\u0027] }}",
+                                         "toEmail":  "={{ $json.Email }}",
+                                         "subject":  "={{ $json[\u0027Email 2 Subject\u0027] }}",
+                                         "emailFormat":  "text",
+                                         "text":  "={{ $json[\u0027Email 2 Body\u0027] + \u0027\\n\\n--\\n\u0027 + ($json[\u0027Sender Name\u0027] || \u0027\u0027) }}",
+                                         "options":  {
+                                                         "replyTo":  "={{ $json[\u0027Sender Email\u0027] }}"
+                                                     }
+                                     },
+                      "id":  "45e41433-d5e5-4ed1-a8a8-e32adeb43851",
+                      "name":  "Send Email 2 (Follow-Up)",
+                      "type":  "n8n-nodes-base.emailSend",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       -1312,
+                                       640
+                                   ],
+                      "webhookId":  "1d44694e-0197-4c41-826b-e16fd7a15bf4",
+                      "credentials":  {
+                                          "smtp":  {
+                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                       "name":  "SMTP Account"
+                                                   }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Recover lead context â€” emailSend doesn\u0027t pass through input.\nconst leads = $(\u0027SAFE MODE Check\u0027).all();\nreturn $input.all().map((item, idx) =\u003e {\n  const lead = leads[idx] ? leads[idx].json : {};\n  return { json: {\n    ...lead,\n    \u0027Status\u0027: \u0027Email 2 Sent\u0027,\n    \u0027Email 2 Sent At\u0027: new Date().toISOString(),\n    \u0027Simulated\u0027: \u0027NO\u0027\n  } };\n});"
+                                     },
+                      "id":  "3bd80921-7e5d-425e-a805-90026c1a6e06",
+                      "name":  "Capture E2 Context",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -1088,
+                                       640
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "fieldsUi":  {
+                                                          "values":  [
+                                                                         {
+                                                                             "fieldValue":  "Email 2 Sent",
+                                                                             "column":  "Status"
+                                                                         },
+                                                                         {
+                                                                             "fieldValue":  "={{ new Date().toISOString() }}",
+                                                                             "column":  "Email 2 Sent At"
+                                                                         }
+                                                                     ]
+                                                      },
+                                         "operation":  "update",
+                                         "columnToMatchOn":  "Email",
+                                         "sheetName":  {
+                                                           "mode":  "id",
+                                                           "value":  "1475293523"
+                                                       },
+                                         "documentId":  {
+                                                            "mode":  "id",
+                                                            "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                        },
+                                         "valueToMatchOn":  "={{ $json.Email.toLowerCase().trim() }}"
+                                     },
+                      "id":  "ffb04cab-8911-4940-aeb2-efb63a63346b",
+                      "name":  "Update CRM: Email 2 Sent",
+                      "position":  [
+                                       -864,
+                                       544
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  3,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Lead Gen Machine Google Sheets"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "text":  "=ðŸ“§ Email 2 {{ $node[\"SAFE MODE Check\"].json.Simulated === \u0027YES\u0027 ? \u0027SIMULATED\u0027 : \u0027Sent\u0027 }}\nRecipient: {{ $node[\"Filter: 3+ Days Passed\"].json[\"First Name\"] || \u0027\u0027 }} {{ $node[\"Filter: 3+ Days Passed\"].json[\"Last Name\"] || \u0027\u0027 }}\nCompany: {{ $node[\"Filter: 3+ Days Passed\"].json[\"Company Name\"] || $node[\"Filter: 3+ Days Passed\"].json[\"Company\"] || \u0027\u0027 }}\nEmail: {{ $node[\"Filter: 3+ Days Passed\"].json.Email }}",
+                                         "chatId":  "7392899748",
+                                         "operation":  "sendMessage"
+                                     },
+                      "id":  "f6f5ca5c-8202-4d75-9de6-1a1ae1214467",
+                      "name":  "Telegram: Email 2 Sent",
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       -640,
+                                       544
+                                   ],
+                      "webhookId":  "7518a654-c687-402c-a166-bc279d12ebc3",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "name":  "AI Lead Gen Machine Telegram account"
+                                                          }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "id":  "3d83f8de-ffb8-410a-add7-2399a18aa9ef",
+                      "name":  "Lead Context Bridge (Replies)",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -192,
+                                       448
+                                   ],
+                      "parameters":  {
+                                         "jsCode":  "const leads = $(\u0027Parse Reply Intent\u0027).all();\nconst results = [];\nfor (let i = 0; i \u003c leads.length; i++) {\n  results.push({ json: leads[i].json });\n}\nreturn results;"
+                                     }
+                  },
+                  {
+                      "id":  "c8f2681e-bd5d-4abb-8621-02511429d027",
+                      "name":  "Lead Context Bridge (Sent)",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -700,
+                                       544
+                                   ],
+                      "parameters":  {
+                                         "jsCode":  "// This bridge now safely handles both SAFE MODE and LIVE MODE data\nconst leads = $(\u0027Filter: 3+ Days Passed\u0027).all();\nconst results = [];\n\nfor (let i = 0; i \u003c leads.length; i++) {\n  results.push({ json: leads[i].json });\n}\n\nreturn results;"
+                                     }
+                  },
+                  {
+                      "id":  "30464067-b0e9-44a4-affb-98042cad7848",
+                      "name":  "IF: Real Reply?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -1760,
+                                       208
+                                   ],
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "rightValue":  true,
+                                                                                   "operator":  {
+                                                                                                    "operation":  "true",
+                                                                                                    "singleValue":  true,
+                                                                                                    "type":  "boolean"
+                                                                                                },
+                                                                                   "leftValue":  "={{ $json.isActionable }}",
+                                                                                   "id":  "real-reply-check-v1-new-wfb-fixed"
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        }
+                                     }
+                  },
+                  {
+                      "id":  "cbd49e71-c65a-48bd-9daa-1371171c383f",
+                      "name":  "IF: Is OOO?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -752,
+                                       256
+                                   ],
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "leftValue":  "={{ $json.intent }}",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "equals",
+                                                                                                    "singleValue":  false
+                                                                                                },
+                                                                                   "rightValue":  "OUT_OF_OFFICE",
+                                                                                   "id":  "intent-ooo-check-final-v1"
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        }
+                                     }
+                  }
+              ],
+    "connections":  {
+                        "Daily 10 AM: Email 2 Due?":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "Fetch CRM",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "Fetch CRM":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Filter: 3+ Days Passed",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Filter: 3+ Days Passed":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "Get Gmail Thread",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Get Gmail Thread":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "IF: Found Thread?",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "IF: Found Thread?":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Fetch Thread Details",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ],
+                                                               [
+                                                                   {
+                                                                       "node":  "SAFE MODE Check",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Fetch Thread Details":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Reply Gate (Email 2)",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Reply Gate (Email 2)":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "IF: Real Reply?",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "IF: Reply Detected?":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Bounce Detection",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Bounce Detection":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "IF: Is Bounce?",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "IF: Is Bounce?":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Blacklist (Bounce)",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ],
+                                                            [
+                                                                {
+                                                                    "node":  "Classify Reply Intent",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Blacklist (Bounce)":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Write Bounce to Replies Sheet",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Write Bounce to Replies Sheet":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "Update CRM: Bounced",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                        "Classify Reply Intent":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Parse Reply Intent",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Write Reply Dashboard":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Update CRM: Reply Status",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Update CRM: Reply Status":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "Is Unsubscribe?",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          },
+                                                                          {
+                                                                              "node":  "Lead Context Bridge (Replies)",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "Is Unsubscribe?":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Blacklist (Unsubscribe)",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ],
+                                                             [
+                                                                 {
+                                                                     "node":  "Telegram: Hot Lead Alert",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "SAFE MODE Check":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "SAFE MODE (Email 2 Simulated)",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ],
+                                                             [
+                                                                 {
+                                                                     "node":  "Send Email 2 (Follow-Up)",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "SAFE MODE (Email 2 Simulated)":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "Update CRM: Email 2 Sent",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                        "Send Email 2 (Follow-Up)":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "Capture E2 Context",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "Capture E2 Context":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Update CRM: Email 2 Sent",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Update CRM: Email 2 Sent":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "Telegram: Email 2 Sent",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          },
+                                                                          {
+                                                                              "node":  "Lead Context Bridge (Sent)",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "Lead Context Bridge (Replies)":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "Is Unsubscribe?",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                        "Lead Context Bridge (Sent)":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "Telegram: Email 2 Sent",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "IF: Real Reply?":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Bounce Detection",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ],
+                                                             [
+                                                                 {
+                                                                     "node":  "SAFE MODE Check",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Parse Reply Intent":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "IF: Is OOO?",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "IF: Is OOO?":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "SAFE MODE Check",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ],
+                                                         [
+                                                             {
+                                                                 "node":  "Write Reply Dashboard",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate",
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false
+                 },
+    "staticData":  {
+                       "node:Daily 10 AM: Email 2 Due?":  {
+                                                              "recurrenceRules":  [
+
+                                                                                  ]
+                                                          }
+                   },
+    "meta":  null,
+    "pinData":  {
+
+                },
+    "versionId":  "0539f576-c715-40ec-80e4-58177f3eb25f",
+    "activeVersionId":  null,
+    "versionCounter":  99,
+    "triggerCount":  1,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-20T06:42:35.831Z",
+                       "createdAt":  "2026-04-20T06:42:35.831Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "RooLB8UBX9x9TOz1",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}
