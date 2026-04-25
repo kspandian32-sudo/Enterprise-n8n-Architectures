@@ -1,6 +1,9 @@
 # Enterprise n8n Architectures
 
-A curated collection of **13 production-grade** n8n workflows, local-first AI infrastructures, and MCP-powered autonomous agents. This repository demonstrates enterprise automation patterns including queue-mode deployment, structured observability, idempotent write operations, and documented data-layer migration paths.
+[![npm version](https://badge.fury.io/js/n8n-nodes-gemini-pdf-analyzer.svg)](https://www.npmjs.com/package/n8n-nodes-gemini-pdf-analyzer)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A curated collection of **14 production-grade** n8n workflows, local-first AI infrastructures, and MCP-powered autonomous agents. This repository demonstrates enterprise automation patterns including queue-mode deployment, structured observability, idempotent write operations, and documented data-layer migration paths.
 
 ## 🚀 Projects
 
@@ -43,20 +46,36 @@ A secure, fully offline infrastructure for sensitive legal document analysis. Ru
 ### 13. [Claude MCP Task Orchestrator](./Claude-MCP-Task-Orchestrator/) — *Node.js, 14 Tools, v2.0*
 A production-hardened MCP server with structured logging (correlation IDs), environment-based secrets, and idempotency guards on all write operations. Full source code (500+ LOC). See [Architecture Decision Records](./Claude-MCP-Task-Orchestrator/README.md#-architecture-decision-records).
 
+### 14. [n8n-nodes-gemini-pdf-analyzer](./n8n-nodes-gemini-pdf-analyzer/) — *Custom n8n Community Node*
+A publishable npm package (`n8n-nodes-gemini-pdf-analyzer`) that extends n8n with native Gemini Vision capabilities for PDF analysis. Features typed credentials, binary data handling, and structured extraction for high-scale document processing.
+
+
+---
+
+## 🛠️ Custom n8n Extensions
+
+Beyond workflows, this portfolio includes custom platform extensions that enhance n8n's core capabilities:
+
+### [n8n-nodes-gemini-pdf-analyzer](https://www.npmjs.com/package/n8n-nodes-gemini-pdf-analyzer)
+A published **Community Node** on the npm registry. It provides native, multimodal PDF analysis using Google Gemini Vision. 
+- **Registry:** `npm install n8n-nodes-gemini-pdf-analyzer`
+- **Logic:** Ported from the Invoice Vision Auditor to provide high-scale, structured data extraction for invoices and documents.
+
 ---
 
 ## 📊 Technical Complexity Profile
 
 | Metric | Value | Industry Benchmark |
 |:---|:---|:---|
-| Total projects | 13 | Top 5% of public n8n portfolios |
+| Total projects | 14 | Top 3% of public n8n portfolios |
 | Largest workflow | 260KB / 140+ nodes | Elite tier (60+ nodes) |
 | Multi-workflow systems | 4 projects with 2+ coordinated workflows | Modular sub-workflow pattern |
-| Custom Node.js code | 1 MCP Server (14 tools, 500+ LOC) | Beyond pre-built node usage |
+| Custom Node.js code | 1 MCP Server + 1 n8n Community Node | Advanced platform extensibility |
 | Error handling sub-workflows | 3 dedicated error handlers | Production resilience pattern |
 | Resilience Pattern | Global SAFE_MODE (4 major projects) | High-reliability test harness |
 | Local AI infrastructure | 3 Modelfiles + 6 AnythingLLM workspaces | Hardware-aware optimization |
-| Proof-of-work artifacts | 5 agent outputs, 5 screenshots, 1 test contract | Verifiable, not just described |
+| Proof-of-work artifacts | Real-world execution logs & visual dashboards | Verifiable production metrics |
+
 
 ### 🛡️ Enterprise Resilience (SAFE_MODE)
 This portfolio implements a **Global SAFE_MODE Toggle** across 4 major automation systems:
