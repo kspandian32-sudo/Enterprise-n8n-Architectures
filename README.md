@@ -60,6 +60,19 @@ graph TD
 ### 📂 [Layer 5: Extensions](./layer-5-extensions/)
 *   **Custom n8n Nodes:** Native TypeScript extensions for the n8n platform.
 
+---
+
+## 🧠 Design Philosophy: The Compound AI Pattern
+
+This repository is built on the **Compound AI Architecture** principle. Unlike simple "one-shot" automations, our systems separate logic into specialized agentic roles:
+
+1.  **Determinism via JSON-RPC:** We use JSON-RPC for tool invocation to ensure that the AI interacts with the real world through a strict, typed interface rather than unpredictable natural language.
+2.  **The Planner-Critic Loop:** Our core orchestrator implements a `while` loop that allows the system to self-evaluate and pivot strategy without human intervention.
+3.  **Tiered Autonomy:** We classify our workflows using the L1-L5 Autonomy Scale. Most systems here operate at **L4 (Adaptive)**, meaning they learn from outcomes.
+
+> [!IMPORTANT]
+> **Proof of Cognition:** See the **[Agent Decision Trace](./docs/AGENT_DECISION_TRACE.json)** for a step-by-step log of the AI identifying a failure, critiquing its own plan, and successfully pivoting its strategy.
+
 
 ---
 
