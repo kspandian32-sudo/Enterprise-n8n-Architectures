@@ -11,24 +11,29 @@ import path from "path";
 import crypto from "crypto";
 import { z } from "zod";
 
-// ===== INPUT VALIDATION SCHEMAS =====
-const SCHEMAS = {
+// ===== INPUT VALIDATION SCHEMAS (CLAUDE-PATTERN) =====
+const schemas = {
   read_file: z.object({
-    path: z.string().min(1, "Path is required"),
+    path: z.string().min(1).describe('Absolute file path'),
   }),
   write_file: z.object({
-    path: z.string().min(1, "Path is required"),
+    path: z.string().min(1),
     text: z.string(),
   }),
   list_files: z.object({
     dir: z.string().optional(),
   }),
   add_task: z.object({
-    task: z.string().min(1, "Task description is required"),
+    task: z.string().min(1).max(500),
     assigned_to: z.string().optional(),
+    status: z.enum(["To Do", "In Progress", "Done", "Blocked"]).default("To Do"),
+    priority: z.enum(["High", "Medium", "Low"]).default("Medium"),
+    due_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD").optional().nullable(),
+  }),
+  list_tasks: z.object({
     status: z.enum(["To Do", "In Progress", "Done", "Blocked"]).optional(),
     priority: z.enum(["High", "Medium", "Low"]).optional(),
-    due_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format").optional().nullable(),
+    assigned_to: z.string().optional(),
   }),
   update_task: z.object({
     id: z.number().int().positive(),
@@ -36,267 +41,34 @@ const SCHEMAS = {
     assigned_to: z.string().optional(),
     status: z.enum(["To Do", "In Progress", "Done", "Blocked"]).optional(),
     priority: z.enum(["High", "Medium", "Low"]).optional(),
-    due_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format").optional().nullable(),
+    due_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD").optional().nullable(),
   }),
   save_standup_report: z.object({
-    report_markdown: z.string().min(1),
+    report_markdown: z.string().min(10),
     done_summary: z.string(),
     in_progress_summary: z.string(),
     blocked_summary: z.string(),
     overdue_count: z.number(),
-    ai_summary: z.string(),
+    ai_summary: z.string().max(500),
   }),
-  list_tasks: z.object({
-    status: z.enum(["To Do", "In Progress", "Done", "Blocked"]).optional(),
-    priority: z.enum(["High", "Medium", "Low"]).optional(),
-    assigned_to: z.string().optional(),
-  }),
+  get_overdue_tasks: z.object({}).optional(),
+  get_task_summary: z.object({}).optional(),
+  generate_standup_data: z.object({}).optional(),
+  read_standup_history: z.object({}).optional(),
 };
 
-// Simple schema-less validation for tools with no args
-const emptySchema = z.object({}).strict();
-
-// ===== STRUCTURED LOGGING =====
-function createLogger() {
-  const log = (level, message, meta = {}) => {
-    const entry = {
-      timestamp: new Date().toISOString(),
-      level,
-      message,
-      ...meta,
-    };
-    console.error(JSON.stringify(entry));
-  };
-
-  return {
-    info: (msg, meta) => log("INFO", msg, meta),
-    warn: (msg, meta) => log("WARN", msg, meta),
-    error: (msg, meta) => log("ERROR", msg, meta),
-    tool: (requestId, toolName, status, meta = {}) =>
-      log("TOOL", `${toolName} -> ${status}`, { requestId, toolName, ...meta }),
-  };
-}
-
-const logger = createLogger();
-
-const CONFIG = {
-  STANDUP_DIR: process.env.MCP_STANDUP_DIR || path.join(process.cwd(), "standups"),
-};
-
-// ===== IDEMPOTENCY GUARD =====
-const recentWrites = new Map();
-const IDEMPOTENCY_WINDOW_MS = 5000;
-
-function checkIdempotency(operation, payload) {
-  const hash = crypto
-    .createHash("sha256")
-    .update(`${operation}:${JSON.stringify(payload)}`)
-    .digest("hex")
-    .slice(0, 16);
-
-  const now = Date.now();
-  if (recentWrites.has(hash)) {
-    const lastWrite = recentWrites.get(hash);
-    if (now - lastWrite < IDEMPOTENCY_WINDOW_MS) {
-      return { isDuplicate: true, hash };
-    }
+// ── Central validation wrapper ────────────────────────────────────────────────
+function validateInput(toolName, rawInput) {
+  const schema = schemas[toolName];
+  if (!schema) {
+    return { ok: false, error: { code: -32601, message: `Unknown tool: ${toolName}` } };
   }
-  recentWrites.set(hash, now);
-  for (const [key, timestamp] of recentWrites) {
-    if (now - timestamp > IDEMPOTENCY_WINDOW_MS * 2) {
-      recentWrites.delete(key);
-    }
+  const result = schema.safeParse(rawInput ?? {});
+  if (!result.success) {
+    const detail = result.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ');
+    return { ok: false, error: { code: -32602, message: `Invalid params — ${detail}` } };
   }
-  return { isDuplicate: false, hash };
-}
-
-function getToday() {
-  return new Date().toISOString().split("T")[0];
-}
-
-// ===== MCP SERVER =====
-const server = new Server(
-  { name: "mcp-task-orchestrator", version: "2.0.0" },
-  { capabilities: { tools: {} } }
-);
-
-// ===== TOOL DEFINITIONS (11 tools - raw sheets removed) =====
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [
-    {
-      name: "read_file",
-      description: "Read a local file and return its contents",
-      inputSchema: {
-        type: "object",
-        properties: { path: { type: "string", description: "Path to the file" } },
-        required: ["path"],
-      },
-    },
-    {
-      name: "write_file",
-      description: "Write text content to a local file (creates or overwrites)",
-      inputSchema: {
-        type: "object",
-        properties: {
-          path: { type: "string", description: "Path to the file" },
-          text: { type: "string", description: "Content to write" },
-        },
-        required: ["path", "text"],
-      },
-    },
-    {
-      name: "list_files",
-      description: "List files and folders in a directory. Shows file sizes and types.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          dir: { type: "string", description: "Directory path to list (defaults to current directory)" },
-        },
-      },
-    },
-    {
-      name: "add_task",
-      description: "Add a new task. Auto-assigns an ID. Status defaults to 'To Do'.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          task: { type: "string", description: "Task description" },
-          assigned_to: { type: "string", description: "Person assigned (optional)" },
-          status: { type: "string", enum: ["To Do", "In Progress", "Done", "Blocked"], description: "Status" },
-          priority: { type: "string", enum: ["High", "Medium", "Low"], description: "Priority level (default: Medium)" },
-          due_date: { type: "string", description: "Due date in YYYY-MM-DD format (optional)" },
-        },
-        required: ["task"],
-      },
-    },
-    {
-      name: "list_tasks",
-      description: "List tasks with optional filters by status, priority, or assigned person.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          status: { type: "string", enum: ["To Do", "In Progress", "Done", "Blocked"], description: "Filter by status" },
-          priority: { type: "string", enum: ["High", "Medium", "Low"], description: "Filter by priority" },
-          assigned_to: { type: "string", description: "Filter by person assigned" },
-        },
-      },
-    },
-    {
-      name: "update_task",
-      description: "Update a task by its ID. Can change status, priority, assigned person, due date, or description.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          id: { type: "number", description: "Task ID to update" },
-          task: { type: "string", description: "New task description" },
-          assigned_to: { type: "string", description: "New assignee" },
-          status: { type: "string", enum: ["To Do", "In Progress", "Done", "Blocked"], description: "New status" },
-          priority: { type: "string", enum: ["High", "Medium", "Low"], description: "New priority" },
-          due_date: { type: "string", description: "New due date in YYYY-MM-DD format" },
-        },
-        required: ["id"],
-      },
-    },
-    {
-      name: "get_overdue_tasks",
-      description: "Get all tasks that are past their due date and not yet Done",
-      inputSchema: { type: "object", properties: {} },
-    },
-    {
-      name: "get_task_summary",
-      description: "Get a summary — counts by status, priority, and overdue items",
-      inputSchema: { type: "object", properties: {} },
-    },
-    {
-      name: "generate_standup_data",
-      description: "Gathers all task data and organizes it for a standup report.",
-      inputSchema: { type: "object", properties: {} },
-    },
-    {
-      name: "save_standup_report",
-      description: "Saves the standup report locally and logs a summary row to Postgres.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          report_markdown: { type: "string", description: "The full standup report in markdown format" },
-          done_summary: { type: "string", description: "Brief summary of completed tasks" },
-          in_progress_summary: { type: "string", description: "Brief summary of in-progress tasks" },
-          blocked_summary: { type: "string", description: "Brief summary of blocked/overdue items" },
-          overdue_count: { type: "number", description: "Number of overdue tasks" },
-          ai_summary: { type: "string", description: "A 1-2 sentence AI-generated overall assessment" },
-        },
-        required: ["report_markdown", "done_summary", "in_progress_summary", "blocked_summary", "overdue_count", "ai_summary"],
-      },
-    },
-    {
-      name: "read_standup_history",
-      description: "Read past standup entries from Postgres.",
-      inputSchema: { type: "object", properties: {} },
-    },
-  ],
-}));
-
-// ===== TOOL IMPLEMENTATIONS =====
-
-async function addTask({ task, assigned_to, status, priority, due_date }) {
-  const { rows } = await pool.query(
-    `INSERT INTO tasks (task, assigned_to, status, priority, due_date)
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING *`,
-    [
-      task,
-      assigned_to ?? 'Unassigned',
-      status      ?? 'To Do',
-      priority    ?? 'Medium',
-      due_date    ?? null,
-    ]
-  );
-  return rows[0];
-}
-
-async function listTasks({ status, priority, assigned_to } = {}) {
-  const conditions = [];
-  const values     = [];
-
-  if (status)      { conditions.push(`status = $${values.length + 1}`);      values.push(status); }
-  if (priority)    { conditions.push(`priority = $${values.length + 1}`);    values.push(priority); }
-  if (assigned_to) { conditions.push(`assigned_to = $${values.length + 1}`); values.push(assigned_to); }
-
-  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-
-  const { rows } = await pool.query(
-    `SELECT id, task, assigned_to, status, priority,
-            to_char(due_date, 'YYYY-MM-DD') AS due_date,
-            created_at, updated_at
-     FROM tasks
-     ${where}
-     ORDER BY
-       CASE priority WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 ELSE 3 END,
-       due_date NULLS LAST`,
-    values
-  );
-  return rows;
-}
-
-async function updateTask(id, updates) {
-  const allowed = ['task', 'assigned_to', 'status', 'priority', 'due_date'];
-  const fields  = Object.keys(updates).filter(k => allowed.includes(k));
-
-  if (fields.length === 0) throw new Error('No valid fields to update.');
-
-  const setClauses = fields.map((f, i) => `${f} = $${i + 2}`).join(', ');
-  const values     = [id, ...fields.map(f => updates[f])];
-
-  const { rows } = await pool.query(
-    `UPDATE tasks
-     SET ${setClauses}
-     WHERE id = $1
-     RETURNING *`,
-    values
-  );
-
-  if (rows.length === 0) throw new Error(`Task id=${id} not found.`);
-  return rows[0];
+  return { ok: true, data: result.data };
 }
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -306,26 +78,30 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   logger.tool(requestId, name, "STARTED", { args: Object.keys(args || {}) });
 
-  try {
-    // --- 🛡️ INPUT VALIDATION (WEEK 5 HARDENING) ---
-    const schema = SCHEMAS[name] || emptySchema;
-    const validatedArgs = schema.parse(args);
+  // 1. Validate
+  const validation = validateInput(name, args);
+  if (!validation.ok) {
+    logger.warn({ tool: name, input: args, error: validation.error }, 'Input validation failed');
+    return { 
+      content: [{ type: "text", text: `JSON-RPC ERROR [${validation.error.code}]: ${validation.error.message}` }],
+      isError: true 
+    };
+  }
 
+  // 2. Execute
+  const validatedArgs = validation.data;
+  try {
     const result = await executeToolHandler(name, validatedArgs, requestId);
     const durationMs = Date.now() - startTime;
     logger.tool(requestId, name, "SUCCESS", { durationMs });
     return result;
   } catch (err) {
     const durationMs = Date.now() - startTime;
-    if (err instanceof z.ZodError) {
-      logger.tool(requestId, name, "VALIDATION_FAILED", { errors: err.errors });
-      return {
-        content: [{ type: "text", text: `VALIDATION ERROR: ${err.errors.map(e => `${e.path}: ${e.message}`).join(", ")}` }],
-        isError: true
-      };
-    }
-    logger.tool(requestId, name, "FAILED", { durationMs, error: err.message });
-    return { content: [{ type: "text", text: `ERROR [${requestId.slice(0, 8)}]: ${err.message}` }], isError: true };
+    logger.error({ tool: name, input: validatedArgs, err: err.message }, 'Tool execution error');
+    return { 
+      content: [{ type: "text", text: `INTERNAL ERROR [${requestId.slice(0, 8)}]: ${err.message}` }], 
+      isError: true 
+    };
   }
 });
 

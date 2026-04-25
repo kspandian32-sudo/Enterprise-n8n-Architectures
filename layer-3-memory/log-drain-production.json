@@ -1,0 +1,139 @@
+{
+  "name": "Centralized Log-Drain (Production Stack)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "log-drain-v1",
+        "options": {}
+      },
+      "name": "Webhook: Receive Log",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code node: Normalize Log Entry\nconst entry = $input.first().json;\n\nreturn [{\n  json: {\n    workflow_name: entry.workflow_name ?? 'unknown',\n    tool_name:     entry.tool_name ?? null,\n    level:         ['debug','info','warn','error'].includes(entry.level) ? entry.level : 'info',\n    message:       String(entry.message ?? '').slice(0, 2000),\n    metadata:      typeof entry.metadata === 'object' ? entry.metadata : {},\n    ts:            entry.ts ?? new Date().toISOString(),\n    session_id:    entry.session_id ?? null,\n  }\n}];"
+      },
+      "name": "Code: Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.level }}",
+              "value2": "error"
+            }
+          ]
+        }
+      },
+      "name": "IF: Is Error?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "🚨 *ERROR in {{ $json.workflow_name }}*\nTool: {{ $json.tool_name }}\nMessage: {{ $json.message }}\nTimestamp: {{ $json.ts }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "name": "Telegram: Alert Admin",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [850, 150]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "execution_logs",
+        "columns": "workflow_name, tool_name, level, message, metadata, session_id, created_at",
+        "values": "={{ $json.workflow_name }}, {{ $json.tool_name }}, {{ $json.level }}, {{ $json.message }}, {{ JSON.stringify($json.metadata) }}, {{ $json.session_id }}, {{ $json.ts }}"
+      },
+      "name": "Supabase: Insert Log",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Log": {
+      "main": [
+        [
+          {
+            "node": "Code: Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code: Normalize": {
+      "main": [
+        [
+          {
+            "node": "IF: Is Error?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: Is Error?": {
+      "main": [
+        [
+          {
+            "node": "Telegram: Alert Admin",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: Alert Admin": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Supabase: Insert Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
