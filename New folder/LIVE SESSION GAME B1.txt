@@ -1,0 +1,18 @@
+14 - feb (week 1)
+The Objective
+To solve the "CEO's Bottleneck." Most founders have incredible insights but zero time to write. We are building an Autonomous Content Factory that converts a raw, rambling voice note into a structured, multi-platform content engine with visual assets.
+The Architecture
+1. Capture: Voice note uploaded to a specific Google Drive folder.
+2. Transcribe: Google Colab (using faster-whisper) monitors the folder, transcribes the audio for $0$ cost, and saves the text.
+3. Process: Make.com triggers on the new text file.
+4. Alchemy (LLM): OpenAI (GPT) splits the transcript into:
+? A value-driven LinkedIn Post.
+? A punchy Twitter (X) Thread.
+? Image Prompts for DALL-E 3.
+5. Output: Final text assets and generated images are saved back to a "Ready to Publish" folder.
+The Tech Stack & Why
+? Google Drive: Acts as our "hot-folder" and file system.
+? Faster-Whisper (on Colab): Standard Whisper API costs money. By running faster-whisper on a free T4 GPU in Colab, we get near-instant transcription for free.
+? Make.com: The "glue" that connects the logic without writing 500 lines of Python.
+? OpenAI API: For high-level reasoning, tone matching, and DALL-E 3 image generation.
+

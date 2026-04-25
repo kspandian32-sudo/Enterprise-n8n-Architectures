@@ -1,0 +1,21 @@
+| # | Party Responsible | Obligation (plain English) | Deadline/Trigger | Penalty for Non-Compliance | Clause Ref |
+|---|-------------------|---------------------------|------------------|---------------------------|------------|
+| 1 | Client            | Review each Deliverable and provide written approval or feedback within 5 business days of submission. | Within 5 business days of submission | Not specified | (b) |
+| 2 | Client            | Provide written approval of a milestone before the Service Provider proceeds to the subsequent milestone. | Before proceeding to the next milestone | Not specified | (c) |
+| 3 | BOTH PARTIES      | Attend mandatory weekly progress calls every Monday at 10:00 AM IST. | Every Monday at 10:00 AM IST | Not specified | (d) |
+| 4 | Client            | Pay a total contract value of ₹18,00,000 (Indian Rupees Eighteen Lakhs only), exclusive of applicable GST. | Upon signing the Agreement | Not specified | (3.1) |
+| 5 | Client            | Provide 30% of Total Value (₹5,40,000) as a non-refundable advance upon signing this Agreement. | Upon signing the Agreement | Not specified | (3.2a) |
+| 6 | Client            | Provide 30% of Total Value (₹5,40,000) upon delivery and acceptance of Phase 1 (Deliverable 1). | Upon delivery and acceptance of Phase 1 | Not specified | (3.2b) |
+| 7 | Client            | Provide 40% of Total Value (₹7,20,000) upon final Project completion and deployment. | Upon final Project completion and deployment | Not specified | (3.2c) |
+| 8 | Client            | Pay all invoices within 7 days of the date of the invoice. | Within 7 days of the date of the invoice | Not specified | (3.3) |
+| 9 | BOTH PARTIES      | Maintain confidentiality for a period of 5 years following the termination or expiry of this Agreement. | For 5 years following termination/expiry | Not specified | (5.2) |
+| 10 | Client            | Not engage any other software development firm or consultant for services similar to those provided by the Service Provider during the term and for a period of 24 months thereafter, across the entire territory of India. | During the term and for 24 months thereafter | 🔴 HIGH PENALTY | (6.1) |
+| 11 | Client            | Not solicit for employment any employee or partner of the Service Provider who was involved in the performance of this Agreement during the term and for 18 months thereafter. | During the term and for 18 months thereafter | 🔴 HIGH PENALTY | (6.2) |
+| 12 | BOTH PARTIES      | Provide written notice of non-renewal at least 7 days prior to the end of the then-current term. | At least 7 days prior to the end of the then-current term | Not specified | (9.3a) |
+| 13 | Client            | Terminate this Agreement for convenience by providing 90 days prior written notice to the Service Provider. | 90 days prior to termination | Not specified | (9.3b) |
+| 14 | Service Provider  | Terminate this Agreement for convenience by providing 7 days prior written notice to the Client. | 7 days prior to termination | Not specified | (9.3c) |
+| 15 | Either Party      | Terminate this Agreement immediately if the other Party commits a material breach and fails to cure such breach within 15 days of receiving written notice thereof. | Upon committing a material breach and failing to cure it within 15 days | Not specified | (9.4) |
+| 16 | BOTH PARTIES      | Govern this Agreement by and construed in accordance with the laws of India. | Upon signing the Agreement | Not specified | (10.1) |
+| 17 | BOTH PARTIES      | Refer any dispute arising out of or in connection with this Agreement to a mutually agreed upon arbitrator. | Upon dispute arising | Not specified | (10.2) |
+
+TOTAL OBLIGATIONS FOUND: 17 | YOUR OBLIGATIONS: 8 | THEIR OBLIGATIONS: 9 | SHARED: 0

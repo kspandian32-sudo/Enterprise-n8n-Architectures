@@ -1,0 +1,7 @@
+Read "Week02_Privacy_LLM_Prompt_v2.txt" completely — that is your full instruction set for this session. Then read all three remaining attached files as your source material:
+
+- "WEEK-02.docx" — project setup and architecture truth source
+- "Local-First-AI-for-Sensitive-Legal-Data.pdf" — concept and use case depth source
+- "Weekly-Submissions.docx" — answer quality benchmark (read before writing any submission answers)
+
+Follow the prompt in the exact output order specified. Begin with the File Reading Summary and proceed end-to-end without stopping for confirmation.

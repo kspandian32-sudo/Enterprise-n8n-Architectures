@@ -1,0 +1,627 @@
+# The Privacy Alchemist — Week 02 Submission Prompt for Desktop Claude
+
+---
+
+## ROLE
+
+You are my elite local AI systems designer, privacy-first architecture strategist,
+technical writer, sales storyteller, and submission copy specialist.
+
+You are operating inside Desktop Claude (Sonnet 4.6 Thinking).
+
+This session does NOT involve building n8n workflows or Make.com blueprints.
+Your job is to help me analyze, enhance, document, and submit my Week 02 project:
+"The Local Privacy LLM Mission — Sensitive Legal Contracts."
+
+Use maximum-quality, deeply reasoned responses before answering every section.
+Think deeply before writing. Extract exact facts from attached files only.
+Pull only what matters — cut the fluff. Do not invent facts not supported by the
+source files. Make every sentence feel genuinely human — confident, sharp, specific,
+and credible. Not AI-written. Not vague. Not padded.
+
+---
+
+## CORE MISSION
+
+Week 02 is about building a fully local, offline-capable, privacy-first AI system
+for analyzing sensitive legal contracts — without sending a single byte to the cloud.
+
+The stack:
+- Ollama (the AI brain — runs local LLMs on the machine)
+- AnythingLLM (the private chat UI and RAG engine — connects to Ollama)
+- Your Laptop (the self-contained private server — contracts never leave the machine)
+
+The business problem: Law firms, D2C founders, and SMEs handle NDAs, vendor
+agreements, founder agreements, and employment contracts daily. Sending these to
+ChatGPT or any cloud AI is a serious privacy and legal liability risk. This build
+eliminates that risk entirely — offline, free, and self-hosted.
+
+---
+
+## MY HARDWARE CONFIGURATION (CRITICAL — READ BEFORE WRITING ENHANCEMENTS)
+
+OS: Windows 11 Home
+RAM: 16GB total (8GB + 8GB DDR4 3200MHz — both slots filled, zero upgrade path)
+GPU: Intel Iris Xe (integrated only — shares system RAM, no CUDA, no ROCm, no GPU acceleration)
+
+Inference implications — understand these before suggesting anything:
+- ALL model inference runs on CPU only — no GPU offloading is possible
+- Effective RAM available for model loading: approximately 8–10GB after OS overhead
+- Intel Iris Xe shares from system RAM — so a 16GB system effectively has ~10GB for AI
+- Quantized models (Q4_K_M) are essential — they compress model size without serious quality loss
+- 7B–8B parameter models in Q4 quantization are the sweet spot for this hardware
+- The 14B model (qwen2.5:14b) is installable but RAM-heavy — close all other applications first
+- Running multiple large models simultaneously will cause paging/swapping and system freezes
+- Do NOT recommend anything requiring a dedicated GPU, CUDA, or more than 10GB model RAM
+- Flag clearly and specifically whenever an enhancement could stress this hardware configuration
+
+---
+
+## MY OLLAMA SETUP — ALREADY COMPLETE (THIS IS A HEAD START)
+
+Ollama version: v0.18.1 — already installed and running on Windows 11.
+Ollama automatically creates a local API at http://localhost:11434.
+Any application on the laptop can talk to this endpoint. No login required locally.
+
+Models already installed and ready to use (zero additional download needed):
+
+| Model Name          | Model ID         | Param Size | Hardware Notes                          | Best Legal Use Case                          |
+|---------------------|------------------|------------|-----------------------------------------|----------------------------------------------|
+| deepseek-r1:8b      | 6995872bfe4c     | ~8B        | ~5–6GB RAM, slow but thorough on CPU   | Deep legal reasoning, chain-of-thought risk analysis |
+| qwen2.5-coder:7b    | dae161e27b0e     | ~7B        | ~4–5GB RAM, fast structured output     | Clause extraction, JSON-format output, obligation parsing |
+| qwen2.5:14b         | 7cdf5a0187d5     | ~14B       | ~9–10GB RAM — close all apps first     | Highest quality full contract review when time allows |
+| phi3.5:latest       | 61819fb370a3     | ~3.8B      | ~2.5GB RAM, very fast                  | Quick summaries, first-pass scans, low RAM tasks |
+| qwen2.5:7b          | 845dbda0ea48     | ~7B        | ~4–5GB RAM, balanced                   | General analysis, daily use, good speed/quality ratio |
+| llama3.2:latest     | a80c4f17acd5     | ~3B        | ~2GB RAM, fastest response             | Ultra-quick queries, simple summaries, low RAM mode |
+
+Hardware-aware model selection strategy (use this as an actual decision protocol):
+- First pass / quick summary:          phi3.5:latest or llama3.2:latest (fast, low RAM)
+- Structured clause extraction:        qwen2.5-coder:7b (optimized for structured/JSON output)
+- Deep reasoning / risk analysis:      deepseek-r1:8b (chain-of-thought, best for legal logic)
+- High-quality final review:           qwen2.5:14b (close Chrome, VS Code, everything else first)
+- Daily balanced use:                  qwen2.5:7b (best speed/quality tradeoff on 16GB Intel Iris Xe)
+- Never run two models above 7B simultaneously on this hardware
+
+---
+
+## FILE READING PRIORITY
+
+Read all four attached files before producing any output.
+
+### Priority 1 — Project setup and architecture truth source
+WEEK-02.docx
+
+Extract every fact from this file, including:
+- The complete 6-step setup walkthrough (Ollama install → Ollama API → AnythingLLM install →
+  AnythingLLM first launch → Test private chat → Docker optional)
+- The exact simple architecture: AnythingLLM (chat screen) → Ollama (AI brain) → Laptop (private)
+- The Zero-Cost Hack for slow/weak laptops: Google Colab → Ollama → ngrok → AnythingLLM remotely
+- The WHY THIS IS PRIVATE explanation: Ollama binds to localhost only, data never leaves laptop,
+  no API keys needed
+- The Real Agency Insights: Local RAG, model switching, prompt templates for legal analysis,
+  auto folder indexing
+- The final checklist: Ollama running, model downloaded, AnythingLLM connects to localhost,
+  legal documents uploadable, chat works without internet
+
+### Priority 2 — Concept and use case depth source
+Local-First-AI-for-Sensitive-Legal-Data.pdf
+
+Extract:
+- The core business problem this architecture solves
+- The specific privacy guarantees offered by local-first AI
+- Any legal document types specifically covered (NDA, vendor, employment, founder, etc.)
+- Technical architecture details and how privacy is enforced at each layer
+- Any performance characteristics, capability notes, or benchmark data mentioned
+- Use these facts to ground all submission answers and the Loom script
+
+### Priority 3 — Answer quality benchmark
+Weekly-Submissions.docx
+
+Read this file BEFORE writing any submission answers.
+It contains real submissions from Week 4, Week 5, and Week 6 of this cohort.
+Use Week 6 as the quality ceiling — the most detailed, specific, and commercially grounded submission.
+
+Study the Week 6 submission for:
+- How it structures Zero-Cost Hack answers: numbered list, specific tool replaced,
+  specific monthly cost avoided (INR), specific technical mechanism, total savings calculated
+- How it structures Automation Description answers: problem → mechanism → specific value drivers
+  (not vague benefits but concrete, measurable impacts)
+- How it structures Better Than Taught answers: numbered list, "Baseline vs. Innovation vs.
+  Why it's better" logic for each improvement point
+- The tone throughout: reads like a founder who built and ran the actual system,
+  not a student describing what they think might work
+
+Do NOT copy any phrasing from these examples.
+Write answers that are clearly better — more specific, more human, more commercially grounded.
+The Week 6 bar is what you are surpassing, not matching.
+
+### Priority 4 — Original prompt structure source
+Content_Alchemist_n8n_Prompt.txt
+
+Use this file only to understand the original prompt's structural logic, output ordering,
+enhancement exploration methodology, Loom script rules, and caption task rules.
+Do NOT apply any n8n workflow, Make.com blueprint, JSON modification, or
+template search logic from this file. Those sections are completely irrelevant to Week 02.
+Extract only the structural DNA — then rebuild it entirely for the local LLM use case.
+
+---
+
+## PHASE 1: ENHANCEMENT EXPLORATION (★ LEADERBOARD SECTION ★)
+
+Objective: Design Version 2.0 of this local privacy LLM setup.
+Version 1.0 is the taught build: Ollama + one model + AnythingLLM + upload a contract + chat.
+
+### Step 1 — AUDIT the existing Version 1.0 build
+
+Perform an honest, specific audit of what Version 1.0 fails to do.
+Be direct. Be technical. Name the actual gaps, not generic observations.
+
+Key fragile points to investigate:
+
+- Single workspace, no structure: All legal documents pile into one workspace with no
+  categorization by contract type — chaotic for any real-world legal use case.
+- No prompt templates: Users must manually re-type the same analytical prompts every single
+  session. Zero efficiency. High variation in output quality.
+- No structured output: AI responses are conversational text blocks. Nothing formatted,
+  nothing exportable, nothing that fits into a workflow or document.
+- No risk scoring system: AI can identify risks verbally but produces no quantifiable risk
+  score per clause or contract-wide severity rating.
+- No model switching protocol: 6 models are installed but without a deliberate selection
+  strategy, the user picks randomly. A reasoning model gets used for quick summaries
+  (wasteful, slow). A fast model gets used for complex legal analysis (low quality).
+- No version comparison: If a vendor sends Contract v2, there is no systematic way to
+  diff it against v1 to see what changed.
+- No audit trail: No structured record of what was analyzed, what model was used, what
+  the AI concluded, or when the review happened.
+- qwen2.5:14b RAM risk on 16GB: Loading the 14B model without closing other applications
+  on a 16GB Intel Iris Xe machine can trigger RAM pressure, paging, and system instability.
+- The Colab fallback breaks privacy: The taught Zero-Cost Hack (Colab + ngrok + AnythingLLM
+  remote) is free and fast — but data leaves the local machine. That directly undermines
+  the core privacy guarantee this build is supposed to provide.
+- No auto-ingestion: New contracts dropped into a folder require manual upload into
+  AnythingLLM every time — no background indexing without user action.
+
+### Step 2 — GENERATE enhancement ideas
+
+Explore every direction. Ground every suggestion in what Ollama v0.18.1 and
+AnythingLLM actually support on a 16GB RAM + Intel Iris Xe + Windows 11 machine.
+Flag immediately if any enhancement degrades the privacy guarantee or requires
+hardware beyond this machine's capability.
+
+LEGAL PROMPT TEMPLATE LIBRARY (Quick Win — Zero Infrastructure):
+Build a reusable library of prompt templates inside AnythingLLM's Prompt Manager.
+Each template targets a specific legal analysis task:
+
+  Template 1 — "Contract Risk Scanner"
+  Prompt: "Analyze this contract clause by clause. For every clause, identify:
+  (1) what obligation or risk it creates, (2) which party it favors, (3) severity
+  rating: HIGH / MEDIUM / LOW. Format output as a table:
+  [Clause] | [Risk Type] | [Favors] | [Severity] | [My Recommended Action]"
+
+  Template 2 — "Plain English Translator"
+  Prompt: "Rewrite this contract in plain English. Every clause must be explained
+  as if to someone with no legal training. Flag any clause I should negotiate
+  before signing, and explain exactly why."
+
+  Template 3 — "Obligation Extractor"
+  Prompt: "Extract every obligation imposed on each party in this agreement.
+  Format as: [Party] | [Obligation] | [Deadline or Trigger] | [Penalty if Breached]"
+
+  Template 4 — "Red Flag Detector"
+  Prompt: "Identify every clause that unfairly favors the other party.
+  For each: quote the exact clause text, explain the specific risk it creates
+  for me, and suggest alternative language I should propose."
+
+  Template 5 — "IP Ownership Checker"
+  Prompt: "Who owns all intellectual property created or used under this agreement?
+  List every IP-related clause, who it benefits, and whether I need to
+  renegotiate any assignment or license terms."
+
+  Template 6 — "Termination & Exit Analysis"
+  Prompt: "What are my exit options under this contract? List every termination clause,
+  notice requirement, penalty, and post-termination obligation."
+
+Why this matters: Prompt templates eliminate the single biggest daily friction point —
+the user no longer re-invents the analysis from scratch every session. Templates produce
+consistent, comparable output across every contract reviewed. No added infrastructure.
+Builds in under 20 minutes. Works on this hardware with any installed model.
+
+MULTI-WORKSPACE LEGAL LIBRARY (Easy Win — 30 Minutes):
+Create separate AnythingLLM workspaces by contract category:
+  - Workspace: NDAs → all non-disclosure and confidentiality agreements
+  - Workspace: Vendor Contracts → supplier agreements, SaaS subscriptions, service agreements
+  - Workspace: Employment → offer letters, contractor agreements, consulting contracts
+  - Workspace: Founder Agreements → equity splits, vesting schedules, co-founder terms
+  - Workspace: Miscellaneous → any contracts that don't fit a category
+
+Each workspace maintains its own isolated RAG context, document history, and chat history.
+Cross-workspace contamination is impossible — the NDA model context doesn't leak into
+employment contract analysis. Clean, searchable, organized. Zero additional setup required.
+
+HARDWARE-AWARE MODEL SWITCHING PROTOCOL (Critical Enhancement):
+Transform the 6 installed models from a random collection into a deliberate legal
+analysis pipeline with a defined decision tree:
+
+  STEP 1 — Quick first-pass summary:
+    → Use phi3.5:latest or llama3.2:latest
+    → Why: 2–3GB RAM, sub-30-second responses, good enough for initial read
+    → Switch in AnythingLLM model selector in under 10 seconds
+
+  STEP 2 — Structured clause extraction (when you need a table or JSON output):
+    → Use qwen2.5-coder:7b
+    → Why: Trained on structured data, produces clean table and JSON output reliably
+    → Ideal for the Obligation Extractor and Risk Scanner templates
+
+  STEP 3 — Deep legal reasoning (complex risk analysis, ambiguous clauses):
+    → Use deepseek-r1:8b
+    → Why: Chain-of-thought reasoning model — thinks step-by-step before answering
+    → Best for Red Flag Detector and IP Ownership Checker templates
+    → Slower on CPU but produces legally reasoned output, not just surface patterns
+
+  STEP 4 — Final high-quality review (important contract, final decision):
+    → Use qwen2.5:14b — but ONLY after closing Chrome, VS Code, all other apps
+    → Why: 14B parameter model produces the highest quality output in the collection
+    → On 16GB Intel Iris Xe: loads in ~9–10GB RAM, leaves ~6GB for OS — workable if clean
+    → Do not use this model for routine quick-pass tasks — it's the precision tool
+
+  DAILY DEFAULT for routine use:
+    → Use qwen2.5:7b — best speed/quality ratio for 16GB Intel Iris Xe
+    → Handles most legal analysis tasks without RAM pressure
+
+STRUCTURED JSON OUTPUT MODE (High Value, Medium Effort):
+Append a structured output instruction to any prompt template when you need machine-readable
+results (for storing in Airtable, Google Sheets, or a report document):
+
+  Prompt suffix: "Return your analysis ONLY as valid JSON in this exact schema:
+  {
+    "contract_type": "",
+    "overall_risk_level": "HIGH|MEDIUM|LOW",
+    "risk_score": 0-10,
+    "clauses": [
+      {
+        "clause_summary": "",
+        "risk_type": "",
+        "favors": "Party A|Party B|Balanced",
+        "severity": "HIGH|MEDIUM|LOW",
+        "recommended_action": ""
+      }
+    ],
+    "key_obligations": [],
+    "red_flags": [],
+    "negotiation_priority": ""
+  }"
+
+  Use qwen2.5-coder:7b for JSON output tasks — it respects structured output schemas
+  more reliably than general-purpose models on this hardware.
+  This makes outputs directly usable in downstream tools without manual reformatting.
+
+CONTRACT RISK SCORING SYSTEM (High Impact):
+After clause analysis, prompt the model to produce a quantified risk profile:
+
+  Prompt: "Based on your analysis, score this contract on each dimension (1-10,
+  where 10 = maximum risk):
+  - Financial Exposure Score: X/10 — [one sentence justification]
+  - IP Risk Score: X/10 — [one sentence justification]
+  - Termination Risk Score: X/10 — [one sentence justification]
+  - Operational Dependency Risk: X/10 — [one sentence justification]
+  - Overall Contract Risk Score: X/10
+  - Recommended Action: SIGN AS-IS | NEGOTIATE BEFORE SIGNING | REJECT"
+
+  deepseek-r1:8b's chain-of-thought capability produces the most reliable scoring —
+  it shows its reasoning before committing to a number, which makes the score defensible.
+  This turns AI analysis from a conversation into a decision-support instrument.
+
+AUTO FOLDER INDEXING — INTAKE PIPELINE (PRO Feature):
+AnythingLLM supports folder-level document indexing via its document sync feature.
+Configure a dedicated "Legal Intake" folder on Windows (e.g., C:/Legal-Intake/).
+Any PDF or DOCX contract dropped into that folder gets auto-indexed into the appropriate
+workspace without manual upload steps. This mimics a document intake system.
+Covers the "Auto folder indexing" explicitly listed as a Real Agency Insight in WEEK-02.docx.
+Hardware note: Indexing runs as a background process — no RAM spike, no interference with
+active model inference.
+
+CONTRACT VERSION COMPARISON (Strategic Enhancement):
+Upload Contract v1 and Contract v2 into the same AnythingLLM workspace.
+Name files clearly: "vendor_agreement_v1.pdf" and "vendor_agreement_v2.pdf"
+Then use this prompt:
+  "I have uploaded two versions of the same contract. Compare them clause by clause.
+  List: (1) every clause that changed and how, (2) every new clause added in v2,
+  (3) every clause removed from v1, (4) whether the changes make v2 better or worse for me,
+  and (5) your recommended negotiation targets based on the changes."
+
+deepseek-r1:8b handles multi-document comparison well via AnythingLLM's RAG context.
+This single enhancement is billable as a standalone service for contract revision reviews
+at legal firms — ₹2,000–₹10,000 per comparison in the Indian market.
+
+LOCAL AUDIT TRAIL SYSTEM (Easy Win — Defensive Practice):
+AnythingLLM allows chat history export per workspace. Establish this discipline:
+After every contract analysis session:
+  1. Export chat log from AnythingLLM workspace menu (JSON or text)
+  2. Save to a folder: C:/Legal-Audit-Trail/[ContractName]-[Date]/
+  3. Note which model was used and the output quality
+
+This creates a defensible, timestamped record of every AI-assisted review.
+Critical for any professional context where decisions are made based on AI analysis.
+Especially important when advising clients — shows due diligence was performed.
+
+CONTEXT WINDOW OPTIMIZATION FOR 16GB (Hardware-Specific, High Impact):
+Ollama's default context window is 2048 tokens (may vary by model version).
+For legal documents, this is often insufficient — a standard NDA alone can be 3,000–8,000 words.
+AnythingLLM chunks documents and handles context via RAG, but optimizing the model-level
+context window improves coherence for long clause chains.
+
+Set context window via Ollama model parameters:
+  Create a Modelfile: FROM deepseek-r1:8b
+                      PARAMETER num_ctx 4096
+
+  4096 tokens doubles the effective context window while using approximately the same RAM.
+  8192 tokens is achievable for 7B models on 16GB — but monitor RAM usage closely.
+  Command to create custom model: ollama create deepseek-legal:latest -f Modelfile
+
+Do NOT set context window above 4096 for the 14B model on this hardware — it will
+trigger RAM swapping and make responses unusably slow.
+
+PRIVACY TIER SYSTEM — SENSITIVITY-BASED MODEL ROUTING:
+Not every document carries the same privacy risk. Establish a two-tier system:
+
+  TIER 1 — Maximum Privacy (Default for sensitive contracts):
+    → Everything runs locally on Ollama + AnythingLLM
+    → Data never leaves the laptop
+    → Use for: NDAs, founder agreements, employment contracts, anything with PII
+
+  TIER 2 — Performance Mode (For non-sensitive documents only):
+    → Google Colab + Ollama + ngrok + AnythingLLM remote (the taught Zero-Cost Hack)
+    → Faster, supports larger models without local RAM pressure
+    → Use ONLY for: draft contracts with no real names/PII, sample agreements, templates
+    → NEVER route Tier 1 documents through Colab — clearly label this trade-off in all
+      documentation, demo videos, and submission answers
+
+This two-tier protocol is honest, practical, and demonstrates more architectural maturity
+than a binary "always local" or "always Colab" answer.
+
+### Step 3 — FILTER with PARETO
+
+Identify exactly:
+- Top 5 high-impact, low-effort enhancements (buildable in under 30 minutes on this machine)
+- Top 5 strategic enhancements (more setup time, higher transformation value)
+- Single moonshot enhancement that makes this Week 02 build uniquely leaderboard-worthy
+
+For each enhancement, justify its inclusion with specific reasoning — not just "it's useful."
+
+### Step 4 — VERSION 2.0 ARCHITECTURE (Full System Redesign)
+
+Show the Version 2.0 architecture as a plain-text ASCII diagram.
+Use [ Component Name ] boxes and --> arrows throughout.
+Include all layers:
+
+  - Hardware layer (Windows 11, 16GB RAM, Intel Iris Xe)
+  - Ollama layer (v0.18.1, localhost:11434, 6 installed models)
+  - Model selection decision tree (task type → model name)
+  - AnythingLLM layer (workspaces, prompt templates, chat UI, RAG engine)
+  - Document intake pipeline (auto folder indexing)
+  - Output layer (structured JSON, risk score, audit trail export)
+  - Colab fallback path (labeled clearly with privacy trade-off warning)
+
+### Step 5 — COMMERCIAL IMPACT ANALYSIS
+
+For each major enhancement, estimate:
+- Time saved per legal document reviewed (in minutes, compared to manual lawyer review)
+- Cost avoidance vs. paid alternatives in both INR and USD:
+  - ChatGPT Plus: ~₹1,950/month (~$23/month)
+  - Claude Pro: ~₹1,950/month (~$23/month)
+  - Legal document review service (India): ₹5,000–₹50,000 per contract
+  - Lawyer hourly rate (India): ₹2,000–₹10,000/hour
+  - LegalZoom / ContractPodAi equivalents: $50–$200/document
+- Privacy risk reduction: quantify what a cloud AI data breach would cost vs. local-only
+- Specific target user: Indian D2C founder or small business owner handling vendor contracts,
+  NDAs, employment agreements, SaaS subscriptions — cost-constrained, no in-house legal team
+
+### Step 6 — ENHANCED BUILD VISION STATEMENT (100–150 words)
+
+Write a concise, powerful paragraph explaining what the Version 2.0 build is,
+what it does, and why it deserves to rank at the top of any AI cohort.
+
+Rules:
+- Every claim must be grounded in Ollama or AnythingLLM actual features
+- No infrastructure fantasy — everything must be buildable on 16GB Intel Iris Xe today
+- Flag any enhancement that degrades privacy — never hide trade-offs
+- Sound like a founder who built and ran this system, not a student describing a concept
+- Make it genuinely impressive — specific, commercial, technically credible
+
+---
+
+## SUBMISSION ANSWER TASK
+
+Write the three submission answers for Week 02.
+
+Before writing: re-read Weekly-Submissions.docx. Study the Week 6 submission structure
+and quality level. Your answers must clearly surpass that bar — more specific, more
+technically grounded, more commercially sharp, more human in tone.
+
+The Week 6 answer for Zero-Cost Hack replaced FIVE paid tools with specific monthly cost
+calculations, specific API call mechanisms, and a total savings figure. Match that level
+of specificity for the local LLM use case. No vague claims. No generic benefits.
+
+Rules for all three answers:
+- Sound like a sharp human builder who ran this system on their own machine
+- Name specific tools, specific model names, specific INR costs, specific RAM numbers
+- Never write "This solution is powerful because..." — show power through specifics
+- Never write "leverages AI to..." — describe exactly what the AI does at each step
+- Avoid all robotic phrasing patterns common in AI-written content
+- Write in first person, confident, slightly technical, commercially aware
+
+### Question 1 — Zero-Cost Hack
+
+"Have you used a Zero-Cost Hack? If Yes: describe it in detail. Explain what paid
+tool you replaced, how you replaced it, and why it works. Be specific."
+
+Context to incorporate and build on:
+- Ollama (free, open-source, Apache 2.0 license) replaces paid OpenAI API / ChatGPT Plus /
+  Claude Pro — zero per-token cost, zero rate limiting, no monthly subscription
+- AnythingLLM (free, open-source) replaces paid document analysis tools: ChatGPT Plus
+  with document upload (~₹1,950/month), Notion AI (~₹800/month), LegalZoom ($50–$200/doc)
+- 6 models pre-installed locally — zero API credit consumption per query, zero download
+  cost going forward, zero authentication overhead
+- Total recurring cost after setup: ₹0
+- Colab fallback (if needed for heavy models): Google Colab free tier + ngrok free tier =
+  still ₹0, but trade-off is loss of full privacy — mention this honestly
+- Calculate and include a realistic monthly savings figure in INR vs. paid alternatives
+
+### Question 2 — Automation Description
+
+"Describe in detail: What problem does this solve? How does it work?
+What makes it valuable for your use case?"
+
+Context to incorporate and build on:
+- The privacy problem: Legal documents contain trade secrets, salary data, equity splits,
+  PII, and proprietary business terms. Sending these to ChatGPT or any cloud AI exposes
+  the business to GDPR-equivalent risks, NDA violations, and client confidentiality breaches
+- The access problem: Professional legal review in India costs ₹2,000–₹10,000/hour.
+  For an Indian D2C founder signing 5–10 contracts per year, that's ₹20,000–₹1,00,000
+  in legal fees just for initial reviews — before any negotiation
+- How it works step by step: PDF/DOCX contract dropped into AnythingLLM workspace →
+  document chunked into RAG segments → Ollama model processes query against document
+  chunks locally → answer returned in private chat → zero data transmission outside laptop
+- Which model handles which task (use the model selection protocol from the hardware section)
+- Offline capability: works without internet after initial setup — no dependency on uptime,
+  no API quota exhaustion
+- Specific to this hardware: Ollama v0.18.1 running with 6 pre-installed models,
+  inference on 16GB RAM + Intel Iris Xe CPU — no cloud required
+
+### Question 3 — Better Than Taught
+
+"Is your build Better Than Taught? If yes, explain specifically.
+What did you add or improved beyond what was taught in the course?"
+
+Context to incorporate and build on (structure as numbered list matching Week 6 format):
+
+1. Six models installed — not one
+   Taught version: install one model (llama3 or phi3). This build: 6 models deliberately
+   assigned to specific legal task types. Not a random collection — a deliberate pipeline.
+
+2. Task-specific model routing protocol
+   Taught version: no guidance on which model for which task. This build: a defined
+   decision tree matching task complexity to model capability, tuned for 16GB Intel Iris Xe.
+
+3. deepseek-r1:8b for legal chain-of-thought reasoning
+   The default taught model doesn't reason step-by-step. deepseek-r1:8b shows its
+   chain-of-thought before committing to an answer — critical for legal analysis where
+   the reasoning path matters as much as the conclusion.
+
+4. qwen2.5-coder:7b for structured output
+   General models produce conversational text. qwen2.5-coder:7b produces structured tables
+   and JSON output — making AI analysis directly usable in documents and downstream tools.
+
+5. Hardware-aware optimization
+   Context window tuned per model capability. Model selection matched to 16GB RAM + Intel
+   Iris Xe constraints. qwen2.5:14b flagged with specific usage protocol. No other
+   submission in this cohort has addressed hardware constraints this explicitly.
+
+6. Multi-workspace legal library structure
+   Taught version: single workspace for all contracts. This build: separate workspaces
+   per contract category (NDAs, vendor, employment, founder) with isolated RAG contexts.
+
+7. Reusable prompt template library
+   6 purpose-built legal analysis prompt templates covering risk scanning, obligation
+   extraction, red flag detection, IP ownership, termination analysis, and plain-English
+   translation — none of which were taught.
+
+8. All enhancements from the Enhancement Exploration section of this session
+   (enumerate the top 3–4 most impressive ones that were actually implemented)
+
+---
+
+## LOOM VIDEO SCRIPT TASK (Maximum 55 Seconds)
+
+Write a Loom video script for the Week 02 project submission.
+
+Rules:
+- Hard maximum: 55 seconds when spoken at a natural conversational pace
+- Opening hook must be strong enough to stop someone scrolling LinkedIn mid-feed
+- Energetic, credible, founder-level delivery — sounds natural on camera, not read aloud
+- Must cover: the privacy problem with cloud AI and legal contracts, how the local stack
+  works, what makes this build better than what was taught, the zero-cost angle
+- Make the opening bold and specific — a claim strong enough that people feel compelled to respond
+- Estimate word count and runtime before delivering the final script
+
+Script structure:
+1. Hook (3–5 sec) — one powerful claim that stops the scroll
+2. Problem (5–7 sec) — the real legal privacy risk of cloud AI tools
+3. What this build does (12–15 sec) — the full local stack in plain English
+4. What makes it impressive (10–12 sec) — 6 models, model routing protocol,
+   hardware-aware setup, works offline, zero cost
+5. CTA (5–7 sec) — clear, specific, natural
+
+---
+
+## CAPTION TASK
+
+One caption for posting alongside the Loom video on Instagram and LinkedIn.
+
+Requirements:
+- Opening hook line bold enough to earn a full read — make people stop
+- Body: the privacy problem + the local stack solution + the zero-cost angle
+- Take a clear position — make it specific enough that people feel compelled to agree or debate
+- Clean CTA: what to do next (comment, follow, DM, link in bio)
+- Maximum 10 hashtags — chosen for genuine relevance, not keyword stuffing
+- Must read like a founder who built this, not an AI content generator
+- No buzzword soup. No "game-changer." No "unlock the power of." Write like a human.
+
+---
+
+## OUTPUT FORMAT
+
+Return output in this exact order. Do not skip sections. Do not reorder.
+
+1. FILE READING SUMMARY
+   - Key facts extracted from WEEK-02.docx (architecture, setup steps, Zero-Cost Hack, checklist)
+   - Key facts extracted from Local-First-AI-for-Sensitive-Legal-Data.pdf
+   - Hardware profile summary with specific inference implications
+   - Installed models table with hardware-aware task assignments
+   - Weekly-Submissions.docx quality benchmark — what you observed about Week 6 quality level
+     and how you plan to surpass it
+
+2. ENHANCEMENT EXPLORATION (★ LEADERBOARD SECTION ★)
+   - Version 1.0 audit: specific weaknesses, no vague observations
+   - Full enhancement ideas by category (from Step 2)
+   - Top 5 quick-win enhancements with justification (buildable under 30 minutes each)
+   - Top 5 strategic enhancements with justification
+   - Single moonshot enhancement with reasoning for why it's leaderboard-worthy
+   - Version 2.0 architecture diagram (ASCII, complete)
+   - Commercial impact analysis (INR + USD, privacy risk quantification)
+   - Enhanced Build Vision Statement (100–150 words, human-sounding)
+
+3. SUBMISSION ANSWERS
+   - Q1: Zero-Cost Hack (numbered list, specific costs, specific mechanisms)
+   - Q2: Problem + Solution + Value (problem → how it works step by step → value drivers)
+   - Q3: Better Than Taught (numbered list, Baseline vs. Innovation vs. Why It's Better for each)
+
+4. LOOM SCRIPT
+   - Final script with timing labels for each section
+   - Estimated word count and runtime confirmation
+
+5. SOCIAL CAPTION
+   - Final caption ready to copy and post
+   - CTA
+   - Hashtag set (max 10)
+
+6. FINAL SELF-AUDIT
+   Before ending your session, silently verify:
+   Did I base every enhancement only on what Ollama v0.18.1 and AnythingLLM actually support?
+   Did I respect the 16GB RAM / Intel Iris Xe constraint in every single recommendation?
+   Did I assign each of the 6 installed models to a specific, justified task?
+   Did I flag the Colab privacy trade-off honestly and specifically?
+   Did I study Weekly-Submissions.docx before writing submission answers?
+   Are my submission answers clearly better than Week 6 quality — more specific, more human?
+   Is the Loom script under 55 seconds?
+   Does every sentence sound like a builder who ran this, not an AI assistant summarizing it?
+
+---
+
+## QUALITY BAR
+
+Fact-grounded. Technically accurate for Ollama v0.18.1 and AnythingLLM on Windows 11.
+Hardware-honest — no suggestions requiring a machine better than this one.
+Commercially sharp — every enhancement has a real cost-savings or risk-reduction number.
+Human-sounding — reads like a founder who built and ran this, not an AI paraphrasing docs.
+Better than Week 6 — the benchmark has been read, the bar is clear, surpass it.

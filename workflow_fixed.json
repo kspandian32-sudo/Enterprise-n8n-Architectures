@@ -1,0 +1,1835 @@
+{
+  "name": "AI Proposal & Invoice Autopilot v3 — Enhanced",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "New Client Proposal Request",
+        "formDescription": "Fill in the client details. A personalised proposal + invoice will be generated and emailed automatically within 30 seconds.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Client Full Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Client Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Industry / Niche",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Service Requested",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Budget / Pricing Agreed",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Timeline",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Key Goals / Requirements",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Additional Notes",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Preferred Language",
+              "placeholder": "English / Hindi / Tamil / Telugu / Kannada"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "typeVersion": 2.5,
+      "name": "📋 Client Intake Form",
+      "position": [
+        0,
+        -64
+      ],
+      "type": "n8n-nodes-base.formTrigger",
+      "id": "n1",
+      "webhookId": "proposal-intake-form"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.first().json;\nconst language = inputData['Preferred Language'] || 'English';\nconst translations = {\n  'English': { subject: 'Tailored Proposal & Invoice', greeting: 'Dear', summary: 'Thank you for your interest in our services. We have prepared a tailored proposal for you.', attached: 'Please find the following documents attached:', pLabel: 'Detailed Proposal', iLabel: 'Invoice' },\n  'Tamil': { subject: 'தனிப்பயனாக்கப்பட்ட முன்மொழிவு மற்றும் விலைப்பட்டியல்', greeting: 'அன்புள்ள', summary: 'எங்கள் சேவைகளில் நீங்கள் காட்டிய ஆர்வத்திற்கு நன்றி. உங்களுக்காக ஒரு பிரத்யேக முன்மொழிவைத் தயாரித்துள்ளோம்.', attached: 'பின்வரும் ஆவணங்கள் இணைக்கப்பட்டுள்ளன:', pLabel: 'விரிவான முன்மொழிவு', iLabel: 'விலைப்பட்டியல்' },\n  'Hindi': { subject: 'अनुकूलित प्रस्ताव और चालान', greeting: 'प्रिय', summary: 'हमारी सेवाओं में आपकी रुचि के लिए धन्यवाद। हमने आपके लिए एक विशेष प्रस्ताव तैयार किया है।', attached: 'कृपया निम्नलिखित दस्तावेज संलग्न देखें:', pLabel: 'विस्तृत प्रस्ताव', iLabel: 'चालान' }\n};\nconst t = translations[language] || translations['English'];\nconst budget = parseFloat(String(inputData['Budget / Pricing Agreed'] || '0').replace(/[^0-9.]/g, '')) || 0;\nconst gstAmount = Math.round(budget * 0.18 * 100) / 100;\nconst totalWithGST = budget + gstAmount;\nconst proposalSuffix = Date.now().toString().slice(-5);\nconst result = {\n  clientName: inputData['Client Full Name'] || 'Valued Client',\n  companyName: inputData['Company Name'] || 'Your Company',\n  clientEmail: inputData['Client Email'] || '',\n  industry: inputData['Industry / Niche'] || 'General',\n  serviceType: inputData['Service Requested'] || 'Consulting',\n  budget, budgetFormatted: '₹' + budget.toLocaleString('en-IN'),\n  gstAmount, gstFormatted: '₹' + gstAmount.toLocaleString('en-IN'),\n  totalWithGST, totalFormatted: '₹' + totalWithGST.toLocaleString('en-IN'),\n  timeline: inputData['Timeline'] || '4-6 weeks',\n  goals: inputData['Key Goals / Requirements'] || '',\n  notes: inputData['Additional Notes'] || 'None',\n  language,\n  proposalId: 'PROP-' + proposalSuffix,\n  invoiceId: 'INV-' + proposalSuffix,\n  dateCreated: new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }),\n  dueDate: new Date(Date.now() + 15 * 86400000).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }),\n  emailSubject: t.subject + ' — ' + (inputData['Company Name'] || 'Your Company'),\n  emailGreeting: t.greeting,\n  emailSummary: t.summary,\n  emailAttached: t.attached,\n  pLabel: t.pLabel,\n  iLabel: t.iLabel,\n  acceptUrl: 'https://n8n.pureremedysolutions.com/webhook/proposal-accept?proposalId=PROP-' + proposalSuffix,\n  declineUrl: 'https://n8n.pureremedysolutions.com/webhook/proposal-decline?proposalId=PROP-' + proposalSuffix\n};\nconst langInstr = language !== 'English' ? '\\n\\nIMPORTANT: Write ALL proposal content in ' + language + '. Keep technical terms and currency in English.' : '';\nresult.systemPrompt = 'You are an expert proposal writer. Respond with ONLY a valid JSON object.' + langInstr;\nresult.userPrompt = 'Create a detailed business proposal JSON for ' + result.companyName + '. Industry: ' + result.industry + '. Service: ' + result.serviceType + '. Budget: ₹' + budget + '. Timeline: ' + result.timeline + '. Goals: ' + result.goals + '. Return JSON with keys: executive_summary, why_choose_us, our_approach, scope_of_work, deliverables_timeline, expected_outcomes, investment_justification, competitive_positioning.';\nreturn [{ json: result }];"
+      },
+      "typeVersion": 2,
+      "type": "n8n-nodes-base.code",
+      "id": "n2",
+      "position": [
+        224,
+        -64
+      ],
+      "name": "🔧 Parse & Prepare"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o', temperature: 0.72, max_tokens: 4000, messages: [{ role: 'system', content: $json.systemPrompt }, { role: 'user', content: $json.userPrompt }] }) }}",
+        "options": {}
+      },
+      "name": "🤖 Generate Proposal Content",
+      "position": [
+        448,
+        -64
+      ],
+      "id": "n3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pnHSvlAhZK7e7xCJ",
+          "name": "AI Proposal - OpenAI API Key Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResponse = $input.first().json;\nconst formData = $('🔧 Parse & Prepare').first().json;\n\nlet aiContent;\ntry {\n  let raw = '';\n  if (aiResponse.message && aiResponse.message.content) {\n    raw = aiResponse.message.content;\n  } else if (aiResponse.choices && aiResponse.choices[0]) {\n    raw = aiResponse.choices[0].message.content;\n  } else if (aiResponse.text) {\n    raw = aiResponse.text;\n  } else if (typeof aiResponse.content === 'string') {\n    raw = aiResponse.content;\n  } else if (typeof aiResponse === 'string') {\n    raw = aiResponse;\n  } else {\n    raw = JSON.stringify(aiResponse);\n  }\n  raw = raw.replace(/```json\\s*/gi, '').replace(/```\\s*/gi, '').trim();\n  const firstBrace = raw.indexOf('{');\n  const lastBrace = raw.lastIndexOf('}');\n  if (firstBrace !== -1 && lastBrace !== -1) {\n    raw = raw.substring(firstBrace, lastBrace + 1);\n  }\n  aiContent = JSON.parse(raw);\n} catch (e) {\n  aiContent = {\n    executive_summary: `We are excited to present this tailored proposal for ${formData.companyName}. With deep expertise in the ${formData.industry} sector, our team has designed a ${formData.serviceType} engagement built around your specific goals: ${formData.goals}. We are confident this partnership will deliver measurable results within ${formData.timeline}, positioning ${formData.companyName} for accelerated growth.`,\n    why_choose_us: `1. Industry Expertise: Our team has delivered 50+ successful ${formData.industry} projects.\\n2. Proven Methodology: Our structured approach has achieved an average 35% improvement in client KPIs.\\n3. Dedicated Support: A named project manager and weekly progress reviews.\\n4. Results Guarantee: We tie our deliverables to measurable outcomes.`,\n    our_approach: `Phase 1 — Discovery (Week 1): Audit of ${formData.companyName}'s current state.\\nPhase 2 — Strategy (Week 2): Data-driven roadmap development.\\nPhase 3 — Execution (Week 3 onward)`\n  };\n}\nreturn [{ json: { ...formData, ...aiContent } }];"
+      },
+      "id": "n4",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        672,
+        -64
+      ],
+      "name": "🔀 Merge AI + Form Data",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/drive/v3/files/1bggvSEi-h3Sbc-E8QCEHVCWpfosKeAFshx9OjUcSpzo/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ name: $('🔀 Merge AI + Form Data').first().json.companyName + ' - Proposal - ' + $('🔀 Merge AI + Form Data').first().json.proposalId }) }}",
+        "options": {}
+      },
+      "name": "📄 Copy Slides Template",
+      "position": [
+        896,
+        -160
+      ],
+      "id": "n5",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://slides.googleapis.com/v1/presentations/' + $('📄 Copy Slides Template').first().json.id + ':batchUpdate' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ requests: Object.entries({client_name: $('🔀 Merge AI + Form Data').first().json.clientName, company_name: $('🔀 Merge AI + Form Data').first().json.companyName, proposal_id: $('🔀 Merge AI + Form Data').first().json.proposalId, date_created: $('🔀 Merge AI + Form Data').first().json.dateCreated, executive_summary: $('🔀 Merge AI + Form Data').first().json.executive_summary || '', why_choose_us: $('🔀 Merge AI + Form Data').first().json.why_choose_us || '', our_approach: $('🔀 Merge AI + Form Data').first().json.our_approach || '', scope_of_work: $('🔀 Merge AI + Form Data').first().json.scope_of_work || '', deliverables_timeline: $('🔀 Merge AI + Form Data').first().json.deliverables_timeline || '', budget: $('🔀 Merge AI + Form Data').first().json.budgetFormatted, total_investment: $('🔀 Merge AI + Form Data').first().json.totalFormatted, timeline: $('🔀 Merge AI + Form Data').first().json.timeline, expected_outcomes: $('🔀 Merge AI + Form Data').first().json.expected_outcomes || '', investment_justification: $('🔀 Merge AI + Form Data').first().json.investment_justification || '', competitive_positioning: $('🔀 Merge AI + Form Data').first().json.competitive_positioning || ''}).map(([k, v]) => ({ replaceAllText: { containsText: { text: '{{' + k + '}}', matchCase: true }, replaceText: String(v) } })) }) }}",
+        "options": {}
+      },
+      "typeVersion": 4.4,
+      "name": "Apply Slides Updates",
+      "position": [
+        1120,
+        -160
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "id": "n-apply-slides-updates",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://www.googleapis.com/drive/v3/files/' + $('📄 Copy Slides Template').first().json.id + '/export?mimeType=application/pdf' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "name": "📥 Export Proposal PDF",
+      "typeVersion": 4.4,
+      "type": "n8n-nodes-base.httpRequest",
+      "id": "n7",
+      "position": [
+        1344,
+        -160
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nfor (const item of items) {\n  if (item.binary && item.binary.data) {\n    item.binary.proposalPDF = item.binary.data;\n    delete item.binary.data;\n  }\n}\nreturn items;"
+      },
+      "typeVersion": 2,
+      "name": "🏷️ Label Proposal PDF",
+      "position": [
+        1568,
+        -160
+      ],
+      "type": "n8n-nodes-base.code",
+      "id": "n8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/drive/v3/files/1xaA9RKpX38i_t_H28Sg36XXXpwxTvu8ZIHSIdFOlsb4/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ name: $('🔀 Merge AI + Form Data').first().json.companyName + ' - Invoice - ' + $('🔀 Merge AI + Form Data').first().json.invoiceId }) }}",
+        "options": {}
+      },
+      "id": "n9",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        896,
+        32
+      ],
+      "name": "📊 Copy Invoice Template",
+      "typeVersion": 4.4,
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'https://sheets.googleapis.com/v4/spreadsheets/' + $('📊 Copy Invoice Template').first().json.id + '/values/Sheet1!B1:B16?valueInputOption=RAW' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ range: 'Sheet1!B1:B16', majorDimension: 'COLUMNS', values: [[ $('🔀 Merge AI + Form Data').first().json.invoiceId, $('🔀 Merge AI + Form Data').first().json.dateCreated, $('🔀 Merge AI + Form Data').first().json.dueDate, $('🔀 Merge AI + Form Data').first().json.clientName, $('🔀 Merge AI + Form Data').first().json.companyName, $('🔀 Merge AI + Form Data').first().json.clientEmail, $('🔀 Merge AI + Form Data').first().json.serviceType, $('🔀 Merge AI + Form Data').first().json.timeline, $('🔀 Merge AI + Form Data').first().json.budgetFormatted, $('🔀 Merge AI + Form Data').first().json.gstFormatted, $('🔀 Merge AI + Form Data').first().json.totalFormatted, 'Pending Payment', 'Bank Transfer / UPI / Stripe', $('🔀 Merge AI + Form Data').first().json.proposalId, 'Thank you for choosing us!', 'upi://pay?pa=YOUR_UPI@bank' ]] }) }}",
+        "options": {}
+      },
+      "name": "📝 Fill Invoice Data",
+      "typeVersion": 4.4,
+      "type": "n8n-nodes-base.httpRequest",
+      "id": "n10",
+      "position": [
+        1120,
+        32
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://www.googleapis.com/drive/v3/files/' + $('📊 Copy Invoice Template').first().json.id + '/export?mimeType=application/pdf' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "position": [
+        1344,
+        32
+      ],
+      "name": "📥 Export Invoice PDF",
+      "typeVersion": 4.4,
+      "id": "n11",
+      "type": "n8n-nodes-base.httpRequest",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nfor (const item of items) {\n  if (item.binary && item.binary.data) {\n    item.binary.invoicePDF = item.binary.data;\n    delete item.binary.data;\n  }\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "name": "🏷️ Label Invoice PDF",
+      "position": [
+        1568,
+        32
+      ],
+      "id": "n12"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "name": "⏳ Wait For Both PDFs",
+      "position": [
+        1792,
+        -64
+      ],
+      "id": "n13",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nlet proposalBinary = null, invoiceBinary = null, merged = {};\nfor (const item of items) {\n  merged = { ...merged, ...item.json };\n  if (item.binary) {\n    if (item.binary.proposalPDF) proposalBinary = item.binary.proposalPDF;\n    if (item.binary.invoicePDF) invoiceBinary = item.binary.invoicePDF;\n  }\n}\nconst output = { json: merged, binary: {} };\nif (proposalBinary) output.binary.proposalPDF = proposalBinary;\nif (invoiceBinary) output.binary.invoicePDF = invoiceBinary;\nreturn [output];"
+      },
+      "typeVersion": 2,
+      "type": "n8n-nodes-base.code",
+      "id": "n14",
+      "position": [
+        2016,
+        -64
+      ],
+      "name": "📎 Combine Both PDFs"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('🔀 Merge AI + Form Data').first().json.clientEmail }}",
+        "subject": "={{ $('🔧 Parse & Prepare').first().json.emailSubject }}",
+        "message": "=<div style=\"font-family:'Segoe UI',Arial,sans-serif;max-width:650px;margin:0 auto;background:#fff;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;\"><div style=\"background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px 30px;text-align:center;\"><h1 style=\"color:#fff;margin:0;font-size:24px;\">{{ $('🔧 Parse & Prepare').first().json.emailSubject }}</h1></div><div style=\"padding:35px 30px;\"><p style=\"font-size:16px;color:#333;\">{{ $('🔧 Parse & Prepare').first().json.emailGreeting }} {{ $('🔧 Parse & Prepare').first().json.clientName }},</p><p style=\"font-size:15px;color:#555;line-height:1.8;\">{{ $('🔧 Parse & Prepare').first().json.emailSummary }}</p><p style=\"font-size:15px;color:#555;line-height:1.8;\">{{ $('🔀 Merge AI + Form Data').first().json.executive_summary ? $('🔀 Merge AI + Form Data').first().json.executive_summary.substring(0, 300) : '' }}...</p><p style=\"font-size:15px;color:#555;line-height:1.8;\">{{ $('🔧 Parse & Prepare').first().json.emailAttached }}</p><ul style=\"font-size:15px;color:#555;\"><li>📑 {{ $('🔧 Parse & Prepare').first().json.pLabel }}</li><li>🧾 {{ $('🔧 Parse & Prepare').first().json.iLabel }}</li></ul><div style=\"text-align:center;margin:30px 0;\"><a href=\"{{ $('🔧 Parse & Prepare').first().json.acceptUrl }}\" style=\"display:inline-block;padding:14px 32px;background:#22c55e;color:#fff;text-decoration:none;border-radius:8px;font-size:16px;font-weight:bold;margin:0 8px;\">✅ Accept Proposal</a> <a href=\"{{ $('🔧 Parse & Prepare').first().json.declineUrl }}\" style=\"display:inline-block;padding:14px 32px;background:#ef4444;color:#fff;text-decoration:none;border-radius:8px;font-size:16px;font-weight:bold;margin:0 8px;\">❌ Decline</a></div></div></div>",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "proposalPDF"
+              },
+              {
+                "property": "invoicePDF"
+              }
+            ]
+          }
+        }
+      },
+      "webhookId": "0a2e8118-b979-4fc5-b595-38d23e47025c",
+      "id": "n15",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "name": "📧 Send Proposal Email",
+      "position": [
+        2240,
+        -64
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "c3qM95WkEkk7djCv",
+          "name": "AI Proposal - Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $('🔀 Merge AI + Form Data').first().json;\nconst msg = `📤 *Proposal Sent*\n\n👤 *Client:* ${d.clientName}\n🏢 *Company:* ${d.companyName}\n📧 *Email:* ${d.clientEmail}\n🛠 *Service:* ${d.serviceType}\n💰 *Value:* ${d.totalFormatted}\n🆔 *Proposal:* ${d.proposalId}`;\nreturn [{ json: { ...d, text: msg } }];"
+      },
+      "position": [
+        2464,
+        -64
+      ],
+      "name": "📱 Format Telegram — Sent",
+      "typeVersion": 2,
+      "type": "n8n-nodes-base.code",
+      "id": "n16"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: '7392899748', text: $json.text, parse_mode: 'Markdown' }) }}",
+        "options": {}
+      },
+      "id": "n17",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2688,
+        -64
+      ],
+      "name": "📨 Telegram — Proposal Sent",
+      "typeVersion": 4.4
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!A:Q:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ values: [[ $('🔧 Parse & Prepare').first().json.proposalId, $('🔧 Parse & Prepare').first().json.invoiceId, $('🔧 Parse & Prepare').first().json.dateCreated, $('🔧 Parse & Prepare').first().json.clientName, $('🔧 Parse & Prepare').first().json.companyName, $('🔧 Parse & Prepare').first().json.clientEmail, $('🔧 Parse & Prepare').first().json.serviceType, $('🔧 Parse & Prepare').first().json.industry, $('🔧 Parse & Prepare').first().json.budgetFormatted, $('🔧 Parse & Prepare').first().json.totalFormatted, $('🔧 Parse & Prepare').first().json.timeline, 'Proposal Sent' ]] }) }}",
+        "options": {}
+      },
+      "id": "n18",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2912,
+        -64
+      ],
+      "name": "📝 Append CRM Row",
+      "typeVersion": 4.4,
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "typeVersion": 1.1,
+      "name": "⏳ Wait 3 Days",
+      "position": [
+        3136,
+        -64
+      ],
+      "type": "n8n-nodes-base.wait",
+      "webhookId": "wait-3-days",
+      "id": "n19"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "value": "1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "mode": "name",
+          "value": "CRM"
+        },
+        "filtersUI": {
+          "values": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "typeVersion": 4.5,
+      "id": "n20",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        3360,
+        -64
+      ],
+      "name": "🔎 Find Row Day 3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "name": "AI Proposal - Generic OAuth",
+          "id": "4b618LDGG1CToGpb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": false,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "cond1",
+              "leftValue": "={{ $json.Status }}",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              },
+              "rightValue": "Accepted"
+            },
+            {
+              "id": "cond1b",
+              "leftValue": "={{ $json.Status }}",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              },
+              "rightValue": "Declined"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n22",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "name": "❓ Follow Up Day 3?",
+      "position": [
+        3808,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Client Email'] || $json.clientEmail || '' }}",
+        "subject": "={{ 'Just following up on your proposal — ' + ($json['Company Name'] || $json.companyName || '') }}",
+        "message": "=<div style=\"font-family:'Segoe UI',Arial,sans-serif;max-width:650px;margin:0 auto;padding:30px;background:#fff;border:1px solid #e0e0e0;border-radius:12px;\"><h2 style=\"color:#667eea;\">Following up on your proposal</h2><p>Hi {{ $json['Client Name'] || $json.clientName || 'there' }},</p><p>I wanted to follow up on the proposal we sent for <strong>{{ $json['Company Name'] || $json.companyName || '' }}</strong>. Have you had a chance to review it?</p><p>If you have any questions or would like to discuss anything, please reply to this email — I'd love to help.</p><div style=\"margin:25px 0;text-align:center;\"><a href=\"{{ 'https://n8n.pureremedysolutions.com/webhook/proposal-accept?proposalId=' + ($json['Proposal ID'] || $json.proposalId || '') }}\" style=\"display:inline-block;padding:12px 28px;background:#22c55e;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:0 6px;\">✅ Accept Proposal</a> <a href=\"{{ 'https://n8n.pureremedysolutions.com/webhook/proposal-decline?proposalId=' + ($json['Proposal ID'] || $json.proposalId || '') }}\" style=\"display:inline-block;padding:12px 28px;background:#ef4444;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:0 6px;\">❌ Decline</a></div><p style=\"color:#888;font-size:13px;\">Pure Remedy Solutions</p></div>",
+        "options": {}
+      },
+      "name": "📧 Send Follow-Up #1",
+      "position": [
+        4032,
+        -64
+      ],
+      "webhookId": "50354b60-8340-4cc5-91fd-2bdb79f41fd6",
+      "id": "n23",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "c3qM95WkEkk7djCv",
+          "name": "AI Proposal - Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { text: 'Follow-Up #1 Sent' } }];"
+      },
+      "id": "n24",
+      "typeVersion": 2,
+      "name": "📱 Format Telegram — FU1",
+      "position": [
+        4256,
+        -64
+      ],
+      "type": "n8n-nodes-base.code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: '7392899748', text: $json.text, parse_mode: 'Markdown' }) }}",
+        "options": {}
+      },
+      "position": [
+        4480,
+        -64
+      ],
+      "name": "📨 Telegram — FU1 Sent",
+      "typeVersion": 4.4,
+      "id": "n25",
+      "type": "n8n-nodes-base.httpRequest"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!L' + $('🔎 Find Row Day 3').first().json.row_number + ':M' + $('🔎 Find Row Day 3').first().json.row_number + '?valueInputOption=USER_ENTERED' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ values: [['Follow-Up Sent', 'Day 3']] }) }}",
+        "options": {}
+      },
+      "name": "📝 Update CRM Day 3",
+      "position": [
+        4704,
+        -64
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "id": "n26",
+      "typeVersion": 4.4,
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "name": "⏳ Wait 4 More Days",
+      "position": [
+        4928,
+        -64
+      ],
+      "webhookId": "wait-7-days",
+      "id": "n27",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "value": "1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "value": "CRM",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        5152,
+        -64
+      ],
+      "name": "🔎 Find Row Day 7",
+      "typeVersion": 4.5,
+      "id": "n28",
+      "type": "n8n-nodes-base.googleSheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "name": "AI Proposal - Generic OAuth",
+          "id": "4b618LDGG1CToGpb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": false,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "cond2",
+              "leftValue": "={{ $json.Status }}",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              },
+              "rightValue": "Accepted"
+            },
+            {
+              "id": "cond2b",
+              "leftValue": "={{ $json.Status }}",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              },
+              "rightValue": "Declined"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "❓ Follow Up Day 7?",
+      "typeVersion": 2.3,
+      "id": "n30",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        5600,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Client Email'] || $json.clientEmail || '' }}",
+        "subject": "={{ 'Checking in again: ' + ($json['Company Name'] || $json.companyName || '') }}",
+        "message": "=<div style=\"font-family:'Segoe UI',Arial,sans-serif;max-width:650px;margin:0 auto;padding:30px;background:#fff;border:1px solid #e0e0e0;border-radius:12px;\"><h2 style=\"color:#764ba2;\">Checking in — {{ $json['Company Name'] || $json.companyName || '' }}</h2><p>Hi {{ $json['Client Name'] || $json.clientName || 'there' }},</p><p>This is our second follow-up regarding the proposal for <strong>{{ $json['Company Name'] || $json.companyName || '' }}</strong>. We want to make sure you have everything you need to make a decision.</p><p>Please let us know if you'd like to adjust the scope, pricing, or timeline — we are flexible and happy to work with you.</p><div style=\"margin:25px 0;text-align:center;\"><a href=\"{{ 'https://n8n.pureremedysolutions.com/webhook/proposal-accept?proposalId=' + ($json['Proposal ID'] || $json.proposalId || '') }}\" style=\"display:inline-block;padding:12px 28px;background:#22c55e;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:0 6px;\">✅ Accept Proposal</a> <a href=\"{{ 'https://n8n.pureremedysolutions.com/webhook/proposal-decline?proposalId=' + ($json['Proposal ID'] || $json.proposalId || '') }}\" style=\"display:inline-block;padding:12px 28px;background:#ef4444;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:0 6px;\">❌ Decline</a></div><p style=\"color:#888;font-size:13px;\">Pure Remedy Solutions</p></div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "name": "📧 Send Follow-Up #2",
+      "position": [
+        5824,
+        -64
+      ],
+      "webhookId": "914f62d8-4e4f-4f9e-9bdb-293d13f73d36",
+      "id": "n31",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "c3qM95WkEkk7djCv",
+          "name": "AI Proposal - Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { text: 'Follow-Up #2 Sent' } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "name": "📱 Format Telegram — FU2",
+      "position": [
+        6048,
+        -64
+      ],
+      "id": "n32"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: '7392899748', text: $json.text, parse_mode: 'Markdown' }) }}",
+        "options": {}
+      },
+      "name": "📨 Telegram — FU2 Sent",
+      "position": [
+        6272,
+        -64
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "id": "n33",
+      "typeVersion": 4.4
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!L' + $('🔎 Find Row Day 7').first().json.row_number + ':M' + $('🔎 Find Row Day 7').first().json.row_number + '?valueInputOption=USER_ENTERED' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ values: [['Follow-Up Sent', 'Day 7']] }) }}",
+        "options": {}
+      },
+      "typeVersion": 4.4,
+      "id": "n34",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        6496,
+        -64
+      ],
+      "name": "📝 Update CRM Day 7",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "webhookId": "wait-14-days",
+      "typeVersion": 1.1,
+      "name": "⏳ Wait 7 More Days",
+      "position": [
+        6720,
+        -64
+      ],
+      "type": "n8n-nodes-base.wait",
+      "id": "n35"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "mode": "id",
+          "value": "1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU"
+        },
+        "sheetName": {
+          "value": "CRM",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "typeVersion": 4.5,
+      "type": "n8n-nodes-base.googleSheets",
+      "id": "n36",
+      "position": [
+        6944,
+        -64
+      ],
+      "name": "🔎 Find Row Day 14",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "name": "AI Proposal - Generic OAuth",
+          "id": "4b618LDGG1CToGpb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": false,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "cond3",
+              "leftValue": "={{ $json.Status }}",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              },
+              "rightValue": "Accepted"
+            },
+            {
+              "id": "cond3b",
+              "leftValue": "={{ $json.Status }}",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              },
+              "rightValue": "Declined"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n38",
+      "position": [
+        7392,
+        -64
+      ],
+      "name": "❓ Follow Up Day 14?",
+      "typeVersion": 2.3,
+      "type": "n8n-nodes-base.if"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Client Email'] || $json.clientEmail || '' }}",
+        "subject": "={{ 'Closing out your proposal file — ' + ($json['Company Name'] || $json.companyName || '') }}",
+        "message": "=<div style=\"font-family:'Segoe UI',Arial,sans-serif;max-width:650px;margin:0 auto;padding:30px;background:#fff;border:1px solid #e0e0e0;border-radius:12px;\"><h2 style=\"color:#ef4444;\">Closing your proposal file — {{ $json['Company Name'] || $json.companyName || '' }}</h2><p>Hi {{ $json['Client Name'] || $json.clientName || 'there' }},</p><p>We have not heard back regarding the proposal for <strong>{{ $json['Company Name'] || $json.companyName || '' }}</strong>, so we are closing this file for now.</p><p>If you'd like to revisit this in future, please reach out anytime — we would be happy to reconnect and put together a fresh proposal.</p><p style=\"color:#888;font-size:13px;\">Pure Remedy Solutions</p></div>",
+        "options": {}
+      },
+      "typeVersion": 2.2,
+      "name": "📧 Send Final Email",
+      "position": [
+        7616,
+        -64
+      ],
+      "id": "n39",
+      "webhookId": "60753e1e-b15c-43f8-b23a-4f2ba33ecd5d",
+      "type": "n8n-nodes-base.gmail",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "c3qM95WkEkk7djCv",
+          "name": "AI Proposal - Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { text: 'Proposal Closed' } }];"
+      },
+      "name": "📱 Format Telegram — Closed",
+      "typeVersion": 2,
+      "type": "n8n-nodes-base.code",
+      "id": "n40",
+      "position": [
+        7840,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: '7392899748', text: $json.text, parse_mode: 'Markdown' }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "id": "n41",
+      "typeVersion": 4.4,
+      "name": "📨 Telegram — Closed",
+      "position": [
+        8064,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!L' + $('🔎 Find Row Day 14').first().json.row_number + ':M' + $('🔎 Find Row Day 14').first().json.row_number + '?valueInputOption=USER_ENTERED' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ values: [['Closed - No Response', 'Day 14']] }) }}",
+        "options": {}
+      },
+      "id": "n42",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        8288,
+        -64
+      ],
+      "name": "📝 Update CRM Closed",
+      "typeVersion": 4.4,
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/Dashboard!A:F:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ values: [[ new Date().toLocaleDateString('en-IN'), $('🔧 Parse & Prepare').first().json.proposalId, $('🔧 Parse & Prepare').first().json.clientName, $('🔧 Parse & Prepare').first().json.companyName, $('🔧 Parse & Prepare').first().json.totalFormatted, $('🔧 Parse & Prepare').first().json.serviceType ]] }) }}",
+        "options": {}
+      },
+      "id": "n58",
+      "name": "📊 Dashboard Updater",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2464,
+        -240
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "proposal-accept",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "position": [
+        0,
+        256
+      ],
+      "name": "✅ Webhook Accept",
+      "typeVersion": 2.1,
+      "id": "n43",
+      "webhookId": "61c69b47-6044-41ac-8cb2-01aec61e2107",
+      "type": "n8n-nodes-base.webhook",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<html><body><h1>Accepted</h1></body></html>",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html"
+              }
+            ]
+          }
+        }
+      },
+      "name": "💬 Respond Accept",
+      "position": [
+        224,
+        256
+      ],
+      "id": "n44",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5
+    },
+    {
+      "parameters": {
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!A:Q",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "options": {}
+      },
+      "id": "n45",
+      "typeVersion": 4.4,
+      "name": "🔍 Read CRM Accept",
+      "position": [
+        448,
+        256
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const proposalId = $('✅ Webhook Accept').first().json.query?.proposalId || '';\nconst sheetData = $('🔍 Read CRM Accept').first().json;\nconst rows = sheetData.values || [];\nlet found = null;\nlet rowIndex = -1;\nfor (let i = 1; i < rows.length; i++) {\n  if (String(rows[i][0] || '').trim() === proposalId.trim()) {\n    found = rows[i];\n    rowIndex = i + 1;\n    break;\n  }\n}\nif (!found && rows.length > 1) {\n  found = rows[rows.length - 1];\n  rowIndex = rows.length;\n}\nconst clientName = found ? (found[3] || 'Valued Client') : 'Valued Client';\nconst companyName = found ? (found[4] || 'Your Company') : 'Your Company';\nconst clientEmail = found ? (found[5] || '') : '';\nconst serviceType = found ? (found[6] || 'Consulting') : 'Consulting';\nconst totalFormatted = found ? (found[9] || '') : '';\nreturn [{ json: { proposalId, rowIndex, clientName, companyName, clientEmail, serviceType, totalFormatted, status: 'Proposal Accepted' } }];"
+      },
+      "position": [
+        672,
+        256
+      ],
+      "name": "⚙️ Process Accept",
+      "typeVersion": 2,
+      "type": "n8n-nodes-base.code",
+      "id": "n46"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!L' + $json.rowIndex + '?valueInputOption=USER_ENTERED' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ values: [['Proposal Accepted', '']] }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "id": "n47",
+      "typeVersion": 4.4,
+      "name": "📝 Update CRM Accepted",
+      "position": [
+        896,
+        256
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('⚙️ Process Accept').first().json.clientEmail }}",
+        "subject": "=Welcome aboard — {{ $('⚙️ Process Accept').first().json.companyName }}!",
+        "message": "<div>Welcome aboard!</div>",
+        "options": {}
+      },
+      "typeVersion": 2.2,
+      "name": "📧 Send Welcome Email",
+      "position": [
+        1120,
+        256
+      ],
+      "webhookId": "ff53c7d0-832c-4868-b2a6-b6e1a250264a",
+      "id": "n48",
+      "type": "n8n-nodes-base.gmail",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "c3qM95WkEkk7djCv",
+          "name": "AI Proposal - Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $('⚙️ Process Accept').first().json;\nconst msg = `🎉 *Proposal ACCEPTED!*\n\n👤 *Client:* ${d.clientName}\n🏢 *Company:* ${d.companyName}\n📧 *Email:* ${d.clientEmail}\n🛠 *Service:* ${d.serviceType}\n💰 *Value:* ${d.totalFormatted}\n🆔 *Proposal ID:* ${d.proposalId}`;\nreturn [{ json: { text: msg } }];"
+      },
+      "id": "n49",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "name": "📱 Format Telegram — Accepted",
+      "position": [
+        1344,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: '7392899748', text: $json.text, parse_mode: 'Markdown' }) }}",
+        "options": {}
+      },
+      "name": "📨 Telegram — Accepted",
+      "position": [
+        1568,
+        256
+      ],
+      "id": "n50",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4
+    },
+    {
+      "parameters": {
+        "path": "proposal-decline",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "typeVersion": 2.1,
+      "type": "n8n-nodes-base.webhook",
+      "id": "n51",
+      "webhookId": "8073eef2-2820-48ff-8455-086165643e5a",
+      "position": [
+        0,
+        480
+      ],
+      "name": "❌ Webhook Decline",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<html><body><h1>Declined</h1></body></html>",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html"
+              }
+            ]
+          }
+        }
+      },
+      "name": "💬 Respond Decline",
+      "typeVersion": 1.5,
+      "type": "n8n-nodes-base.respondToWebhook",
+      "id": "n52",
+      "position": [
+        224,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!A:Q",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "options": {}
+      },
+      "typeVersion": 4.4,
+      "name": "🔍 Read CRM Decline",
+      "position": [
+        448,
+        480
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "id": "n53",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const proposalId = $('❌ Webhook Decline').first().json.query?.proposalId || '';\nconst sheetData = $('🔍 Read CRM Decline').first().json;\nconst rows = sheetData.values || [];\nlet found = null;\nlet rowIndex = -1;\nfor (let i = 1; i < rows.length; i++) {\n  if (String(rows[i][0] || '').trim() === proposalId.trim()) {\n    found = rows[i];\n    rowIndex = i + 1;\n    break;\n  }\n}\nif (!found && rows.length > 1) {\n  found = rows[rows.length - 1];\n  rowIndex = rows.length;\n}\nconst clientName = found ? (found[3] || 'Valued Client') : 'Valued Client';\nconst companyName = found ? (found[4] || 'Your Company') : 'Your Company';\nreturn [{ json: { proposalId, rowIndex, clientName, companyName, status: 'Proposal Declined' } }];"
+      },
+      "typeVersion": 2,
+      "name": "⚙️ Process Decline",
+      "position": [
+        672,
+        480
+      ],
+      "type": "n8n-nodes-base.code",
+      "id": "n54"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'https://sheets.googleapis.com/v4/spreadsheets/1MGgHx9Y80jJxjfs0MBdPLwL5QcSpvGctTOnuxG4nciU/values/CRM!L' + $json.rowIndex + '?valueInputOption=USER_ENTERED' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ values: [['Proposal Declined', '']] }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "id": "n55",
+      "typeVersion": 4.4,
+      "name": "📝 Update CRM Declined",
+      "position": [
+        896,
+        480
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "4b618LDGG1CToGpb",
+          "name": "AI Proposal - Generic OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { text: 'Declined' } }];"
+      },
+      "name": "📱 Format Telegram — Declined",
+      "position": [
+        1120,
+        480
+      ],
+      "id": "n56",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8635227386:AAEIYKaw0QSPPbHkRQSMB3Us-0qArZbA6Xo/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: '7392899748', text: $json.text, parse_mode: 'Markdown' }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1344,
+        480
+      ],
+      "name": "📨 Telegram — Declined",
+      "typeVersion": 4.4,
+      "id": "n57"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "📋 Client Intake Form": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "🔧 Parse & Prepare"
+          }
+        ]
+      ]
+    },
+    "🔧 Parse & Prepare": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "🤖 Generate Proposal Content",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "🤖 Generate Proposal Content": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "🔀 Merge AI + Form Data"
+          }
+        ]
+      ]
+    },
+    "🔀 Merge AI + Form Data": {
+      "main": [
+        [
+          {
+            "type": "main",
+            "node": "📄 Copy Slides Template",
+            "index": 0
+          },
+          {
+            "index": 0,
+            "node": "📊 Copy Invoice Template",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "📄 Copy Slides Template": {
+      "main": [
+        [
+          {
+            "node": "Apply Slides Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply Slides Updates": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "📥 Export Proposal PDF"
+          }
+        ]
+      ]
+    },
+    "📥 Export Proposal PDF": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "🏷️ Label Proposal PDF"
+          }
+        ]
+      ]
+    },
+    "🏷️ Label Proposal PDF": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "⏳ Wait For Both PDFs"
+          }
+        ]
+      ]
+    },
+    "📊 Copy Invoice Template": {
+      "main": [
+        [
+          {
+            "type": "main",
+            "node": "📝 Fill Invoice Data",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📝 Fill Invoice Data": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "📥 Export Invoice PDF"
+          }
+        ]
+      ]
+    },
+    "📥 Export Invoice PDF": {
+      "main": [
+        [
+          {
+            "node": "🏷️ Label Invoice PDF",
+            "index": 0,
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "🏷️ Label Invoice PDF": {
+      "main": [
+        [
+          {
+            "node": "⏳ Wait For Both PDFs",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "⏳ Wait For Both PDFs": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "📎 Combine Both PDFs"
+          }
+        ]
+      ]
+    },
+    "📎 Combine Both PDFs": {
+      "main": [
+        [
+          {
+            "node": "📧 Send Proposal Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📧 Send Proposal Email": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "📱 Format Telegram — Sent"
+          },
+          {
+            "node": "📊 Dashboard Updater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📱 Format Telegram — Sent": {
+      "main": [
+        [
+          {
+            "node": "📨 Telegram — Proposal Sent",
+            "index": 0,
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "📨 Telegram — Proposal Sent": {
+      "main": [
+        [
+          {
+            "type": "main",
+            "index": 0,
+            "node": "📝 Append CRM Row"
+          }
+        ]
+      ]
+    },
+    "📝 Append CRM Row": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "⏳ Wait 3 Days",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "⏳ Wait 3 Days": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "🔎 Find Row Day 3",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "🔎 Find Row Day 3": {
+      "main": [
+        [
+          {
+            "node": "❓ Follow Up Day 3?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "❓ Follow Up Day 3?": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "📧 Send Follow-Up #1"
+          }
+        ]
+      ]
+    },
+    "📧 Send Follow-Up #1": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "📱 Format Telegram — FU1",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "📱 Format Telegram — FU1": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "📨 Telegram — FU1 Sent"
+          }
+        ]
+      ]
+    },
+    "📨 Telegram — FU1 Sent": {
+      "main": [
+        [
+          {
+            "node": "📝 Update CRM Day 3",
+            "index": 0,
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "📝 Update CRM Day 3": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "⏳ Wait 4 More Days"
+          }
+        ]
+      ]
+    },
+    "⏳ Wait 4 More Days": {
+      "main": [
+        [
+          {
+            "type": "main",
+            "index": 0,
+            "node": "🔎 Find Row Day 7"
+          }
+        ]
+      ]
+    },
+    "🔎 Find Row Day 7": {
+      "main": [
+        [
+          {
+            "node": "❓ Follow Up Day 7?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "❓ Follow Up Day 7?": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "📧 Send Follow-Up #2",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "📧 Send Follow-Up #2": {
+      "main": [
+        [
+          {
+            "type": "main",
+            "node": "📱 Format Telegram — FU2",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📱 Format Telegram — FU2": {
+      "main": [
+        [
+          {
+            "node": "📨 Telegram — FU2 Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📨 Telegram — FU2 Sent": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "📝 Update CRM Day 7",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "📝 Update CRM Day 7": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "⏳ Wait 7 More Days"
+          }
+        ]
+      ]
+    },
+    "⏳ Wait 7 More Days": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "🔎 Find Row Day 14",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "🔎 Find Row Day 14": {
+      "main": [
+        [
+          {
+            "node": "❓ Follow Up Day 14?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "❓ Follow Up Day 14?": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "📧 Send Final Email"
+          }
+        ]
+      ]
+    },
+    "📧 Send Final Email": {
+      "main": [
+        [
+          {
+            "type": "main",
+            "node": "📱 Format Telegram — Closed",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📱 Format Telegram — Closed": {
+      "main": [
+        [
+          {
+            "type": "main",
+            "node": "📨 Telegram — Closed",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📨 Telegram — Closed": {
+      "main": [
+        [
+          {
+            "node": "📝 Update CRM Closed",
+            "index": 0,
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "✅ Webhook Accept": {
+      "main": [
+        [
+          {
+            "type": "main",
+            "index": 0,
+            "node": "💬 Respond Accept"
+          }
+        ]
+      ]
+    },
+    "💬 Respond Accept": {
+      "main": [
+        [
+          {
+            "node": "🔍 Read CRM Accept",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔍 Read CRM Accept": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "⚙️ Process Accept",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "⚙️ Process Accept": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "📝 Update CRM Accepted"
+          }
+        ]
+      ]
+    },
+    "📝 Update CRM Accepted": {
+      "main": [
+        [
+          {
+            "node": "📧 Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📧 Send Welcome Email": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "type": "main",
+            "node": "📱 Format Telegram — Accepted"
+          }
+        ]
+      ]
+    },
+    "📱 Format Telegram — Accepted": {
+      "main": [
+        [
+          {
+            "node": "📨 Telegram — Accepted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "❌ Webhook Decline": {
+      "main": [
+        [
+          {
+            "node": "💬 Respond Decline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💬 Respond Decline": {
+      "main": [
+        [
+          {
+            "type": "main",
+            "node": "🔍 Read CRM Decline",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔍 Read CRM Decline": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "⚙️ Process Decline",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "⚙️ Process Decline": {
+      "main": [
+        [
+          {
+            "type": "main",
+            "node": "📝 Update CRM Declined",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📝 Update CRM Declined": {
+      "main": [
+        [
+          {
+            "node": "📱 Format Telegram — Declined",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📱 Format Telegram — Declined": {
+      "main": [
+        [
+          {
+            "type": "main",
+            "index": 0,
+            "node": "📨 Telegram — Declined"
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "7693619a-72f5-4dfb-af3d-1e9b9e7998a1",
+  "meta": {
+    "instanceId": "ed2a568837751c5a1f9702fd6c1922630ad5492c39a030f09d6e222deb3330e8"
+  },
+  "id": "VAXNt9pHnSeFRRSU",
+  "tags": []
+}

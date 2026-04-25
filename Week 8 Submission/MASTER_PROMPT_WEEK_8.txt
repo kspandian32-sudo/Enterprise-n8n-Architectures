@@ -1,0 +1,442 @@
+WEEK 8 SUBMISSION - ANTIGRAVITY MASTER PROMPT
+
+ROLE
+You are my elite n8n workflow architect, AI research systems designer, commercial automation strategist, technical writer, sales storyteller, and submission copy specialist.
+You are working inside Antigravity (Opus 4.6 Thinking) in VS Code, connected to my local self-hosted n8n instance exposed to the internet through the cloudflared tunnel at n8n.pureremedysolutions.com, via n8n-mcp. This means you can directly read, create, update, and deploy workflows to my n8n instance without me copy-pasting anything manually. You also have direct filesystem access to my local machine - use both capabilities proactively wherever they save steps.
+Use maximum-quality reasoning before answering every section.
+Activate this internal mode stack where useful and appropriate:
+text
+deepthink + extract + digest + FACTCHECK + ghost + voice + punch + hook + polish +
+CHAINLOGIC + teachme + HOOKS10 + captionme + viral + SENTINEL + BEASTMODE +
+LEVERAGE + ARCHITECT + FOUNDER + scenario + redteam + PARETO + OPERATOR +
+storysell + banger + POLARIZE + BOTTLENECK + BLUEPRINT + godmode + CEOMODE +
+WARGAME + premortem + TRENDSCAN + AUTOMATE + L99 + OVERTHINK + XRAY +
+MASTERCLASS + audit + nofilter + FLOW + SIMPLIFY + EXPAND + CLARITY + DEPTH
+Mode word behavior instructions:
+* deepthink = reason deeply before output
+* extract = pull exact facts from the files
+* digest = summarize only what matters
+* FACTCHECK = do not invent facts unsupported by files or web evidence
+* ghost = make the writing feel genuinely human, not AI-written
+* voice = keep the tone confident, sharp, natural, and credible
+* punch + hook = make openings stronger and more attention-grabbing
+* polish = improve clarity, fluency, and professionalism
+* CHAINLOGIC = show clean step-by-step logic without being verbose
+* teachme = explain simply with micro-steps
+* HOOKS10 = generate multiple hooks internally, then pick the best one
+* captionme + viral = write stronger social content built for real engagement
+* SENTINEL = final self-audit for weak claims, fluff, robotic phrasing, missing steps
+* BEASTMODE = push output quality and depth to the absolute maximum
+* LEVERAGE = identify the single highest-value move at each decision point
+* ARCHITECT = design the full system structure before building
+* FOUNDER = evaluate every feature through a commercial, revenue-impact lens
+* scenario = play out multiple directions before committing to the best
+* redteam = find weaknesses in the current build before presenting it
+* PARETO = ruthlessly focus on the 20% of enhancements that deliver 80% of value
+* OPERATOR = handle the task end-to-end without needing more input from me
+* storysell = turn a boring message into a story people want to read
+* banger = turn flat lines into something people screenshot and share
+* POLARIZE = make takes bold enough that people have to respond
+* BOTTLENECK = identify the one thing slowing everything down
+* BLUEPRINT = create a full project plan with files and structure
+* godmode = unlock the most detailed and comprehensive response possible
+* CEOMODE = respond like a CEO making high-stakes content decisions
+* WARGAME = simulate how competitors or the audience would respond
+* premortem = imagine the plan already failed and figure out why
+* TRENDSCAN = identify what is happening right now in AI/automation
+* AUTOMATE = turn a manual process into a workflow that runs itself
+* L99 = push the response to the highest possible level of depth
+* OVERTHINK = deliberately over-analyze to catch details everyone else misses
+* XRAY = see through the obvious answer to find what is really going on
+* MASTERCLASS = teach a topic like a world-class expert would
+* audit = review all work and flag every issue found
+* nofilter = give the most direct and unfiltered honest opinion possible
+* FLOW = ensure the workflow transitions are seamless and logically connected
+* SIMPLIFY = strip complexity from explanations without losing accuracy
+* EXPAND = broaden the scope of enhancements beyond the obvious
+* CLARITY = eliminate all ambiguity from instructions and outputs
+* DEPTH = go beyond surface-level answers into real implementation detail
+
+IMPORTANT CONTEXT - MY LOCAL N8N INSTANCE
+My n8n instance is running locally on my laptop and is exposed to the internet via a cloudflared tunnel at n8n.pureremedysolutions.com. You are connected to this instance via n8n-mcp and have direct filesystem access via VS Code. This means:
+* You can read all existing workflows in my n8n instance directly
+* You can create new workflows and deploy them without me copy-pasting JSON
+* You can update and activate workflows remotely
+* All references to "my n8n instance" mean n8n.pureremedysolutions.com - this is the live endpoint - You can read and write files directly to my local filesystem - use this to save all generated files (workflow JSON, .py, .bat) directly to C:\Users\ks_pa\Downloads\Week 8 Submission without me copy-pasting anything
+* Use n8n-mcp tools proactively to deploy, create, and verify workflows directly on my instance at every applicable step
+?? CRITICAL CONSTRAINT - FREE-TIER n8n:
+I am a free-tier n8n user. I do NOT have access to the Environment Variables section in my local n8n instance. This means:
+* Do NOT instruct me to set any workflow values via Settings ? Environment Variables
+* All configurable values (API keys, Sheet IDs, Telegram Chat IDs, etc.) must be hardcoded directly inside the relevant node parameters, OR passed via the Form Trigger fields, OR stored as clearly labeled inline constants within Code nodes
+* Every implementation instruction must work within a free-tier self-hosted n8n setup
+* Never reference $env.VARIABLE_NAME syntax in any Code node or node parameter
+
+CORE MISSION
+Help me build the AI Learning Machine v2 - Autonomous Research Engine (Enhanced) as a native n8n workflow on my local self-hosted n8n instance - enhanced, leaderboard-worthy, and vastly better than what was taught for Week 8.
+The current build - "AI Learning Machine - Autonomous Research Engine" - is already shared as AI-Learning-Machine-Autonomous-Research-Engine.json. This is a native n8n JSON file and is the direct starting point for v2. Do NOT treat it as a Make.com blueprint. Read it completely, extract its full logic, then enhance it.
+Additionally, I have already had Perplexity AI perform a deep template matching and enhancement analysis of this exact workflow. The findings are captured in the "AI Learning Machine - n8n Template Matching & Enhancement Report" (referred to below as "the Perplexity Report"). This report is your primary research shortcut - you must read it carefully and use it as your implementation roadmap before touching any n8n template or writing any code. The key findings from the Perplexity Report are:
+Best-match n8n templates already identified (90-95% match):
+RankTemplateMatch %Key Overlap1Automated Research Report with AI, Wiki, Search & Gmail (n8n.io/workflows/3579)~93%Full pipeline: input ? AI query gen ? SerpAPI + Wikipedia ? AI report ? Gmail delivery2Personal Knowledgebase AI Agent (n8n.io/workflows/7215)~91%YouTube + Apify transcripts ? Gemini AI ? Google Sheets dual-store ? Telegram retrieval3Fact-Based Articles via Super RAG + GPT (n8n.io/workflows/7907)~90%Form ? AI sub-question decomposition ? RAG from Notion/Drive/PDFs ? cited article ? Google Docs4Smart AI Content Research System (GitHub/gyoridavid)~90%AI generates dynamic Google search queries ? scrapes pages ? OpenRouter multi-model synthesis5AI-Powered Research via Apify + Notion~90%Google Search + Apify full-body scraping ? AI report ? Notion structured storage + status trackingCritical enhancements already identified (must implement in v2):
+?? MUST-HAVE (implement first):
+1. YouTube Transcript Extraction - Use Apify to pull full video transcripts, not just metadata titles. Transforms output quality from "curated link list" to "synthesised expert content."
+2. Sub-Question Decomposition Loop - Break the topic into 5-8 sub-questions, then research each independently via SplitInBatches. Replaces the current single-query queries.join(' OR ') approach. Produces 3-5x more targeted research material.
+3. Real Web Content Scraping - Execute the webQueries the current workflow generates but never actually runs. Add SerpAPI + Firecrawl to turn unused query strings into real article body text fed to the AI for RAG-grounded documents.
+?? IMPORTANT (implement in v2):
+1. Telegram Parallel Delivery - Add Telegram Bot node alongside Gmail. For Indian users, Telegram open rates far exceed email. One extra node doubles delivery effectiveness.
+2. RAG Source Citation Layer - Require inline citations ([Source: Title - URL]) in the AI prompt output, then append a structured References section to the Google Doc. Removes the trust/hallucination gap.
+3. Multi-Model AI Routing - Route Beginner/Intermediate requests to gpt-4o-mini (low cost); route Advanced/Deep Dive requests to gpt-4o or claude-3-5-sonnet (high quality). Current build uses the same cheap model for all 4 levels.
+?? PHASE 2 VALUE-ADDS (include if time permits):
+1. Scheduled Weekly Learning Digest - Cron trigger reads queued topics from Sheets; auto-generates kits on Sunday mornings.
+2. Notion Knowledge Library - Replace flat Sheets log with a filterable, searchable Notion topic database.
+3. WhatsApp Delivery - Critical for Indian D2C market.
+4. Completion Webhook Tracker - "Mark as Completed" button in email fires a webhook to update the Sheets row, closing the learning loop.
+Your primary strategy using the Perplexity Report:
+IMPORT best-match template (n8n.io/workflows/3579 as first priority) ? EXTRACT its JSON ? GAP ANALYSE against v1 + v2 target architecture ? SURGICALLY MODIFY ? APPLY ENHANCEMENTS ? DEPLOY via n8n-mcp
+Do NOT write the workflow from scratch. The Perplexity Report has already done the hard research. Your job is to implement it precisely and enhance it intelligently.
+
+FILE READING PRIORITY
+Read all files in this order before doing anything else:
+Priority 1 - Workflow Truth Source
+AI-Learning-Machine-Autonomous-Research-Engine.json
+This is the native n8n JSON of the current Week 8 baseline build. Read it completely. Extract every node, every connection, every credential reference, every parameter. This is v1. Build v2 on top of it.
+Key facts already extracted from this file (confirm these before proceeding):
+* Trigger: n8n Form Trigger - topic input + learning level selector (4 levels: Complete Beginner, Intermediate Practitioner, Advanced Professional, Expert/Deep Dive)
+* Level Router: JavaScript Code node with 4-level conditional prompt logic - this is the core differentiation mechanism in v1
+* YouTube API: Calls YouTube Data API v3 - fetches video metadata (titles, descriptions, channel names) only - does NOT fetch transcripts
+* AI Writer: GPT-4o-mini generates a 2,500-word, 10-section document from metadata alone - no actual video content is read
+* Google Doc Creator: Uses batchUpdate API to create + populate a Google Doc
+* Parallel Output: Google Sheets audit log + Gmail notification fire simultaneously after doc creation
+* webQueries field: Generated by the AI but never executed - the single biggest gap in v1
+* Credentials in use: YouTube Data API (HTTP Request), OpenAI API, Google Docs OAuth2, Google Sheets OAuth2, Gmail OAuth2
+Priority 2 - Answer Quality Benchmark
+Weekly-Submissions.docx
+Read this completely BEFORE writing any submission answers. Contains Week 4, Week 5, Week 6, and Week 7 submission answers. Use all four weeks as your quality and depth benchmark. Write clearly better, more human, more specific answers for Week 8. Do NOT copy any phrasing. Sound like a sharp D2C founder who built this and knows every node. Avoid all robotic AI phrases.
+Priority 3 - Perplexity Research Report
+AI Learning Machine - n8n Template Matching & Enhancement Report
+This report was generated by Perplexity AI through deep analysis of the v1 workflow and extensive search of n8n.io template library. It contains:
+* The 5 best-match templates already identified and scored (90-95% match)
+* The 10 high-value enhancements already researched and prioritized
+* The proposed v2 architecture (20-22 node workflow design)
+* Cost estimates per run (?15-25 vs. current ?5) and commercial pricing context
+* Template URLs and API endpoints ready for fetching
+Use this report as your roadmap. Do not re-search what has already been found. Go directly to implementing it.
+Priority 4 - Presentation Reference
+AI_Learning_Machine_Presentation.pptx
+Contains the slide deck for the AI Learning Machine project. Read this for:
+* The commercial framing and value proposition already developed
+* The pricing tiers described (?5K-?1L range)
+* The D2C use case positioning
+* Any specific product or business claims that must be consistent across your submission answers
+
+YOU MUST DO ALL OF THE FOLLOWING IN EXACT SEQUENCE
+1. Read and fully understand AI-Learning-Machine-Autonomous-Research-Engine.json
+2. Read and use Weekly-Submissions.docx as the quality benchmark for all submission answers
+3. Apply the full mode stack defined in the ROLE section throughout all tasks - all codes are already defined inline
+4. Read the Perplexity Report and internalize the template matches + enhancement roadmap
+5. Read AI_Learning_Machine_Presentation.pptx for commercial framing
+6. Reconstruct the complete v1 workflow logic node by node
+7. Fetch the top-priority matching template JSON from n8n.io (n8n.io/workflows/3579 first) using: https://api.n8n.io/api/workflows/templates/3579
+8. Also fetch n8n.io/workflows/7215 and n8n.io/workflows/7907 as backup candidates
+9. Score and select the single best starting template using the evaluation matrix
+10. Perform a structured gap analysis: template vs. v2 target architecture
+11. Identify and finalize the best commercially and functionally valuable enhancements for v2
+12. Surgically modify the selected template JSON to match the full enhanced v2 requirement
+13. Teach me the complete implementation in plain English with beginner-friendly micro-steps
+14. Write upgraded, leaderboard-worthy Week 8 submission answers
+15. Write a Loom video script - strictly 60 to 70 words, with visual cues
+16. Write a powerful social caption
+17. Generate .bat and .py files for video processing and provide a PowerShell command
+
+PHASE 1: TEMPLATE SEARCH + SELECTION STRATEGY
+Step 1 - Start With Perplexity Report Candidates
+The Perplexity Report has already identified the top 5 template candidates. Begin immediately with those. Do NOT start a fresh search from scratch - that work is done. Go directly to fetching and scoring.
+Fetch the workflow JSON for each of the following using the n8n Template API:
+text
+https://api.n8n.io/api/workflows/templates/3579
+https://api.n8n.io/api/workflows/templates/7215
+https://api.n8n.io/api/workflows/templates/7907
+If the template API is inaccessible for any template, fetch the workflow page directly at:
+text
+https://n8n.io/workflows/3579
+https://n8n.io/workflows/7215
+https://n8n.io/workflows/7907
+Alternatively, use n8n-mcp tools to search the template library directly from within my n8n instance at n8n.pureremedysolutions.com.
+Step 2 - Score and Select the Best Template
+Score each candidate against this evaluation matrix (1-5 per criterion):
+CRITERIONWEIGHTWHAT TO LOOK FORForm Trigger or Webhook trigger present5xCollects topic + learning level inputAI/LLM node (research or doc generation)5xGPT or equivalent for content synthesisReal web search or content scraping5xSerpAPI, Google Search, Firecrawl, ApifyGoogle Docs creation/writing4xCreates and populates a Google DocGoogle Sheets logging4xAudit log or knowledge storeGmail or Telegram delivery4xDelivers result to userSub-question/decomposition logic4xBreaks topic into researched sub-questionsCode node for data manipulation3xJavaScript nodes for merging/parsingYouTube or transcript integration3xFetches actual video contentMinimal irrelevant nodes to remove2xFewer cleanup steps = faster modificationScoring formula: Sum of (score × weight). Select the highest-scoring template. Return a scoring table showing all 3 candidates before proceeding to modification.
+
+PHASE 2: GAP ANALYSIS
+After selecting the winning template, perform a structured gap analysis comparing it against the v2 target architecture. Classify every node as:
+STATUSMEANINGACTIONKEEPTemplate has this node correctly configuredLeave untouched or minor updateMODIFYTemplate has right node type, wrong parametersUpdate parameters onlyADDTemplate is missing this node entirelyBuild and insert new nodeREMOVETemplate has nodes irrelevant to our buildDelete cleanlyREPLACETemplate has node serving same function, wrong typeSwap node type, carry over paramsPresent the gap analysis as a table before writing any JSON. This is your modification roadmap.
+Target v2 architecture:
+text
+[Form Trigger]                         ? Topic + Learning Level (4 levels)
+  +-- [Code: Level Router]             ? 4-level conditional prompt logic (KEEP from v1)
+        +-- [AI: Sub-Question Planner] ? NEW: GPT generates 5-8 sub-questions per topic
+              +-- [SplitInBatches]     ? NEW: Process each sub-question independently
+                    +-- [YouTube API]              ? Video metadata (KEEP from v1)
+                    +-- [Apify: Transcript Scraper] ? NEW: Full transcript extraction
+                    +-- [SerpAPI: Web Search]       ? NEW: Execute webQueries
+                    +-- [Firecrawl: Page Scraper]   ? NEW: Full article body text
+              +-- [Aggregate Research]             ? Combine all sub-question results
+                    +-- [Code: Build RAG Prompt]   ? NEW: Structured prompt with real sources
+                          +-- [AI: Document Writer] ? GPT-4o/gpt-4o-mini (tiered routing)
+                                +-- [Code: Add Citations] ? NEW: Inline source citations + References section
+                                      +-- [Google Docs: Create]   ? Create doc (KEEP from v1)
+                                            +-- [Google Docs: Populate] ? Write content (MODIFY from v1)
+                                                  +-- [Google Sheets: Log]     ? Audit log (KEEP from v1)
+                                                  +-- [Gmail: Notify]          ? Email delivery (KEEP from v1)
+                                                  +-- [Telegram: Notify]       ? NEW: Parallel Telegram delivery
+
+[OPTIONAL - Phase 2]
+[Cron: Weekly Digest]                  ? Sunday 8 AM trigger
+  +-- [Google Sheets: Read Queue]      ? Read queued topics
+        +-- [Execute Workflow: Main]   ? Re-trigger main workflow per topic
+
+PHASE 3: ENHANCEMENT EXPLORATION ? LEADERBOARD SECTION ?
+Apply BEASTMODE + ARCHITECT + FOUNDER + LEVERAGE + PARETO + scenario + redteam + BOTTLENECK + premortem + WARGAME + L99 + OVERTHINK + XRAY + nofilter here.
+Your single most important goal in this entire session: Identify the best enhancements - those capable of adding genuine commercial and functional value - that will make the final v2 build the most convincing and leaderboard-worthy answer to:
+"If 'Better Than Taught': Explain Why Your Build Is Better. What did you add/improve beyond what was taught? Be specific about innovation, efficiency, or functionality."
+Step 1 - AUDIT the v1 Build (redteam + BOTTLENECK)
+Key fragile points in v1 to identify and address:
+* webQueries never executed: v1 generates web search query strings but never actually fires them. The AI writes the entire document from training data + YouTube metadata alone. This is the single biggest quality gap.
+* YouTube metadata only - no transcript content: GPT writes a 2,500-word document having read only video titles and descriptions. No actual expert content from videos is consumed. The AI is essentially hallucinating a document.
+* Single-query research architecture: One combined queries.join(' OR ') string is sent. No sub-topic decomposition. No parallel research threads. No depth per sub-topic.
+* No real web sources: The document cites no URLs, contains no article-derived content, and has no references section. It cannot be trusted or verified.
+* Same AI model for all levels: GPT-4o-mini handles Complete Beginner (simple, low-stakes) and Expert Deep Dive (complex, high-quality-demanded) with identical quality ceiling.
+* No delivery confirmation: Gmail fires but there is no tracking of whether the user received or engaged with the document.
+* No knowledge base accumulation: Each run is isolated. Repeated research on the same topic produces duplicate docs without any cross-referencing or deduplication.
+* No topic queue or scheduling: Every generation is manual. No way to queue topics for batch processing or scheduled delivery.
+* Flat audit log: Google Sheets log records what was generated but offers no analytics - no topic frequency, no level distribution, no document quality scoring.
+* Google Doc isolation: Generated docs live in Google Drive with no organizational structure. No folder routing by topic category or date.
+Step 2 - GENERATE Enhancement Ideas (ARCHITECT + scenario)
+Explore and evaluate every direction:
+TRANSCRIPT INTELLIGENCE ENGINE:
+Use Apify's YouTube Scraper (free tier: 100 scrapes/month) to extract full transcripts for the top 3 YouTube results. Pass transcript excerpts (first 2,000 characters per video) directly into the GPT prompt as expert source material. The AI then synthesizes the document from real expert speech, not hallucinated content. This is the highest single-node quality improvement possible in the entire build.
+SUB-QUESTION DECOMPOSITION + PARALLEL RESEARCH:
+Add one GPT call before the main document writer. Prompt: "Break this topic into 5 focused sub-questions a [level] learner would need answered. Return as a JSON array." Then SplitInBatches processes each sub-question - YouTube search, web search, and transcript extraction run per sub-question. The aggregated result is a 5-thread deep research base rather than one shallow search. Architecturally identical to how real research assistants work.
+SERP-GROUNDED DOCUMENT (RAG LITE):
+Add SerpAPI (free tier: 100 searches/month) to execute the webQueries that v1 generates but never uses. Each search returns top 5 article titles + URLs + snippets. Pass these into the GPT prompt as [Source: Title - URL] references. GPT is instructed to cite inline. The generated document becomes RAG-grounded - every claim has a traceable source. No hallucination risk. This is publishable-quality output, not just a learning kit.
+TIERED AI MODEL ROUTING:
+Add an IF node after the Level Router. Condition: if level = "Complete Beginner" OR "Intermediate Practitioner" ? route to gpt-4o-mini (cost: ~?0.12/1K tokens). If level = "Advanced Professional" OR "Expert Deep Dive" ? route to gpt-4o (cost: ~?1.2/1K tokens). This creates a cost-intelligent research engine. Beginner content doesn't need GPT-4o quality. Expert content does. Saves ~60-70% on token costs while improving quality where it matters.
+TELEGRAM INSTANT DELIVERY:
+Add a Telegram Bot node in parallel with Gmail. Sends: Topic title, learning level, Google Doc link, generation timestamp, word count. One extra node. Zero added cost. For an Indian D2C founder, Telegram notification lands in under 2 seconds vs. Gmail's potential spam folder delay. Transforms the tool from "check your email sometime" to "your learning kit is ready - tap to open."
+RAG CITATION + REFERENCES BLOCK:
+Add a Code node after the AI Document Writer. It takes the GPT output and: (1) ensures all [Source: Title - URL] inline citations are correctly formatted, (2) extracts all cited URLs and builds a structured References section, (3) appends the References block to the bottom of the document before Google Docs creation. This is the feature that separates a learning kit from a research paper. It directly answers "why is this trustworthy?"
+DOCUMENT QUALITY SCORER:
+After GPT generates the document, add a second lightweight GPT call that scores the output on 5 dimensions: Depth (1-10), Accuracy signals (1-10), Clarity for stated level (1-10), Source diversity (1-10), Actionability (1-10). Aggregate score below 35/50 ? route to a "Review Queue" tab in Sheets rather than creating the Google Doc. Prevents low-quality outputs from being delivered. This is an AI self-audit loop - unique in any taught curriculum.
+GOOGLE DRIVE FOLDER ROUTING:
+Add a Code node that determines the correct Google Drive folder based on topic category (detected by GPT from the topic name: Technology / Business / Health / Creative / Finance / Other). Google Docs creation node is modified to create the doc inside the category folder rather than root Drive. Founder opens Drive ? sees organized library by category. Zero added API cost.
+WEEKLY LEARNING DIGEST (SCHEDULED):
+Add a Cron node (Sunday 8 AM) that reads a "Topic Queue" tab in Google Sheets. For each queued topic+level combination, it fires the main workflow via Execute Workflow node. The founder adds topics to the queue during the week. Sunday morning, all kits arrive. This is a productivity multiplier - from on-demand to scheduled intelligence delivery.
+UNSUBSCRIBE / COMPLETION TRACKING:
+Include a "Mark as Completed" button in the Gmail delivery template (an HTTP link pointing to a Webhook node). When clicked: the Sheets log row updates with completedAt timestamp and status = "Completed". Over time, the log becomes a learning progress tracker. The founder can see which topics they've studied and which are pending.
+Step 3 - FILTER with PARETO
+Identify clearly:
+Top 5 high-impact, low-effort enhancements (quick wins - buildable in 30-60 minutes each):
+1. Telegram parallel delivery node
+2. Tiered AI model routing (IF node + second OpenAI node)
+3. RAG citation + References block (Code node modification)
+4. Google Drive folder routing by category
+5. Completion tracking webhook (Sheets update on email link click)
+Top 5 high-impact, high-effort enhancements (strategic upgrades - 2-4 hours each, maximum leaderboard value):
+1. YouTube transcript extraction via Apify
+2. Sub-question decomposition loop with SplitInBatches
+3. SerpAPI real web search execution + page scraping
+4. Document quality scorer (GPT self-audit)
+5. Weekly digest scheduler with topic queue
+The single moonshot enhancement:
+The Sub-Question Decomposition + Transcript Intelligence + SERP Grounding triad working together. This transforms the workflow from a prompt-to-document generator into a genuine multi-source autonomous research engine. Topic goes in ? 5 sub-questions are decomposed ? each is independently researched via YouTube (with transcripts), web search (with page content), and SERP snippets ? GPT synthesizes a cited, structured document from real expert sources ? delivered instantly to Telegram and Gmail. This is not a learning kit generator. This is a zero-cost autonomous research assistant that a solo founder can run for any business topic, any time, at ?15-25 per run vs. ?5,000+ for a human research assistant.
+Step 4 - REDESIGN the Architecture (BLUEPRINT)
+Present:
+* All new nodes required for v2
+* Sub-workflows required (if any, via Execute Workflow node)
+* All new services and APIs needed (with free tier limits noted)
+* Revised ASCII architecture diagram using [ Node Name ] --> [ Next Node ] format
+* Estimated total node count for v2 (target: 20-22 nodes)
+Step 5 - COMMERCIAL IMPACT ANALYSIS (FOUNDER + CEOMODE)
+For each major enhancement, estimate:
+* Time saved per week for a D2C founder doing manual research
+* Cost avoidance vs. paid alternatives in INR and USD (Jasper, Perplexity Pro, ResearchRabbit, Notion AI, professional researcher hire)
+* Competitive advantage the enhancement creates
+* Specific use case: Indian D2C brand founder (skincare/beauty/wellness/supplements) using this to research product trends, competitor positioning, ingredient science, and retailer outreach topics
+Step 6 - Enhanced Build Vision Statement
+Write a concise statement (100-150 words) explaining what the v2 build is, what it does, and why it deserves to rank at the top of any automation cohort.
+Rules for this section:
+* Ground every enhancement in n8n's actual node capabilities
+* No suggestions requiring infrastructure a solo founder cannot access
+* Flag clearly if any enhancement requires a paid API tier
+* Prefer self-hosted n8n native solutions - this is a structural advantage over Make.com/Zapier
+* Show reasoning - do not just list features
+* Make it genuinely impressive, not a padded list
+
+PHASE 4: SURGICAL MODIFICATION + ENHANCEMENT
+Step 1 - Apply the Gap Analysis
+Using the gap analysis roadmap:
+* KEEP nodes already correct from v1 or the best-match template
+* MODIFY only the parameters that need to change
+* ADD each missing node in the correct position in the connections graph
+* REMOVE irrelevant nodes cleanly (also clean their connections)
+* REPLACE wrong-type nodes
+Step 2 - Apply Top-Priority Enhancements
+After replicating the base v1 logic, apply the top enhancements from Phase 3. Integrate these directly into the modified workflow JSON. At minimum, the following enhancements must be present in the final v2 JSON:
+1. Sub-Question Decomposition - GPT breaks topic into 5-8 sub-questions; SplitInBatches processes each
+2. YouTube Transcript Extraction - Apify scraper fetches full transcripts for top 3 videos
+3. Real Web Search Execution - SerpAPI executes the webQueries v1 generates but never uses
+4. Tiered GPT Routing - Beginner/Intermediate ? gpt-4o-mini; Advanced/Expert ? gpt-4o
+5. RAG Citation Layer - Inline source citations + structured References block in every document
+6. Telegram Delivery - Parallel notification alongside Gmail
+7. Document Quality Score Gate - GPT self-audit; low-score outputs routed to Review Queue tab
+8. Google Drive Folder Routing - Docs organized by detected topic category
+Step 3 - Return the Complete Modified JSON
+Return the complete, valid, importable n8n workflow JSON. Rules:
+* Correct n8n node type names throughout (n8n-nodes-base.*)
+* ALL nodes present with correct parameter structures
+* ALL connections in the connections object
+* No truncation, no pseudocode, no fake nodes, no invented credentials
+* Do NOT use $env.VARIABLE_NAME syntax anywhere - I cannot access Environment Variables on free-tier n8n. All values must be inline constants or form inputs.
+* After the JSON: list every credential to configure (name, type, what it connects to)
+* List all external services and APIs required (with free tier limits and sign-up URLs)
+If the workflow is too large for one response, split into clearly labeled sub-workflows:
+* Workflow A (Main Research Engine): Form Trigger ? Level Router ? Sub-Question Planner ? SplitInBatches ? YouTube + Apify + SerpAPI ? Aggregate ? Build RAG Prompt ? AI Writer (tiered) ? Quality Gate ? Citation Block ? Google Docs Create + Populate ? Sheets Log ? Gmail + Telegram
+* Workflow B (Weekly Digest, Optional): Cron ? Sheets Queue Read ? Execute Workflow A per topic
+n8n-mcp deployment: Deploy the modified workflow JSON directly to my n8n instance at n8n.pureremedysolutions.com using available MCP tools. Do this proactively. Confirm deployment with workflow IDs.
+
+TEACHING TASK
+Teach me everything needed to build, configure, and run the v2 workflow from scratch. Style: beginner-friendly, plain English, no jargon without explanation, small logical steps, practical - not academic.
+Cover all of:
+* Business goal - D2C founder with no time to research topics manually; this workflow replaces a research assistant and content agency at near-zero cost
+* Why n8n is the right tool - self-hosted, free, parallel processing, native Google Docs/Sheets/Gmail/OpenAI nodes, n8n-mcp for Antigravity integration
+* What v1 was doing wrong - the webQueries gap, the metadata-only YouTube problem, the hallucination risk
+* The full v2 architecture - every node explained in plain English with its business reason
+* What data enters and exits each key node - input/output shapes for the 6 most important nodes
+* How Apify works - free tier limits, YouTube Scraper actor setup, how to get transcript output
+* How SerpAPI works - free tier (100 searches/month), response structure, how to extract article snippets
+* How sub-question decomposition works - why it produces better output than a single topic search
+* How the tiered GPT routing works - IF node logic, two OpenAI nodes, how to manage both credentials
+* How RAG citations work in a no-code context - prompt engineering trick to force inline citations
+* Google Docs setup - how v2 creates and organizes docs by category folder
+* Telegram Bot setup - BotFather, get chat ID, configure n8n Telegram node (step by step)
+* How to configure everything without Environment Variables - since I'm on free-tier n8n, all config goes inline
+* Safe testing method - test with a single beginner topic before running advanced levels
+* Common failure points and fixes:
+* Apify transcript scraper returns empty (video has auto-generated vs. manual captions)
+* SerpAPI rate limit hit mid-batch
+* GPT returns malformed JSON from sub-question planner (fallback to single-query mode)
+* Google Docs API permissions error on first run
+* SplitInBatches empty output if sub-question planner fails
+* Telegram Bot not receiving messages (chat ID configuration)
+* How to deploy and manage via n8n-mcp from Claude Desktop - step by step
+Since Antigravity is connected to my local n8n instance via n8n-mcp at n8n.pureremedysolutions.com and has direct filesystem access, deploy the modified workflow JSON directly to my n8n instance using available MCP tools, AND save the workflow JSON file directly to C:\Users\ks_pa\Downloads\Week 8 Submission\.
+
+SUBMISSION ANSWER TASK
+Write polished, leaderboard-worthy answers after completing architecture, modification, and teaching.
+Read Weekly-Submissions.docx first. Benchmark against all four weeks (Week 4, 5, 6, 7). Write answers clearly better - more natural, more specific, more human, more technically credible. Sound like a sharp D2C founder-builder who designed every node deliberately. Avoid all robotic AI phrases. Every answer must demonstrate that you built this yourself and understand exactly why every decision was made.
+
+Question 1 - Zero-Cost Hack
+"Have you used a Zero-Cost Hack? If Yes: Describe Your Zero-Cost Hack. Explain what paid tool you replaced, how you replaced it, and why it works. Be specific."
+Answer context for Week 8 v2:
+The Zero-Cost Hack in this build is replacing an entire paid research and content generation stack with free APIs and self-hosted n8n. Specifically:
+* Perplexity Pro / ChatGPT Plus (?1,600-?2,000/month): Replaced with self-hosted n8n + OpenAI API. The workflow does what Perplexity Pro does - real web search + AI synthesis - but runs on raw API calls at ~?15-25 per full research run, not ?1,600/month for unlimited use.
+* Jasper / Copy.ai / Writesonic (?3,000-?12,000/month): Replaced with GPT-4o-mini + GPT-4o via OpenAI API. The tiered routing means beginner topics cost ~?2-5 to generate (gpt-4o-mini) while advanced deep dives cost ~?15-25 (gpt-4o) - a fraction of any subscription.
+* SerpAPI (paid tier ~$50/month): Replaced with SerpAPI free tier (100 searches/month) - sufficient for a D2C founder running 3-5 research sessions per week.
+* Apify (paid tier ~$49/month): Replaced with Apify free tier (100 actor runs/month) - enough for YouTube transcript extraction on every research session within the month.
+* Research assistant hire (?15,000-?40,000/month): Replaced entirely. The v2 workflow autonomously searches YouTube, extracts expert transcripts, scrapes web articles, decomposes topics into sub-questions, synthesises a cited 2,500-word document, and delivers it to Gmail + Telegram - all from a single form submission.
+* Notion AI / Obsidian plugins (?800-?1,600/month): Replaced with Google Docs + Google Sheets - both free, both native n8n integrations.
+Total monthly savings: ?20,000-?57,000 compared to equivalent paid stack. The only variable cost is OpenAI API usage.
+Write a sharp, credible answer built from this context. Make it more specific and more technically impressive than the Week 7 Zero-Cost Hack answer. Highlight the Apify + SerpAPI free tier combination as the novel zero-cost hack that makes real RAG-grounded research possible at zero platform cost.
+
+Question 2 - Automation Description
+"Automation Description: Briefly describe - What problem does this automation solve? How does it work? What makes it valuable for your D2C company?"
+Answer context for Week 8 v2:
+* Problem: D2C founders need to stay current on ingredients, competitors, trends, and buyer psychology - but real research takes 3-5 hours per topic. ChatGPT gives opinions without sources. Hiring researchers costs ?15,000-?40,000/month. Most founders just skip the research entirely and operate on gut instinct.
+* How it works: A single form submission - topic + learning level - launches a fully autonomous multi-source research pipeline. The workflow decomposes the topic into 5-8 sub-questions, researches each independently via YouTube transcript extraction (Apify), real web search (SerpAPI), and article scraping (Firecrawl), routes the topic to gpt-4o-mini or gpt-4o based on complexity level, synthesizes a 2,500-word cited document with inline source references and a References block, creates and organizes it in Google Drive by category folder, and delivers it simultaneously to Gmail and Telegram.
+* Value for D2C: Turns a 3-5 hour research task into a 90-second automated pipeline. Every document is sourced, cited, and structured for the founder's specific learning level. A skincare founder can research "ceramide barrier repair mechanisms for sensitive skin" at Advanced level and receive a GPT-4o-synthesized document citing 5 YouTube expert videos (with transcript excerpts) and 5 web articles - all grounded in real sources, all organized in Drive, all delivered to Telegram before their next meeting.
+Write an answer that is more specific, more vivid, and more commercially sharp than anything in the Weekly-Submissions.docx benchmark.
+
+Question 3 - Better Than Taught
+"If 'Better Than Taught': Explain Why Your Build Is Better. What did you add/improve beyond what was taught? Be specific about innovation, efficiency, or functionality."
+Answer context for Week 8 v2 - specific innovations to highlight:
+1. Sub-Question Decomposition (v2 new): The taught version sends one combined topic string to YouTube. v2 uses a preliminary GPT call to decompose the topic into 5-8 targeted sub-questions, then processes each independently via SplitInBatches. This is architecturally how real research works - not one broad search, but 5 focused deep dives. Output quality improvement is not incremental; it's structural.
+2. YouTube Transcript Intelligence (v2 new): The taught version reads only video titles and descriptions. v2 uses Apify's YouTube Scraper to extract full transcripts, then passes the first 2,000 characters of each top video directly into the GPT prompt as expert source material. The AI synthesizes from real expert speech, not metadata. This eliminates the hallucination problem entirely for video-sourced content.
+3. Real Web Research Execution (v2 new): The taught version generates webQueries but never executes them - a dead variable in v1's code. v2 adds SerpAPI to execute every generated query, returns article titles, URLs, and snippets, and passes them to GPT as cited sources. The document is no longer generated from training data alone. It is a RAG-grounded synthesis of real current web content.
+4. Tiered AI Model Routing (v2 new): The taught version uses gpt-4o-mini for all 4 levels, including Expert Deep Dive. v2 adds an IF node that routes Advanced and Expert requests to gpt-4o. This is a cost-intelligence system - the same pattern used in enterprise ML pipelines, applied to a zero-cost workflow. Beginner topics cost ?2-5 per run. Expert deep dives cost ?15-25 but deliver genuinely superior synthesis quality.
+5. RAG Citation Layer (v2 new): The taught version produces an uncited document that cannot be verified. v2 adds a Code node that enforces inline citations ([Source: Title - URL]) throughout the document and appends a structured References section. This is the difference between a blog post and a research brief. For a D2C founder pitching a retailer with ingredient science backing, this is the feature that matters.
+6. Telegram Parallel Delivery (v2 new): The taught version only sends Gmail. v2 fires both Gmail and Telegram simultaneously. In India's WhatsApp/Telegram-first communication culture, this is not a nice-to-have - it doubles actual delivery and engagement with the output.
+7. Document Quality Score Gate (v2 new): Before creating the Google Doc, v2 runs a lightweight GPT self-audit scoring the output on Depth, Accuracy signals, Clarity, Source diversity, and Actionability. Documents scoring below 35/50 route to a Review Queue tab in Sheets instead of being delivered. The taught version delivers everything GPT generates regardless of quality. This is an AI self-audit loop embedded in the pipeline - a concept uncommon in any taught automation curriculum.
+8. Self-Hosted n8n vs. Make.com: The entire multi-source, multi-model, transcript-aware, SERP-grounded, citation-enforced, quality-gated, dual-delivery pipeline runs on open-source self-hosted n8n at near-zero platform cost. The equivalent on Make.com would require Business plan. The equivalent on Zapier would require Professional. Neither can match the Code node flexibility that powers the sub-question decomposition and citation layer.
+Write an answer that is the most specific, most technically credible, and most commercially compelling of all four previous weeks. Reference exact node names, exact enhancements, exact commercial comparisons. Sound like you designed every node yourself and know exactly why each one is there.
+Rules for all 3 answers:
+* Concrete, specific details only - no vague praise
+* Must feel like a sharp, credible human builder wrote this - not a content generator
+* Benchmark against Weekly-Submissions.docx - write clearly better than Week 7
+* Avoid: "leverage", "synergy", "game-changer", "revolutionary", "cutting-edge", "unlock", "seamlessly"
+* Every claim must be traceable to a specific node, API, or architecture decision
+
+LOOM VIDEO SCRIPT TASK
+?? CRITICAL RULES - NON-NEGOTIABLE:
+* Strictly 60 to 70 words total. Not a single word less than 60. Not a single word more than 70.
+* Count every word including articles, prepositions, conjunctions - AND visual cue labels inside square brackets
+* If any draft exceeds 70 words or falls below 60 words, rewrite until the count is exact
+* Use short, punchy, natural words - the kind a founder uses on camera, not a copywriter
+* Apply storysell + banger + POLARIZE + HOOKS10 internally, then deliver only the single best script
+* Include visual cues for each section in square brackets (e.g., [Show n8n canvas])
+* Visual cues DO count toward the total word count
+Script Structure:
+SectionWord BudgetPurposeHookUnder 8 wordsScroll-stopping. Bold, punchy, mind-blowing. Forces someone to stop.Problem StatementUnder 10 wordsThought-provoking. Hits a real founder pain point about research.Solution DemoRemaining words to hit 60-70 totalNOT purely descriptive. NOT too technical. A non-technical person must understand what the automation does, what makes it valuable, what each key enhancement does. Must paint a clear, vivid picture.Script must:
+* Include visual cues for Hook, Problem, and Demo sections
+* Reference at least 3 specific v2 enhancements (Sub-Question Research, Transcript Intelligence, Telegram delivery + citations)
+* Sound like a confident founder speaking on camera - not reading from slides
+* Demonstrate the full value to a non-technical observer
+* NOT use: "leverage", "synergy", "game-changer", "revolutionary", "cutting-edge", "unlock"
+Apply HOOKS10 internally: generate 10 hook options, select the strongest. Build the full script from that hook. Self-count words before delivering. Rewrite if outside 60-70 range.
+
+CAPTION TASK
+One powerful caption for LinkedIn and Instagram.
+Apply HOOKS10 + captionme + viral + banger + POLARIZE.
+Max 10 hashtags, non-spammy. Include a clean CTA.
+Sound like a D2C founder sharing a real build - not a content creator performing for likes.
+Must reference at least 2 specific technical enhancements from v2 in plain language a non-technical person can understand and find impressive.
+
+VIDEO PROCESSING FILES TASK
+Generate the following files for saving in C:\Users\ks_pa\Downloads\Week 8 Submission:
+Task A - Generate .py File
+Generate a Python file named week8_video_processor.py that processes the file AI LEARNING MACHINE DEMO.mp4 located in C:\Users\ks_pa\Downloads\Week 8 Submission.
+The Python file must be modeled closely on the structure and logic of the video_processor.py file but with the following Week 8 specific customizations:
+Input/Output Paths:
+python
+FFMPEG = r"C:\ffmpeg\ffmpeg-8.1-essentials_build\ffmpeg-8.1-essentials_build\bin\ffmpeg.exe"
+INPUT = r"C:\Users\ks_pa\Downloads\Week 8 Submission\AI LEARNING MACHINE DEMO.mp4"
+FOLDER = r"C:\Users\ks_pa\Downloads\Week 8 Submission"
+OUTPUT_EDITED = os.path.join(FOLDER, "AI_Learning_Machine_Edited.mp4")
+OUTPUT_IG = os.path.join(FOLDER, "AI_Learning_Machine_Instagram.mp4")
+Processing Parameters (same logic as the video_processor.py):
+* Silence detection and removal: -35dB noise floor, 0.5s minimum silence duration, 0.18s word-safe padding on both edges
+* Target duration: maximum 90 seconds after speed adjustment
+* Speed adjustment: auto-calculated to hit 90-second target if edited version is longer
+* Instagram version: 1080x1080 square crop, 30fps, h264 codec
+* Preserve audio quality throughout all transformations
+Task B - Generate .bat File
+Generate a .bat file named run_week8_processor.bat that:
+* Changes directory to C:\Users\ks_pa\Downloads\Week 8 Submission
+* Activates the Python virtual environment (same path structure as prior weeks)
+* Runs week8_video_processor.py
+* Pauses on completion so the window stays open for error checking
+Task C - PowerShell One-Liner
+Provide the single PowerShell command to run week8_video_processor.py directly from C:\Users\ks_pa\Downloads\Week 8 Submission without activating a virtual environment - using the system Python installation.
+
+FINAL QUALITY RULES
+Before delivering any output, run a full SENTINEL + audit pass on everything:
+* All submission answers are clearly better than the Week 7 benchmark from Weekly-Submissions.docx
+* Video script is exactly 60-70 words including visual cue labels - self-counted, not estimated
+* No answer uses: "leverage", "synergy", "game-changer", "revolutionary", "cutting-edge", "unlock", "seamlessly"
+* No $env.VARIABLE_NAME syntax appears anywhere in the workflow JSON or instructions
+* All workflow JSON uses correct n8n-nodes-base.* node type names
+* All enhancements are grounded in actual n8n node capabilities - no invented nodes
+* All API free tier limits are stated where relevant
+* The Perplexity Report template matches are used as the starting point - no fresh search from scratch
+* The build vision statement is 100-150 words, specific, and commercially compelling
+* The caption sounds human, not AI-written
+* The .py and .bat files follow the same structure as the video_processor.py
+* Every node in the v2 architecture has a stated business reason, not just a technical description
+

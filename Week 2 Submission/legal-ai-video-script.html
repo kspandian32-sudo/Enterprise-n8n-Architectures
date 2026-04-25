@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Legal System — Video Script & Caption</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,300;9..144,700;9..144,900&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --accent: #c8ff00;
+    --accent2: #ff4444;
+    --muted: #555555;
+    --text: #e8e8e8;
+    --subtext: #999999;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1.6;
+    padding: 40px 20px 80px;
+  }
+
+  .wrapper { max-width: 1080px; margin: 0 auto; }
+
+  /* HEADER */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 3px 10px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(32px, 5vw, 60px);
+    font-weight: 900;
+    line-height: 1.05;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .meta {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  /* SECTION LABELS */
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* SCRIPT TABLE */
+  .script-section { margin-bottom: 64px; }
+
+  .table-wrapper { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    min-width: 780px;
+  }
+
+  thead tr {
+    border-bottom: 1px solid var(--accent);
+  }
+
+  th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: rgba(200,255,0,0.03); }
+
+  td {
+    padding: 14px 16px;
+    vertical-align: top;
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  .tc {
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--accent);
+    font-size: 11px;
+    width: 70px;
+  }
+
+  .shot-label {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 6px;
+  }
+
+  .visual { max-width: 300px; color: var(--subtext); font-size: 11px; }
+  .visual strong { color: var(--text); display: block; margin-bottom: 4px; }
+
+  .spoken { max-width: 240px; }
+  .spoken em {
+    display: block;
+    font-style: normal;
+    color: #fff;
+    font-size: 13px;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .spoken .silent {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .spoken .wc {
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .tone {
+    max-width: 180px;
+    font-size: 11px;
+    color: var(--subtext);
+    font-style: italic;
+  }
+
+  .word-count-bar {
+    margin-top: 24px;
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .wc-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .wc-number {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--accent);
+  }
+  .wc-max { font-size: 11px; color: var(--muted); }
+  .wc-bar-outer {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    min-width: 100px;
+  }
+  .wc-bar-inner {
+    height: 100%;
+    width: 59%;
+    background: var(--accent);
+  }
+
+  /* CAPTION SECTION */
+  .caption-section { margin-bottom: 64px; }
+
+  .caption-box {
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .caption-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 10px 18px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .caption-content {
+    padding: 28px;
+    white-space: pre-wrap;
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .caption-content .hook { color: #fff; font-weight: 600; font-size: 15px; }
+  .caption-content .tag { color: var(--accent); }
+  .caption-content .red { color: var(--accent2); }
+  .caption-content .dim { color: var(--muted); }
+
+  /* SENTINEL */
+  .sentinel-section { margin-bottom: 48px; }
+
+  .sentinel-box {
+    border: 1px solid var(--accent2);
+    padding: 24px 28px;
+  }
+
+  .sentinel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .sentinel-dot { width: 8px; height: 8px; background: var(--accent2); border-radius: 50%; }
+
+  .sentinel-title {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent2);
+  }
+
+  .sentinel-item {
+    margin-bottom: 14px;
+    padding-left: 16px;
+    border-left: 2px solid var(--border);
+    font-size: 12px;
+  }
+
+  .sentinel-item .verdict {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 4px;
+  }
+  .sentinel-item .verdict.pass { color: var(--accent); }
+  .sentinel-item .verdict.rewrite { color: var(--accent2); }
+
+  .sentinel-item p { color: var(--subtext); line-height: 1.5; }
+  .sentinel-item strong { color: var(--text); }
+
+  /* COPY BUTTONS */
+  .copy-btn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 6px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .row-hero { background: rgba(200,255,0,0.04); }
+
+  @media (max-width: 600px) {
+    body { padding: 24px 16px 60px; }
+    .caption-content { padding: 18px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="badge">Video Script + Caption</div>
+    <h1>Local AI Legal System<br><span>50-Second Demo</span></h1>
+    <div class="meta">
+      <span>6 Workspaces</span>
+      <span>9 Models</span>
+      <span>₹0 Cost</span>
+      <span>50 Seconds</span>
+      <span>53 Spoken Words</span>
+    </div>
+  </div>
+
+  <!-- VIDEO SCRIPT -->
+  <div class="script-section">
+    <div class="section-label">01 — Video Script</div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Timecode</th>
+            <th>Visual on Screen</th>
+            <th>Spoken Words</th>
+            <th>Tone / Direction</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="tc">0–4 sec</td>
+            <td class="visual">
+              <div class="shot-label">Hook</div>
+              <strong>Windows Explorer — C:\Legal-Audit-Trail\</strong>
+              6 subfolders visible in clean grid. Mouse cursor rests still. No animation. Let it breathe.
+            </td>
+            <td class="spoken">
+              <em>"₹5,000 an hour. Or ₹0. Choose."</em>
+              <span class="wc">7 words</span>
+            </td>
+            <td class="tone">Deadpan. No inflection on "Choose." Silence follows — let the number land.</td>
+          </tr>
+
+          <tr>
+            <td class="tc">4–7 sec</td>
+            <td class="visual">
+              <div class="shot-label">Problem</div>
+              <strong>AnythingLLM sidebar</strong>
+              All 6 workspaces stacked in frame — no scroll needed. Slow zoom to fit.
+            </td>
+            <td class="spoken">
+              <em>"Legal contracts destroy small founders."</em>
+              <span class="wc">5 words</span>
+            </td>
+            <td class="tone">Flat. Not angry — diagnostic. Like reading a statistic.</td>
+          </tr>
+
+          <tr class="row-hero">
+            <td class="tc">7–11 sec</td>
+            <td class="visual">
+              <div class="shot-label">Hero Shot — Part 1</div>
+              <strong>Client Contracts workspace</strong>
+              Drag Test-Contract-Verdant-NexaTech.pdf into workspace. Type "Analyze this contract." Hit Enter. Camera catches the cursor hitting Enter in real time.
+            </td>
+            <td class="spoken">
+              <em>"Watch it think."</em>
+              <span class="wc">3 words</span>
+            </td>
+            <td class="tone">Near-whisper. Like you're watching something rare.</td>
+          </tr>
+
+          <tr class="row-hero">
+            <td class="tc">11–18 sec</td>
+            <td class="visual">
+              <div class="shot-label">Hero Shot — Part 2 (MONEY SHOT)</div>
+              <strong>deepseek-legal:latest chain-of-thought streaming FULL SCREEN</strong>
+              &lt;think&gt; tokens visible — reasoning flows live. Slow scroll. No UI chrome. Just the model thinking in plain sight.
+            </td>
+            <td class="spoken">
+              <span class="silent">— SILENT —</span>
+              <div style="font-size:10px;color:#555;margin-top:4px;">No narration. 7 full seconds of AI reasoning on screen. This is the video.</div>
+            </td>
+            <td class="tone">No music. Maybe a very low ambient hum. Let the token stream speak.</td>
+          </tr>
+
+          <tr class="row-hero">
+            <td class="tc">18–20 sec</td>
+            <td class="visual">
+              <div class="shot-label">Hero Shot — Part 3</div>
+              <strong>Final IP analysis output</strong>
+              Scroll to conclusion. Clause 4.1 highlighted. Cut to audit trail PNG file.
+            </td>
+            <td class="spoken">
+              <em>"Clause 4.1. The IP was never yours."</em>
+              <span class="wc">8 words</span>
+            </td>
+            <td class="tone">Cold. Calm. Like a verdict being read. No emotion — that's what makes it land.</td>
+          </tr>
+
+          <tr>
+            <td class="tc">20–27 sec</td>
+            <td class="visual">
+              <div class="shot-label">Vendor Contracts</div>
+              <strong>17-row obligation table scrolling</strong>
+              🔴 HIGH PENALTY on Clauses 6.1 and 6.2 visible. Audit trail PNG flashes at the end.
+            </td>
+            <td class="spoken">
+              <em>"₹18 lakhs. 17 obligations. Every clause. Every risk."</em>
+              <span class="wc">8 words</span>
+            </td>
+            <td class="tone">Staccato. Each phrase is a separate beat. Pause briefly between each. Like dropping evidence.</td>
+          </tr>
+
+          <tr>
+            <td class="tc">27–33 sec</td>
+            <td class="visual">
+              <div class="shot-label">NDAs & Confidentiality</div>
+              <strong>qwen-legal:latest plain English output</strong>
+              Dense legal text in feed — clean translation below. Contrast is obvious on screen.
+            </td>
+            <td class="spoken">
+              <em>"Legal jargon, dead. Plain English, instant."</em>
+              <span class="wc">6 words</span>
+            </td>
+            <td class="tone">Dry. Almost bored. The contrast does the heavy lifting.</td>
+          </tr>
+
+          <tr>
+            <td class="tc">33–38 sec</td>
+            <td class="visual">
+              <div class="shot-label">Employment & Consulting</div>
+              <strong>Red flag output loading</strong>
+              🔴 markers cascade down screen. Pan slowly so each flag is readable.
+            </td>
+            <td class="spoken">
+              <em>"Your contract is hiding these."</em>
+              <span class="wc">5 words</span>
+            </td>
+            <td class="tone">Pointed. Direct. Like someone who already knew and waited to tell you.</td>
+          </tr>
+
+          <tr>
+            <td class="tc">38–43 sec</td>
+            <td class="visual">
+              <div class="shot-label">Founder Agreements</div>
+              <strong>Termination clause extraction</strong>
+              90-day vs 7-day asymmetry highlighted on screen. Hold on it. Don't rush.
+            </td>
+            <td class="spoken">
+              <em>"Read the exit clause before you sign."</em>
+              <span class="wc">7 words</span>
+            </td>
+            <td class="tone">Slow. Deliberate. The energy of someone who learned this the hard way.</td>
+          </tr>
+
+          <tr>
+            <td class="tc">43–50 sec</td>
+            <td class="visual">
+              <div class="shot-label">Closing Shot</div>
+              <strong>Split screen — static, clean</strong>
+              LEFT: AnythingLLM sidebar, all 6 workspaces. RIGHT: C:\Legal-Audit-Trail\ with all 6 subfolders + audit files. No movement. Hold for 6 full seconds.
+            </td>
+            <td class="spoken">
+              <em>"Build yours. Link in bio."</em>
+              <span class="wc">4 words</span>
+            </td>
+            <td class="tone">Flat delivery. Zero energy sell. The split screen is the pitch. You are not.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="word-count-bar">
+      <div>
+        <div class="wc-label">Total Spoken Words</div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span class="wc-number">53</span>
+          <span class="wc-max">/ 90 max</span>
+        </div>
+      </div>
+      <div class="wc-bar-outer"><div class="wc-bar-inner"></div></div>
+      <div style="font-size:10px;color:#555;letter-spacing:0.08em;">37 words of headroom — every silence is intentional, not wasted.</div>
+    </div>
+  </div>
+
+  <!-- CAPTION -->
+  <div class="caption-section">
+    <div class="section-label">02 — Master Caption</div>
+    <div class="caption-box">
+      <div class="caption-tabs">
+        <button class="tab-btn active" onclick="showTab('caption-full')">Full Caption</button>
+        <button class="tab-btn" onclick="showTab('caption-short')">Short Version (Twitter/X)</button>
+      </div>
+
+      <div id="caption-full" class="caption-content"><span class="hook">₹5,000 an hour. Or ₹0. Choose.</span>
+
+I built a fully local, offline AI legal contract analysis system on a ₹0/month budget.
+No cloud. No API subscription. No data leaves the machine. Ever.
+
+Here's what's actually running:
+
+<span class="tag">⬛ THE STACK</span>
+→ Ollama (local model runner) + AnythingLLM v1.12.0 (RAG interface)
+→ 9 models total: 6 base + 3 custom Modelfiles with doubled context windows (num_ctx 4096)
+→ 3 custom models: deepseek-legal, qwen-legal, qwen-coder-legal
+→ Audit trail: C:\Legal-Audit-Trail\ — 6 subfolders, timestamped PNG exports per workspace
+→ Hardware: Windows 11, 16GB RAM, Intel Iris Xe, CPU-only. No GPU required.
+
+<span class="tag">⬛ THE 6 WORKSPACES</span>
+1. NDAs & Confidentiality     → qwen-legal:latest          → Plain English Translator
+2. Client Contracts           → deepseek-legal:latest       → IP Ownership Checker
+3. Vendor Contracts           → qwen-coder-legal:latest     → Obligation Extractor
+4. Employment & Consulting    → deepseek-legal:latest       → Red Flag Detector
+5. Founder Agreements         → deepseek-legal:latest       → Termination & Exit Analysis
+6. Miscellaneous              → deepseek-legal:latest       → Contract Risk Scanner
+
+<span class="tag">⬛ THE TEST CONTRACT</span>
+₹18L Software Development Agreement — Verdant Commerce Pvt Ltd (Karnataka) vs NexaTech Solutions LLP (Maharashtra). 5 pages. 6 deliberate red flags planted. All 6 found.
+
+<span class="red">🔴 Clause 4.1 — IP vests in vendor, not client</span>
+<span class="red">🔴 Clause 3.4 — Unilateral deduction rights</span>
+<span class="red">🔴 Clause 9.3 — Asymmetric termination (90 days vs 7 days)</span>
+<span class="red">🔴 Clause 9.2 — 7-day auto-renewal opt-out window</span>
+<span class="red">🔴 Clause 6.1 — Pan-India 24-month non-compete</span>
+<span class="red">🔴 Clause 8.1 — ₹1.5L liability cap on an ₹18L contract</span>
+
+Vendor Contracts workspace produced a verified 17-row obligation table with 🔴 HIGH PENALTY flags on Clauses 6.1 and 6.2. One trigger: "Analyze this contract." One PDF. Thirty seconds.
+
+<span class="tag">⬛ THE PART MOST PEOPLE MISS</span>
+deepseek-legal is built on deepseek-r1:8b — a chain-of-thought model.
+You watch it reason through the contract before it concludes.
+The &lt;think&gt; tokens stream live on screen. That's not a demo trick.
+That's the actual model architecture doing exactly what it was trained to do.
+
+<span class="dim">---</span>
+
+Most founders sign contracts like these every year.
+Most have no idea what's inside until something goes wrong.
+
+This isn't a replacement for lawyers.
+It's a first pass for people who can't afford one — or who sign first and regret later.
+
+If you're a lawyer reading this: I'm not replacing you.
+I'm replacing the contracts people sign without ever talking to you.
+
+<span class="dim">---</span>
+
+The whole system runs on a laptop.
+Costs ₹0/month to operate.
+Takes one week to build from scratch.
+Your documents never leave your machine.
+
+You either think that's impressive or you think it's overkill.
+Either way, you know it's possible now. That's the point.
+
+Build yours → link in bio.
+
+<span class="tag">#LocalAI #Ollama #AnythingLLM #AILegalTech #ContractAnalysis #PrivacyFirst #DeepSeekR1 #Qwen #OfflineAI #IndieHacker #BuildInPublic #StartupIndia #LegalTech #AIAutomation #FounderLife #SMBIndia #RAG #OpenSourceAI #AITools #TechIndia #NoSubscription #LLM #AIWorkflow</span></div>
+
+      <div id="caption-short" class="caption-content" style="display:none;"><span class="hook">₹5,000 an hour. Or ₹0. Choose.</span>
+
+I built a local, offline AI contract analysis system.
+9 models. 6 workspaces. 3 custom Modelfiles.
+One test contract. 6 red flags planted. All 6 found.
+
+<span class="red">🔴 Clause 4.1 — IP vests in vendor</span>
+<span class="red">🔴 Clause 8.1 — ₹1.5L cap on ₹18L deal</span>
+<span class="red">🔴 Clause 9.3 — 90 days to exit vs 7 days for them</span>
+
+No cloud. No subscription. No GPU. Runs on a laptop.
+You watch deepseek-r1 think through every clause in real time.
+
+You either think this is impressive or overkill.
+Either way — you know it's possible now.
+
+Build yours → link in bio.
+
+<span class="tag">#LocalAI #Ollama #AILegalTech #BuildInPublic #OfflineAI #LegalTech #StartupIndia</span></div>
+    </div>
+    <button class="copy-btn" onclick="copyCaption()">Copy Full Caption</button>
+  </div>
+
+  <!-- SENTINEL REVIEW -->
+  <div class="sentinel-section">
+    <div class="section-label">03 — Sentinel Review</div>
+    <div class="sentinel-box">
+      <div class="sentinel-header">
+        <div class="sentinel-dot"></div>
+        <div class="sentinel-title">/SENTINEL — Line-by-line audit. Flagged, rewritten, or cleared.</div>
+      </div>
+
+      <div class="sentinel-item">
+        <div class="verdict pass">✓ PASS — KEPT</div>
+        <strong>Hook: "₹5,000 an hour. Or ₹0. Choose."</strong>
+        <p>Specific number. Binary choice. Forces viewer to self-sort. No adjectives. Passes.</p>
+      </div>
+
+      <div class="sentinel-item">
+        <div class="verdict pass">✓ PASS — KEPT</div>
+        <strong>Shot 3 narration: "Clause 4.1. The IP was never yours."</strong>
+        <p>Specific clause number. "Never yours" is a gut-punch verb. Not explaining — accusing. Passes.</p>
+      </div>
+
+      <div class="sentinel-item">
+        <div class="verdict rewrite">⚠ FLAGGED → REWRITTEN</div>
+        <strong>Original Shot 5 draft: "Legal language made simple."</strong>
+        <p>Generic. Rewritten to: <strong>"Legal jargon, dead. Plain English, instant."</strong> — Parallel structure. Active verbs. The word "dead" does real work.</p>
+      </div>
+
+      <div class="sentinel-item">
+        <div class="verdict rewrite">⚠ FLAGGED → REWRITTEN</div>
+        <strong>Original caption closing: "This is a powerful tool for SMBs and startups."</strong>
+        <p>Marketer language. Rewritten to the lawyer confrontation line: <strong>"I'm not replacing you. I'm replacing the contracts people sign without ever talking to you."</strong> — Disarming, specific, and true. Forces engagement from both audiences.</p>
+      </div>
+
+      <div class="sentinel-item">
+        <div class="verdict pass">✓ PASS — INTENTIONAL CHOICE</div>
+        <strong>Shot 4 (11–18 sec): 7 seconds of silent token streaming, no narration</strong>
+        <p>This was questioned internally. Verdict: keep it. deepseek-r1's chain-of-thought is the most differentiating visual in the entire video. Narrating over it would kill it. Silence is the direction.</p>
+      </div>
+
+      <div class="sentinel-item">
+        <div class="verdict pass">✓ PASS — KEPT</div>
+        <strong>Caption: Full stack specification (num_ctx, Modelfile names, folder paths)</strong>
+        <p>Could be seen as "too technical." Kept deliberately — this is what separates a founder post from a marketer post. The specificity IS the credibility signal. Anyone who builds will want the exact details. Anyone who doesn't will still be impressed by the density.</p>
+      </div>
+
+      <div class="sentinel-item">
+        <div class="verdict rewrite">⚠ FLAGGED → ADDRESSED</div>
+        <strong>Risk: "Clause 9.2 — 7-day auto-renewal opt-out" is missing from the closing shot narration</strong>
+        <p>Confirmed: all 6 clauses are in the caption, not in the narration. The video can't cover all 6 in 50 seconds. The caption is the place for the full clause list. Division of labour is correct.</p>
+      </div>
+
+      <div style="margin-top:20px;padding-top:20px;border-top:1px solid #222;font-size:11px;color:#555;">
+        SENTINEL VERDICT: No generic lines remain in the final output. All narration is clause-specific, number-specific, or architecturally specific. The silent 7-second hero shot is the most technically honest choice in the script. Caption earns its length because every paragraph carries information a builder or buyer actually needs.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showTab(id) {
+  document.getElementById('caption-full').style.display = 'none';
+  document.getElementById('caption-short').style.display = 'none';
+  document.getElementById(id).style.display = 'block';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function copyCaption() {
+  const text = document.getElementById('caption-full').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied.';
+    setTimeout(() => { btn.textContent = 'Copy Full Caption'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>

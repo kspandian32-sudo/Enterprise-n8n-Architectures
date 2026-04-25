@@ -1,0 +1,539 @@
+{
+  "name": "🧠 AI Learning Machine — Autonomous Research Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "🧠 AI Learning Machine",
+        "formDescription": "Enter any topic. AI will research it across YouTube and the web, summarize everything, compile a master Google Doc, and notify you when your NotebookLM learning kit is ready.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Topic I Want to Learn",
+              "fieldType": "string",
+              "placeholder": "e.g. AI Agents and Multi-Agent Frameworks",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "My Current Knowledge Level",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Complete Beginner"
+                  },
+                  {
+                    "option": "Some Basics"
+                  },
+                  {
+                    "option": "Intermediate"
+                  },
+                  {
+                    "option": "Advanced - Deep Dive Only"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "What I Specifically Want to Understand",
+              "fieldType": "textarea",
+              "placeholder": "e.g. How do multi-agent systems work? What frameworks exist? How can I build one using n8n?"
+            },
+            {
+              "fieldLabel": "Notification Email",
+              "fieldType": "string",
+              "placeholder": "your@email.com",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5f6f7bd5-358d-4139-9e88-51f8ffa749f2",
+      "name": "📋 What Do You Want to Learn?",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -672,
+        64
+      ],
+      "webhookId": "daebd039-bdf6-43fb-a76b-fa97117cf8e4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ─────────────────────────────────────────────────────────────\n// Parse form input and prepare research parameters\n// ─────────────────────────────────────────────────────────────\nconst form = $input.first().json;\n\nconst topic = (form['Topic I Want to Learn'] || '').trim();\nconst level = (form['My Current Knowledge Level'] || 'Complete Beginner').trim();\nconst specificQ = (form['What I Specifically Want to Understand'] || '').trim();\nconst email = (form['Notification Email'] || '').trim();\n\nif (!topic) throw new Error('Topic is required.');\nif (!email) throw new Error('Notification email is required.');\n\nconst levelContext = {\n  'Complete Beginner': 'Explain from absolute scratch. Use simple analogies. Assume zero prior knowledge.',\n  'Some Basics': 'Assume basic understanding. Focus on how things work and practical applications.',\n  'Intermediate': 'Skip the basics. Go deeper into architecture, trade-offs, and implementation details.',\n  'Advanced - Deep Dive Only': 'Expert level. Focus on cutting-edge developments, research papers, advanced techniques, and edge cases.'\n};\n\nreturn [{ json: {\n  topic,\n  level,\n  levelInstruction: levelContext[level] || levelContext['Complete Beginner'],\n  specificQuestions: specificQ,\n  email,\n  timestamp: new Date().toISOString()\n}}];"
+      },
+      "id": "eaed0d1e-748e-4d03-92f9-0f280cd01ea9",
+      "name": "🔧 Parse Learning Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o-mini",
+        "prompt": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "You are a research strategist. Given a learning topic, generate the best search queries to find high-quality learning resources. Return ONLY valid JSON, no markdown."
+            },
+            {
+              "content": "={{ 'Topic: ' + $json.topic + '\\nLevel: ' + $json.level + '\\nSpecific interests: ' + ($json.specificQuestions || 'General overview') + '\\n\\nGenerate exactly this JSON:\\n{\\n  \"youtube_queries\": [\"query1\", \"query2\", \"query3\", \"query4\", \"query5\"],\\n  \"web_queries\": [\"query1\", \"query2\", \"query3\"],\\n  \"topic_summary_prompt\": \"A 2-sentence description of what this topic is about for context\"\\n}\\n\\nYouTube queries should find the best tutorial/explainer videos. Web queries should find the best articles and guides. Make queries specific and likely to return high-quality educational content.' }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 600,
+          "temperature": 0.5
+        },
+        "requestOptions": {}
+      },
+      "id": "aefac6d9-7347-461a-b235-7e5daea77cfe",
+      "name": "🤖 AI: Generate Search Queries",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        64
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "89T5yg1yb0oyQtpX",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ─────────────────────────────────────────────────────────────\n// Parse AI search queries and prepare YouTube + Web searches\n// ─────────────────────────────────────────────────────────────\nconst aiResp = $input.first().json;\nconst formData = $('\\ud83d\\udd27 Parse Learning Request').first().json;\n\nlet queries = {};\ntry {\n  const raw = aiResp?.message?.content || '{}';\n  const cleaned = raw.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n  queries = JSON.parse(cleaned);\n} catch (e) {\n  // Fallback queries\n  queries = {\n    youtube_queries: [\n      `${formData.topic} explained for beginners`,\n      `${formData.topic} tutorial 2025 2026`,\n      `${formData.topic} how it works`,\n      `what is ${formData.topic}`,\n      `${formData.topic} practical examples`\n    ],\n    web_queries: [\n      `${formData.topic} complete guide`,\n      `${formData.topic} explained simply`,\n      `${formData.topic} best practices 2026`\n    ],\n    topic_summary_prompt: `A comprehensive overview of ${formData.topic}.`\n  };\n}\n\nreturn [{ json: {\n  ...formData,\n  youtubeQueries: queries.youtube_queries || [],\n  webQueries: queries.web_queries || [],\n  topicSummary: queries.topic_summary_prompt || ''\n}}];"
+      },
+      "id": "e22d23f7-e48c-47aa-8d84-d861bb1d55ed",
+      "name": "🔀 Parse Search Queries",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=' + encodeURIComponent($json.youtubeQueries.join(' OR ')) + '&type=video&order=relevance&relevanceLanguage=en&videoDuration=medium' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "options": {}
+      },
+      "id": "3d3c9dfd-bf99-422a-bb44-155e2cde3eab",
+      "name": "🎥 Search YouTube (Top Videos)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        -96
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "sOZZV98hmZsmyuO6",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ─────────────────────────────────────────────────────────────\n// Extract YouTube video details into clean format\n// ─────────────────────────────────────────────────────────────\nconst resp = $input.first().json;\nconst formData = $('\\ud83d\\udd00 Parse Search Queries').first().json;\nconst items = resp.items || [];\n\nconst videos = items.map((item, idx) => {\n  const snippet = item.snippet || {};\n  const videoId = item.id?.videoId || '';\n  return {\n    index: idx + 1,\n    title: snippet.title || 'Untitled',\n    channel: snippet.channelTitle || 'Unknown',\n    description: (snippet.description || '').slice(0, 300),\n    url: `https://www.youtube.com/watch?v=${videoId}`,\n    publishedAt: snippet.publishedAt || '',\n    thumbnail: snippet.thumbnails?.high?.url || ''\n  };\n}).filter(v => v.url.includes('watch?v='));\n\nreturn [{ json: {\n  ...formData,\n  youtubeVideos: videos,\n  youtubeCount: videos.length\n}}];"
+      },
+      "id": "d0a97bf3-be36-4405-b9f1-a8581df0a0f1",
+      "name": "📊 Extract Video Details",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o-mini",
+        "prompt": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "={{ 'You are a world-class research assistant and educator. Your job is to create the ULTIMATE learning document on a topic. ' + $json.levelInstruction + ' Return well-structured content with clear sections, explanations, examples, and key takeaways. Use markdown formatting with headers (##), bullet points, bold for key terms, and numbered lists for steps.' }}"
+            },
+            {
+              "content": "={{ 'Create a comprehensive, in-depth learning document on: ' + $json.topic + '\\n\\nStudent level: ' + $json.level + '\\n\\nSpecific questions they want answered: ' + ($json.specificQuestions || 'Cover all major aspects') + '\\n\\nYouTube videos found (reference these as recommended watching):\\n' + $json.youtubeVideos.map(v => '- ' + v.title + ' by ' + v.channel + ' (' + v.url + ')').join('\\n') + '\\n\\nCreate this document with these sections:\\n\\n## 1. What Is [Topic]? (Clear definition and why it matters)\\n## 2. How Does It Actually Work? (Mechanics explained simply)\\n## 3. Key Concepts You Must Understand (5-10 core concepts with definitions)\\n## 4. Real-World Applications and Examples (At least 5 practical examples)\\n## 5. Step-by-Step: How to Get Started (Practical first steps for the student)\\n## 6. Common Tools and Platforms (What tools exist, which are free, which are best)\\n## 7. Common Mistakes and Misconceptions (What beginners get wrong)\\n## 8. Advanced Topics for Further Learning (What to explore next)\\n## 9. Key Questions to Test Your Understanding (10 self-assessment questions)\\n## 10. Recommended Resources\\n### Videos to Watch:\\n[List the YouTube videos found above with titles and URLs]\\n### Articles to Read:\\n[Suggest 5 articles/blogs to search for]\\n\\nMake this document 2000-3000 words. Be thorough, practical, and engaging. Use analogies for complex concepts. Include specific numbers, statistics, and examples wherever possible.' }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 4000,
+          "temperature": 0.7
+        },
+        "requestOptions": {}
+      },
+      "id": "81c3a6fb-0a98-4b0d-9a1f-242e3d59d65b",
+      "name": "🤖 AI: Write Master Learning Document",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        768,
+        64
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "89T5yg1yb0oyQtpX",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ─────────────────────────────────────────────────────────────\n// Prepare the master document content for Google Doc creation\n// ─────────────────────────────────────────────────────────────\nconst aiResp = $input.first().json;\nconst formData = $('\\ud83d\\udcca Extract Video Details').first().json;\n\nconst masterContent = aiResp?.message?.content || aiResp?.choices?.[0]?.message?.content || 'Content generation failed.';\n\n// Build the final document with header and metadata\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric' });\n\nconst finalDoc = `LEARNING KIT: ${formData.topic.toUpperCase()}\nGenerated: ${dateStr}\nLevel: ${formData.level}\nCustom Focus: ${formData.specificQuestions || 'General overview'}\n\n${'='.repeat(60)}\n\n${masterContent}\n\n${'='.repeat(60)}\n\nYOUTUBE VIDEOS FOR NOTEBOOKLM\n(Copy these URLs into NotebookLM as sources for audio lectures)\n\n${formData.youtubeVideos.map((v, i) => `${i+1}. ${v.title}\\n   Channel: ${v.channel}\\n   URL: ${v.url}`).join('\\n\\n')}\n\n${'='.repeat(60)}\n\nNEXT STEPS:\n1. Open notebooklm.google.com\n2. Create a new notebook titled \"${formData.topic}\"\n3. Add THIS Google Doc as a source (it is already in your Google Drive)\n4. Add the YouTube URLs listed above as additional sources\n5. Click Audio Overview > Deep Dive > Generate\n6. While it generates, also create: Study Guide, FAQ, Quiz\n7. Listen to the podcast while walking, commuting, or cooking\n8. Use the interactive chat to ask follow-up questions\n\nYour complete learning kit is ready. Learn anywhere, anytime.`;\n\nconst docTitle = `Learning Kit: ${formData.topic} (${dateStr})`;\n\nreturn [{ json: {\n  ...formData,\n  masterContent: finalDoc,\n  docTitle,\n  plainContent: masterContent\n}}];"
+      },
+      "id": "5410e1f1-1b2e-43e4-b41f-0566e7357ad8",
+      "name": "📝 Compile Master Document",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "folderId": "default",
+        "title": "={{ $json.docTitle }}"
+      },
+      "id": "8be950c7-64ac-4794-a735-0fc9fa325088",
+      "name": "📄 Create Google Doc",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        64
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "3hBOZ4xomzyQZyhT",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://docs.googleapis.com/v1/documents/' + $('📄 Create Google Doc').first().json.id + ':batchUpdate' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ requests: [{ insertText: { location: { index: 1 }, text: $('📝 Compile Master Document').first().json.masterContent } }] }) }}",
+        "options": {}
+      },
+      "id": "c51f0c0f-b106-42c3-8d76-b1858bdf1209",
+      "name": "✍️ Write Content to Google Doc",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1488,
+        64
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "3hBOZ4xomzyQZyhT",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Qe8du0_RZcS1ETojoqQeKfubhAfvtGIbyp-9y9OHG10",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Qe8du0_RZcS1ETojoqQeKfubhAfvtGIbyp-9y9OHG10/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $('📝 Compile Master Document').first().json.timestamp }}",
+            "Topic": "={{ $('📝 Compile Master Document').first().json.topic }}",
+            "Level": "={{ $('📝 Compile Master Document').first().json.level }}",
+            "Specific Question": "={{ $('📝 Compile Master Document').first().json.specificQuestions }}",
+            "Google Doc Title": "={{ $('📝 Compile Master Document').first().json.docTitle }}",
+            "Google Doc URL": "={{ 'https://docs.google.com/document/d/' + $('📄 Create Google Doc').first().json.id + '/edit' }}",
+            "YouTube Videos Found": "={{ $('📝 Compile Master Document').first().json.youtubeCount }}",
+            "Status": "Ready for NotebookLM"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Level",
+              "displayName": "Level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Specific Question",
+              "displayName": "Specific Question",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Google Doc Title",
+              "displayName": "Google Doc Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Google Doc URL",
+              "displayName": "Google Doc URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "YouTube Videos Found",
+              "displayName": "YouTube Videos Found",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "16cf95c6-0fa0-49ae-9006-4b2cc5b8bc43",
+      "name": "📊 Log to Learning Tracker",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1728,
+        -80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5brDmuDjWSY8b4It",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('📝 Compile Master Document').first().json.email }}",
+        "subject": "={{ '🧠 Your Learning Kit Is Ready: ' + $('📝 Compile Master Document').first().json.topic }}",
+        "message": "={{ '🧠 YOUR AI LEARNING KIT IS READY!\\n\\nTopic: ' + $('📝 Compile Master Document').first().json.topic + '\\nLevel: ' + $('📝 Compile Master Document').first().json.level + '\\nYouTube Videos Found: ' + $('📝 Compile Master Document').first().json.youtubeCount + '\\n\\n📄 YOUR MASTER GOOGLE DOC:\\nhttps://docs.google.com/document/d/' + $('📄 Create Google Doc').first().json.documentId + '/edit\\n\\n🎙️ NEXT STEPS — NOTEBOOKLM:\\n1. Go to notebooklm.google.com\\n2. Create a new notebook\\n3. Click Google Docs → select your Learning Kit doc (it is already in your Drive)\\n4. Add the YouTube URLs from the doc as additional sources\\n5. Click Audio Overview → Deep Dive → Generate\\n6. Generate Study Guide, FAQ, and Quiz\\n7. Listen to the AI podcast while walking/commuting\\n8. Ask follow-up questions in the chat\\n\\nYour entire learning kit was compiled by AI in under 2 minutes.\\nTotal cost: Approximately INR 5.\\n\\n— AI Learning Machine 🤖' }}",
+        "options": {}
+      },
+      "id": "ce179036-1b41-497e-96fb-52fd6b99ee55",
+      "name": "📧 Send Notification Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1728,
+        208
+      ],
+      "webhookId": "fadbe5c7-7fc2-45f7-81e2-d27d3ee543fc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "N5udxTpXco6P3N81",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "📋 What Do You Want to Learn?": {
+      "main": [
+        [
+          {
+            "node": "🔧 Parse Learning Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔧 Parse Learning Request": {
+      "main": [
+        [
+          {
+            "node": "🤖 AI: Generate Search Queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 AI: Generate Search Queries": {
+      "main": [
+        [
+          {
+            "node": "🔀 Parse Search Queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔀 Parse Search Queries": {
+      "main": [
+        [
+          {
+            "node": "🎥 Search YouTube (Top Videos)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎥 Search YouTube (Top Videos)": {
+      "main": [
+        [
+          {
+            "node": "📊 Extract Video Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 Extract Video Details": {
+      "main": [
+        [
+          {
+            "node": "🤖 AI: Write Master Learning Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 AI: Write Master Learning Document": {
+      "main": [
+        [
+          {
+            "node": "📝 Compile Master Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📝 Compile Master Document": {
+      "main": [
+        [
+          {
+            "node": "📄 Create Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📄 Create Google Doc": {
+      "main": [
+        [
+          {
+            "node": "✍️ Write Content to Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✍️ Write Content to Google Doc": {
+      "main": [
+        [
+          {
+            "node": "📊 Log to Learning Tracker",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📧 Send Notification Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d42a8b55-dd65-4a87-bc30-99841c2c29af",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f89f5bdb931b90795ec2315d5308fc326c5facd6d42d0a57b988cb5431248822"
+  },
+  "id": "At6WGrbAX5YzuoD3",
+  "tags": []
+}
