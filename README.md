@@ -52,6 +52,8 @@ graph TD
 ### 📂 [Layer 2: Core Intelligence](./layer-2-core/)
 *   **[Claude MCP Orchestrator](./layer-2-core/Claude-MCP-Task-Orchestrator/)** — *Node.js, 14 Tools, v2.0*
     *   The central brain using JSON-RPC to manage planning, execution, and self-reflection.
+*   **[Agent Decision Trace](./docs/AGENT_DECISION_TRACE.json)** — *Proof of Cognition*
+    *   **CRITICAL EVIDENCE:** A step-by-step log showing the AI identifying a failure, critiquing its own plan, and autonomously pivoting its strategy.
 *   **[System Prompt Library](./layer-2-core/prompts/)** — *Production-Grade Instructions*
     *   Structured system prompts for the **Planner** and **Evaluator** agents, optimized for JSON-RPC determinism.
 
