@@ -15,26 +15,28 @@ A curated collection of **14 production-grade** n8n workflows and autonomous AI 
 
 ```mermaid
 graph TD
-    subgraph "Layer 1: Perception & Ingestion"
+    subgraph "Layer 1: Perception (Ingestion)"
         A[Signal Pipeline] --> B[AI Lead Gen]
     end
     subgraph "Layer 2: Core Intelligence (Agentic Loop)"
-        C[Claude MCP Orchestrator]
+        C[Planner Agent] --> D[Executor Agent]
+        D --> E[Evaluator/Critic]
+        E -- "PIVOT / ADAPT" --> C
     end
     subgraph "Layer 3: Memory & State (Supabase)"
-        D[(PostgreSQL Persistence)]
+        F[(Postgres + Vector DB)]
     end
     subgraph "Layer 4: Execution & Solutions"
-        E[Invoice Auditor]
-        F[Legal AI]
-        G[Content Alchemist]
+        G[Invoice Auditor]
+        H[Legal AI]
+        I[Content Alchemist]
     end
     
-    A --> C
-    C <--> D
-    C --> E
-    C --> F
-    C --> G
+    B --> C
+    D <--> F
+    D --> G
+    D --> H
+    D --> I
 ```
 
 ---
@@ -49,11 +51,15 @@ graph TD
 
 ### 📂 [Layer 2: Core Intelligence](./layer-2-core/)
 *   **[Claude MCP Orchestrator](./layer-2-core/Claude-MCP-Task-Orchestrator/)** — *Node.js, 14 Tools, v2.0*
-    *   The central brain using JSON-RPC to manage planning, execution, and self-reflection (Critic loop).
+    *   The central brain using JSON-RPC to manage planning, execution, and self-reflection.
+*   **[System Prompt Library](./layer-2-core/prompts/)** — *Production-Grade Instructions*
+    *   Structured system prompts for the **Planner** and **Evaluator** agents, optimized for JSON-RPC determinism.
 
 ### 📂 [Layer 3: Memory](./layer-3-memory/)
 *   **[Infinite Memory Vault](./layer-3-memory/Infinite-Memory-Vault/)** — *Supabase pgvector + Error Handler*
     *   Long-term episodic memory system powered by Supabase/pgvector for cross-session agent recall.
+*   **[Production Database Schema](./layer-3-memory/schema.sql)** — *PostgreSQL / Supabase*
+    *   Relational schema for stateful task tracking, lead management, and vector-based semantic memory.
 
 ### 📂 [Layer 4: Execution](./layer-4-execution/)
 *   **[Invoice Vision Auditor](./layer-4-execution/Invoice-Vision-Auditor/)** — *3 Workflows, 60+ Nodes*
