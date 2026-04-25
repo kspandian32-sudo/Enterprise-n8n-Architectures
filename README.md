@@ -134,7 +134,10 @@ This portfolio implements a **Global SAFE_MODE Toggle** across 4 major automatio
 
 ## 🏗️ Production Deployment
 
-This repository includes a production-ready [docker-compose.production.yml](./docker-compose.production.yml) for enterprise deployment:
+This repository is optimized for **Queue-Mode Deployment** and horizontal scaling. Key infrastructure features include:
+- **Queue-Mode Ready:** Architected for Redis/BullMQ to decouple planning and execution.
+- **Resilience Layer:** Native support for Exponential Backoff and Dead Letter Queues (DLQ).
+- **Observability:** Centralized logging and cost-tracking hooks (see [Scalability Strategy](./docs/SCALABILITY_STRATEGY.md)).
 
 ```
 ┌─────────────┐    ┌──────────────┐    ┌──────────────┐
