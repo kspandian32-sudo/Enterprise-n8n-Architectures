@@ -60,6 +60,7 @@ graph TD
 
 ### 📂 [Layer 3: Memory](./layer-3-memory/)
 *   **[Production Log-Drain](./layer-3-memory/log-drain-production.json)** — *Claude-Pattern Observability*
+    *   **Status:** LIVE at ID `FEK7PNwR6I3XZygD` (Production instance).
     *   A centralized n8n pipeline for capturing execution logs across the entire stack. Features input normalization, error-based Telegram alerting, and unified Supabase logging.
 *   **[Infinite Memory Vault](./layer-3-memory/Infinite-Memory-Vault/)** — *Supabase pgvector + Error Handler*
     *   Long-term episodic memory system powered by Supabase/pgvector for cross-session agent recall.

@@ -35,12 +35,18 @@ CREATE TABLE IF NOT EXISTS agent_memory (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 4. Execution Logs (Audit Trail)
+-- 4. Execution Logs (Audit Trail - Hardened Spec)
 CREATE TABLE IF NOT EXISTS execution_logs (
-    id SERIAL PRIMARY KEY,
-    task_id UUID REFERENCES agent_tasks(id),
-    log_level TEXT DEFAULT 'INFO',
-    message TEXT,
-    correlation_id UUID,
-    timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id           uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  workflow_name text NOT NULL,
+  tool_name    text,
+  level        text NOT NULL CHECK (level IN ('debug','info','warn','error')),
+  message      text NOT NULL,
+  metadata     jsonb DEFAULT '{}',
+  session_id   text,
+  created_at   timestamptz DEFAULT now()
 );
+
+CREATE INDEX IF NOT EXISTS idx_execlog_level      ON execution_logs (level);
+CREATE INDEX IF NOT EXISTS idx_execlog_workflow   ON execution_logs (workflow_name);
+CREATE INDEX IF NOT EXISTS idx_execlog_created_at ON execution_logs (created_at DESC);
