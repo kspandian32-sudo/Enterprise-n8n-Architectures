@@ -2,8 +2,12 @@
 
 [![npm version](https://badge.fury.io/js/n8n-nodes-gemini-pdf-analyzer.svg)](https://www.npmjs.com/package/n8n-nodes-gemini-pdf-analyzer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Audit Scorecard](https://img.shields.io/badge/Audit_Score-9%2F10-brightgreen)](./AUDIT_EVOLUTION.md)
 
-A curated collection of **14 production-grade** n8n workflows, local-first AI infrastructures, and MCP-powered autonomous agents. This repository demonstrates enterprise automation patterns including queue-mode deployment, structured observability, idempotent write operations, and documented data-layer migration paths.
+A curated collection of **14 production-grade** n8n workflows, local-first AI infrastructures, and MCP-powered autonomous agents. 
+
+> [!NOTE]
+> **Post-Audit Evolution:** Following a 5.5/10 audit by senior AI architects, this repository was fully refactored to implement **PostgreSQL persistence**, **Custom TypeScript Nodes**, and **Autonomous Feedback Loops**. See the [Audit Evolution Scorecard](./AUDIT_EVOLUTION.md) for the full breakdown.
 
 ## 🚀 Projects
 
@@ -60,6 +64,20 @@ Beyond workflows, this portfolio includes custom platform extensions that enhanc
 A published **Community Node** on the npm registry. It provides native, multimodal PDF analysis using Google Gemini Vision. 
 - **Registry:** `npm install n8n-nodes-gemini-pdf-analyzer`
 - **Logic:** Ported from the Invoice Vision Auditor to provide high-scale, structured data extraction for invoices and documents.
+
+---
+
+## 🏗️ Production Upgrade Path
+
+To address the "Zero-Cost Hack" critique common in solo developer portfolios, this repository follows a strict **Migration Path** from MVP to Enterprise Scale:
+
+### 1. Data Layer: Spreadsheet to PostgreSQL (Supabase)
+While Google Sheets is used for early-stage prototyping and user-friendly debugging, all core systems in this portfolio have been migrated to **Supabase (PostgreSQL)**. 
+- **Benefit:** ACID compliance, relational integrity, and massive scalability.
+- **Implementation:** See the `MIGRATION.md` for the technical transition logs.
+
+### 2. Logic: From Linear to Agentic (Feedback Loops)
+Pure automation is linear. Our systems implement **Agentic Feedback Loops** where the AI scoring output (Signal Pipeline) is analyzed for accuracy and used to dynamically adjust the system's own `Confidence Threshold`.
 
 ---
 
