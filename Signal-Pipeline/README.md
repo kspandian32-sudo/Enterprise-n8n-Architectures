@@ -16,3 +16,15 @@ A specialized job-market scanner that identifies "High-Signal" opportunities by 
 - Requires a Google Sheet with "Scanned" and "Hot Leads" tabs.
 - Requires GPT-4o or Claude 3.5 Sonnet credentials.
 - Requires your chosen Job Board API or search engine (e.g., SerpAPI).
+
+## 📸 Proof of Work & Architecture
+
+### 1. Signal Scanner (with Dynamic Threshold)
+This is the main ingestion engine. It pulls the dynamic confidence threshold from Google Sheets, scores leads using AI, and routes them accordingly.
+
+![Signal Pipeline Architecture](../proof-of-work/01_Signal_Pipeline_Architecture.jpeg)
+
+### 2. Autonomous Feedback Analyzer
+This is the self-correcting "Manager" loop. It runs weekly to evaluate the AI's recent accuracy against human tags (`relevant` / `irrelevant`), and automatically adjusts the global confidence threshold up or down.
+
+![Feedback Loop Analyzer](../proof-of-work/02_Autonomous_Feedback_Analyzer.jpeg)
