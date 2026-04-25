@@ -54,8 +54,18 @@ A production-hardened MCP server with structured logging (correlation IDs), envi
 | Multi-workflow systems | 4 projects with 2+ coordinated workflows | Modular sub-workflow pattern |
 | Custom Node.js code | 1 MCP Server (14 tools, 500+ LOC) | Beyond pre-built node usage |
 | Error handling sub-workflows | 3 dedicated error handlers | Production resilience pattern |
+| Resilience Pattern | Global SAFE_MODE (4 major projects) | High-reliability test harness |
 | Local AI infrastructure | 3 Modelfiles + 6 AnythingLLM workspaces | Hardware-aware optimization |
 | Proof-of-work artifacts | 5 agent outputs, 5 screenshots, 1 test contract | Verifiable, not just described |
+
+### 🛡️ Enterprise Resilience (SAFE_MODE)
+This portfolio implements a **Global SAFE_MODE Toggle** across 4 major automation systems:
+- **Lead Gen Machine**: Gates cold outreach / SMTP.
+- **Invoice Vision Auditor**: Gates file movements / external API writes.
+- **Signal Pipeline**: Gates email alerting / intent notifications.
+- **Auto-Blogger**: Gates WordPress publishing API.
+
+**Architecture:** Destructive actions are programmatically gated by environment-based IF branches (`SAFE_MODE=true`). This ensures that developers can run end-to-end tests without triggering real-world side effects. Designed for the n8n Community Edition by leveraging system environment variables instead of Enterprise-only UI features.
 
 ## 💰 Measured ROI (Representative)
 
@@ -116,7 +126,7 @@ Google Sheets is used intentionally as a **zero-infrastructure bootstrap layer**
 1. **Import**: Import `.json` workflow files into your n8n instance.
 2. **Configure Credentials**: Replace all `REPLACE_WITH_YOUR_CREDENTIAL_ID` placeholders.
 3. **Configure Resources**: Replace `REPLACE_WITH_YOUR_SHEET_ID` and `REPLACE_WITH_DRIVE_FOLDER_ID`.
-4. **Test**: Use `SAFE_MODE=true` where available (Lead Gen Machine).
+4. **Test**: Use `SAFE_MODE=true` to verify logic without side effects.
 5. **Deploy**: Activate workflows and monitor via n8n's built-in execution log.
 
 > **Security**: All credentials, API keys, emails, and personal identifiers have been removed. No production secrets exist in this repository's history.

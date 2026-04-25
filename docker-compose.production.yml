@@ -52,6 +52,9 @@ x-n8n-common: &n8n-common
     N8N_LOG_OUTPUT: console
     N8N_METRICS: "true"
     N8N_METRICS_PREFIX: n8n_
+
+    # Global Toggles
+    SAFE_MODE: ${SAFE_MODE:-false}
   volumes:
     - n8n_data:/home/node/.n8n
   depends_on:
