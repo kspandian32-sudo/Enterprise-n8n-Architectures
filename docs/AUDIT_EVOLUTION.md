@@ -11,6 +11,17 @@ This document tracks the technical evolution of this repository. Following a rig
 ## 🟢 The "After" State (9/10 "Elite" Architect)
 Following the critique, the following "Elite" upgrades were implemented:
 
+### 🏆 Autonomy Maturity Scale
+This repository has been audited against the standard AI Autonomy Scale:
+
+| Level | Name | Status | Description |
+| :--- | :--- | :--- | :--- |
+| **L1** | Triggered | ✅ | Basic event-driven automation. |
+| **L2** | Assisted | ✅ | Human-in-the-loop AI processing. |
+| **L3** | Reasoning | ✅ | Multi-step logic with planning phases. |
+| **L4** | **Adaptive** | 🚀 | **Self-correcting feedback loops (Implemented).** |
+| **L5** | Autonomous | 🏗️ | Fully independent goal-seeking (Roadmapped). |
+
 ### 1. Data Layer: Spreadsheet to Supabase
 - **Migration:** All core CRM and Logging logic moved to **PostgreSQL (Supabase)**.
 - **Architectural Shift:** Replaced stateless sheet writes with relational database persistence, enabling ACID compliance and complex queries for the AI.
