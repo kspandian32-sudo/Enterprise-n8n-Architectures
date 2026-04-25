@@ -42,23 +42,42 @@ graph TD
 ## 🚀 The Layered Stack
 
 ### 📂 [Layer 1: Perception](./layer-1-perception/)
-*   **Signal Pipeline:** Autonomous job/market signal ingestion.
-*   **AI Lead Gen:** Targeted prospect identification with AI scoring.
+*   **[Signal Pipeline](./layer-1-perception/Signal-Pipeline/)** — *Scanner + Error-Alert Sub-Workflow*
+    *   Autonomous job/market signal ingestion with AI-powered intent analysis and tech stack detection.
+*   **[AI Lead Gen Machine](./layer-1-perception/AI-Lead-Gen-Machine/)** — *3 Workflows, 260KB, SAFE_MODE*
+    *   Targeted prospect identification with GPT-4o intent classification and dynamic blacklist suppression.
 
 ### 📂 [Layer 2: Core Intelligence](./layer-2-core/)
-*   **Claude MCP Orchestrator:** The central brain using JSON-RPC to manage planning, execution, and critique.
+*   **[Claude MCP Orchestrator](./layer-2-core/Claude-MCP-Task-Orchestrator/)** — *Node.js, 14 Tools, v2.0*
+    *   The central brain using JSON-RPC to manage planning, execution, and self-reflection (Critic loop).
 
 ### 📂 [Layer 3: Memory](./layer-3-memory/)
-*   **Infinite Memory Vault:** Long-term episodic memory powered by Supabase/pgvector.
+*   **[Infinite Memory Vault](./layer-3-memory/Infinite-Memory-Vault/)** — *Supabase pgvector + Error Handler*
+    *   Long-term episodic memory system powered by Supabase/pgvector for cross-session agent recall.
 
 ### 📂 [Layer 4: Execution](./layer-4-execution/)
-*   **Invoice Auditor:** Multi-modal PDF extraction and validation.
-*   **Enterprise Sales Rep:** Human-in-the-loop autonomous outreach.
-*   **Local Legal AI:** Privacy-first legal document analysis.
-*   **Content Alchemist:** Multi-channel content generation system.
+*   **[Invoice Vision Auditor](./layer-4-execution/Invoice-Vision-Auditor/)** — *3 Workflows, 60+ Nodes*
+    *   Multi-modal PDF extraction using Gemini 2.5 Flash with built-in fraud detection and audit trails.
+*   **[Enterprise Sales Rep](./layer-4-execution/Enterprise-AI-Sales-Rep/)** — *Human-in-the-Loop Pattern*
+    *   Slack-integrated autonomous agent implementing approval gates for AI-assisted outreach.
+*   **[Local Legal AI](./layer-4-execution/Local-Legal-AI/)** — *100% Air-Gapped Privacy*
+    *   Privacy-first legal document analysis running on local LLMs (Ollama/Llama3).
+*   **[Content Alchemist](./layer-4-execution/Content-Alchemist/)** — *6 Sub-Workflows, 80+ Nodes*
+    *   Multi-modal content factory transforming voice notes into social media assets.
+*   **[Auto-Blogger SEO Suite](./layer-4-execution/Auto-Blogger-SEO-Suite/)** — *WordPress Integration*
+    *   Automated SEO content pipeline with direct WordPress publishing and dual audit logging.
+*   **[WhatsApp AI Bot Series](./layer-4-execution/WhatsApp-AI-Bot-Series/)** — *Industry Specialized*
+    *   Production-ready AI bots for Hotels and Restaurants with reusable webhook boilerplates.
+*   **[Autonomous Research Engine](./layer-4-execution/Autonomous-Research-Engine/)** — *Deep Web RAG*
+    *   Multi-source research agent generating 20-page citation-backed learning kits.
+*   **[UGC Content System](./layer-4-execution/UGC-Content-System/)** — *Multi-Lane Architecture*
+    *   Sophisticated video production engine with multi-lane processing (Nano, Veo, Sora) and dynamic lane switching.
+*   **[AI Proposal Autopilot](./layer-4-execution/AI-Proposal-Invoice-Autopilot/)** — *Full Sales Lifecycle*
+    *   End-to-end automation from lead intake to Google Slides generation and invoicing.
 
 ### 📂 [Layer 5: Extensions](./layer-5-extensions/)
-*   **Custom n8n Nodes:** Native TypeScript extensions for the n8n platform.
+*   **[Gemini PDF Node](./layer-5-extensions/n8n-nodes-gemini-pdf-analyzer/)** — *Custom n8n Extension*
+    *   Native TypeScript community node for multimodal PDF analysis, published on npm.
 
 ---
 
