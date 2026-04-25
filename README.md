@@ -7,7 +7,7 @@
 A curated collection of **14 production-grade** n8n workflows and autonomous AI agents, structured into an enterprise-grade layered architecture.
 
 > [!NOTE]
-> **Post-Audit Evolution:** Following a 5.5/10 audit by senior AI architects, this repository was fully refactored to implement **PostgreSQL persistence**, **Custom TypeScript Nodes**, and **Autonomous Feedback Loops**. See the [Audit Evolution Scorecard](./docs/AUDIT_EVOLUTION.md) for details.
+> **Post-Audit Evolution:** Following 4 technical audits by senior AI architects, this repository was refactored for **L4 Autonomy**. Key upgrades include: **[Postgres Persistence](./docs/MIGRATION.md)**, **[Decision Traces](./docs/AGENT_DECISION_TRACE.json)**, and **[Enterprise Scalability Strategy](./docs/SCALABILITY_STRATEGY.md)**.
 
 ---
 
