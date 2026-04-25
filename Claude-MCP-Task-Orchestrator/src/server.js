@@ -1,18 +1,16 @@
+import 'dotenv/config';
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-
-import { google } from "googleapis";
+import pool from './db.js';
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 
 // ===== STRUCTURED LOGGING =====
-// Enterprise pattern: every tool invocation gets a unique requestId
-// for traceability across distributed systems.
 function createLogger() {
   const log = (level, message, meta = {}) => {
     const entry = {
@@ -21,7 +19,6 @@ function createLogger() {
       message,
       ...meta,
     };
-    // Logs to stderr (MCP convention: stdout is for JSON-RPC, stderr for diagnostics)
     console.error(JSON.stringify(entry));
   };
 
@@ -36,77 +33,13 @@ function createLogger() {
 
 const logger = createLogger();
 
-// ===== CONFIGURATION (Environment-Based Secrets Management) =====
-// Enterprise pattern: secrets come from environment variables, never hardcoded.
-// For production, inject these via Docker secrets, Vault, or .env files.
 const CONFIG = {
-  SPREADSHEET_ID: process.env.MCP_SPREADSHEET_ID || "REPLACE_WITH_YOUR_SPREADSHEET_ID",
-  KEY_FILE: process.env.GOOGLE_APPLICATION_CREDENTIALS || "path/to/your/service-account.json",
-  TASK_RANGE: "Sheet1!A:F",
-  STANDUP_RANGE: "Standup Log!A:F",
   STANDUP_DIR: process.env.MCP_STANDUP_DIR || path.join(process.cwd(), "standups"),
 };
 
-// ===== GOOGLE SHEETS SETUP =====
-let auth = null;
-let sheets = null;
-
-async function getAuth() {
-  if (!auth) {
-    try {
-      auth = new google.auth.GoogleAuth({
-        keyFile: CONFIG.KEY_FILE,
-        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-      });
-      sheets = google.sheets({ version: "v4", auth });
-      logger.info("Google Auth initialized successfully");
-    } catch (err) {
-      logger.error("Failed to initialize Google Auth", { error: err.message });
-      throw err;
-    }
-  }
-  return { auth, sheets };
-}
-
-// ===== HELPERS =====
-
-async function getAllTasks() {
-  const { sheets: sheetsApi } = await getAuth();
-  const res = await sheetsApi.spreadsheets.values.get({
-    spreadsheetId: CONFIG.SPREADSHEET_ID,
-    range: CONFIG.TASK_RANGE,
-  });
-
-  const rows = res.data.values || [];
-  if (rows.length <= 1) return [];
-
-  const headers = rows[0];
-  return rows.slice(1).map((row, index) => {
-    const task = {};
-    headers.forEach((header, i) => {
-      task[header] = row[i] || "";
-    });
-    task._rowIndex = index + 2;
-    return task;
-  });
-}
-
-async function getNextId() {
-  const tasks = await getAllTasks();
-  if (tasks.length === 0) return 1;
-  const maxId = Math.max(...tasks.map((t) => parseInt(t.ID) || 0));
-  return maxId + 1;
-}
-
-function getToday() {
-  return new Date().toISOString().split("T")[0];
-}
-
 // ===== IDEMPOTENCY GUARD =====
-// Enterprise pattern: prevents duplicate writes within a short window.
-// Tracks recent write operations by a hash of their payload.
 const recentWrites = new Map();
-const IDEMPOTENCY_WINDOW_MS = 5000; // 5-second dedup window
+const IDEMPOTENCY_WINDOW_MS = 5000;
 
 function checkIdempotency(operation, payload) {
   const hash = crypto
@@ -123,15 +56,16 @@ function checkIdempotency(operation, payload) {
     }
   }
   recentWrites.set(hash, now);
-
-  // Cleanup old entries
   for (const [key, timestamp] of recentWrites) {
     if (now - timestamp > IDEMPOTENCY_WINDOW_MS * 2) {
       recentWrites.delete(key);
     }
   }
-
   return { isDuplicate: false, hash };
+}
+
+function getToday() {
+  return new Date().toISOString().split("T")[0];
 }
 
 // ===== MCP SERVER =====
@@ -140,15 +74,9 @@ const server = new Server(
   { capabilities: { tools: {} } }
 );
 
-logger.info("MCP Task Orchestrator v2.0.0 initializing", {
-  spreadsheetId: CONFIG.SPREADSHEET_ID.slice(0, 8) + "...",
-  standupDir: CONFIG.STANDUP_DIR,
-});
-
-// ===== TOOL DEFINITIONS (14 tools) =====
+// ===== TOOL DEFINITIONS (11 tools - raw sheets removed) =====
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
-    // === FILE TOOLS ===
     {
       name: "read_file",
       description: "Read a local file and return its contents",
@@ -180,38 +108,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
       },
     },
-
-    // === GOOGLE SHEETS — RAW ACCESS ===
-    {
-      name: "read_sheet",
-      description: "Read all rows from the Google Sheet (raw task data)",
-      inputSchema: { type: "object", properties: {} },
-    },
-    {
-      name: "append_sheet_row",
-      description: "Add a raw row to the bottom of the Google Sheet",
-      inputSchema: {
-        type: "object",
-        properties: {
-          values: { type: "array", items: { type: "string" }, description: "Array of cell values for the new row" },
-        },
-        required: ["values"],
-      },
-    },
-    {
-      name: "update_sheet_cell",
-      description: "Update a specific cell in the Google Sheet",
-      inputSchema: {
-        type: "object",
-        properties: {
-          cell: { type: "string", description: "Cell reference like A1, B2" },
-          value: { type: "string", description: "New value to set" },
-        },
-        required: ["cell", "value"],
-      },
-    },
-
-    // === SMART TASK MANAGER ===
     {
       name: "add_task",
       description: "Add a new task. Auto-assigns an ID. Status defaults to 'To Do'.",
@@ -220,6 +116,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         properties: {
           task: { type: "string", description: "Task description" },
           assigned_to: { type: "string", description: "Person assigned (optional)" },
+          status: { type: "string", enum: ["To Do", "In Progress", "Done", "Blocked"], description: "Status" },
           priority: { type: "string", enum: ["High", "Medium", "Low"], description: "Priority level (default: Medium)" },
           due_date: { type: "string", description: "Due date in YYYY-MM-DD format (optional)" },
         },
@@ -264,16 +161,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       description: "Get a summary — counts by status, priority, and overdue items",
       inputSchema: { type: "object", properties: {} },
     },
-
-    // === DAILY STANDUP AUTO-REPORTER ===
     {
       name: "generate_standup_data",
-      description: "Gathers all task data and organizes it for a standup report. Returns tasks grouped by status, highlights overdue tasks, and provides structured data for AI analysis.",
+      description: "Gathers all task data and organizes it for a standup report.",
       inputSchema: { type: "object", properties: {} },
     },
     {
       name: "save_standup_report",
-      description: "Saves the standup report locally and logs a summary row to the Google Sheet.",
+      description: "Saves the standup report locally and logs a summary row to Postgres.",
       inputSchema: {
         type: "object",
         properties: {
@@ -289,13 +184,75 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: "read_standup_history",
-      description: "Read past standup entries from the Standup Log sheet.",
+      description: "Read past standup entries from Postgres.",
       inputSchema: { type: "object", properties: {} },
     },
   ],
 }));
 
-// ===== TOOL EXECUTION (All 14 handlers with structured logging) =====
+// ===== TOOL IMPLEMENTATIONS =====
+
+async function addTask({ task, assigned_to, status, priority, due_date }) {
+  const { rows } = await pool.query(
+    `INSERT INTO tasks (task, assigned_to, status, priority, due_date)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING *`,
+    [
+      task,
+      assigned_to ?? 'Unassigned',
+      status      ?? 'To Do',
+      priority    ?? 'Medium',
+      due_date    ?? null,
+    ]
+  );
+  return rows[0];
+}
+
+async function listTasks({ status, priority, assigned_to } = {}) {
+  const conditions = [];
+  const values     = [];
+
+  if (status)      { conditions.push(`status = $${values.length + 1}`);      values.push(status); }
+  if (priority)    { conditions.push(`priority = $${values.length + 1}`);    values.push(priority); }
+  if (assigned_to) { conditions.push(`assigned_to = $${values.length + 1}`); values.push(assigned_to); }
+
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  const { rows } = await pool.query(
+    `SELECT id, task, assigned_to, status, priority,
+            to_char(due_date, 'YYYY-MM-DD') AS due_date,
+            created_at, updated_at
+     FROM tasks
+     ${where}
+     ORDER BY
+       CASE priority WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 ELSE 3 END,
+       due_date NULLS LAST`,
+    values
+  );
+  return rows;
+}
+
+async function updateTask(id, updates) {
+  const allowed = ['task', 'assigned_to', 'status', 'priority', 'due_date'];
+  const fields  = Object.keys(updates).filter(k => allowed.includes(k));
+
+  if (fields.length === 0) throw new Error('No valid fields to update.');
+
+  const setClauses = fields.map((f, i) => `${f} = $${i + 2}`).join(', ');
+  const values     = [id, ...fields.map(f => updates[f])];
+
+  const { rows } = await pool.query(
+    `UPDATE tasks
+     SET ${setClauses}
+     WHERE id = $1
+     RETURNING *`,
+    values
+  );
+
+  if (rows.length === 0) throw new Error(`Task id=${id} not found.`);
+  return rows[0];
+}
+
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
   const requestId = crypto.randomUUID();
@@ -311,14 +268,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   } catch (err) {
     const durationMs = Date.now() - startTime;
     logger.tool(requestId, name, "FAILED", { durationMs, error: err.message });
-    return { content: [{ type: "text", text: `ERROR [${requestId.slice(0, 8)}]: ${err.message}` }] };
+    return { content: [{ type: "text", text: `ERROR [${requestId.slice(0, 8)}]: ${err.message}` }], isError: true };
   }
 });
 
 async function executeToolHandler(name, args, requestId) {
-
-  // ===== FILE TOOLS =====
-
   if (name === "read_file") {
     const content = fs.readFileSync(args.path, "utf8");
     return { content: [{ type: "text", text: content }] };
@@ -326,10 +280,7 @@ async function executeToolHandler(name, args, requestId) {
 
   if (name === "write_file") {
     const { isDuplicate } = checkIdempotency("write_file", { path: args.path, text: args.text });
-    if (isDuplicate) {
-      logger.warn("Idempotency guard: duplicate write_file blocked", { requestId, path: args.path });
-      return { content: [{ type: "text", text: `File already written (dedup): ${args.path}` }] };
-    }
+    if (isDuplicate) return { content: [{ type: "text", text: `File already written (dedup): ${args.path}` }] };
     fs.writeFileSync(args.path, args.text);
     return { content: [{ type: "text", text: `File written successfully: ${args.path}` }] };
   }
@@ -346,165 +297,69 @@ async function executeToolHandler(name, args, requestId) {
     return { content: [{ type: "text", text: `Contents of ${path.resolve(dir)}:\n\n${listing.join("\n")}` }] };
   }
 
-  // ===== GOOGLE SHEETS — RAW ACCESS =====
-
-  if (name === "read_sheet") {
-    const { sheets: sheetsApi } = await getAuth();
-    const res = await sheetsApi.spreadsheets.values.get({
-      spreadsheetId: CONFIG.SPREADSHEET_ID,
-      range: CONFIG.TASK_RANGE,
-    });
-    return { content: [{ type: "text", text: JSON.stringify(res.data.values) }] };
-  }
-
-  if (name === "append_sheet_row") {
-    const { isDuplicate } = checkIdempotency("append_row", args.values);
-    if (isDuplicate) {
-      logger.warn("Idempotency guard: duplicate append blocked", { requestId });
-      return { content: [{ type: "text", text: "Row already added (dedup guard)." }] };
-    }
-    const { sheets: sheetsApi } = await getAuth();
-    await sheetsApi.spreadsheets.values.append({
-      spreadsheetId: CONFIG.SPREADSHEET_ID,
-      range: CONFIG.TASK_RANGE,
-      valueInputOption: "RAW",
-      requestBody: { values: [args.values] },
-    });
-    return { content: [{ type: "text", text: "Row added successfully!" }] };
-  }
-
-  if (name === "update_sheet_cell") {
-    const { sheets: sheetsApi } = await getAuth();
-    await sheetsApi.spreadsheets.values.update({
-      spreadsheetId: CONFIG.SPREADSHEET_ID,
-      range: `Sheet1!${args.cell}`,
-      valueInputOption: "RAW",
-      requestBody: { values: [[args.value]] },
-    });
-    return { content: [{ type: "text", text: `Cell ${args.cell} updated to "${args.value}"` }] };
-  }
-
-  // ===== SMART TASK MANAGER =====
-
   if (name === "add_task") {
     const { isDuplicate } = checkIdempotency("add_task", { task: args.task });
-    if (isDuplicate) {
-      logger.warn("Idempotency guard: duplicate task creation blocked", { requestId, task: args.task });
-      return { content: [{ type: "text", text: `Task already added (dedup): "${args.task}"` }] };
-    }
-
-    const { sheets: sheetsApi } = await getAuth();
-    const nextId = await getNextId();
-    const row = [String(nextId), args.task, args.assigned_to || "", "To Do", args.priority || "Medium", args.due_date || ""];
-    await sheetsApi.spreadsheets.values.append({
-      spreadsheetId: CONFIG.SPREADSHEET_ID,
-      range: CONFIG.TASK_RANGE,
-      valueInputOption: "RAW",
-      requestBody: { values: [row] },
-    });
-
-    logger.info("Task created", { requestId, taskId: nextId, task: args.task });
-    return { content: [{ type: "text", text: `Task #${nextId} added: "${args.task}" | Priority: ${args.priority || "Medium"} | Due: ${args.due_date || "No date set"}` }] };
+    if (isDuplicate) return { content: [{ type: "text", text: `Task already added (dedup): "${args.task}"` }] };
+    const row = await addTask(args);
+    return { content: [{ type: "text", text: `✅ Task created: id=${row.id}` }] };
   }
 
   if (name === "list_tasks") {
-    let tasks = await getAllTasks();
-    if (args.status) tasks = tasks.filter((t) => t.Status.toLowerCase() === args.status.toLowerCase());
-    if (args.priority) tasks = tasks.filter((t) => t.Priority.toLowerCase() === args.priority.toLowerCase());
-    if (args.assigned_to) tasks = tasks.filter((t) => t["Assigned To"].toLowerCase() === args.assigned_to.toLowerCase());
-
-    if (tasks.length === 0) return { content: [{ type: "text", text: "No tasks found matching the filters." }] };
-
-    const formatted = tasks.map(
-      (t) => `#${t.ID} | ${t.Task} | Assigned: ${t["Assigned To"] || "Unassigned"} | Status: ${t.Status} | Priority: ${t.Priority} | Due: ${t["Due Date"] || "No date"}`
-    );
-    return { content: [{ type: "text", text: `Found ${tasks.length} task(s):\n\n${formatted.join("\n")}` }] };
+    const rows = await listTasks(args);
+    const text = rows.length
+      ? rows.map(r => `[${r.id}] ${r.task} | ${r.assigned_to} | ${r.status} | ${r.priority} | Due: ${r.due_date ?? '—'}`).join('\n')
+      : 'No tasks found.';
+    return { content: [{ type: "text", text }] };
   }
 
   if (name === "update_task") {
-    const { sheets: sheetsApi } = await getAuth();
-    const tasks = await getAllTasks();
-    const task = tasks.find((t) => parseInt(t.ID) === args.id);
-    if (!task) return { content: [{ type: "text", text: `ERROR: Task #${args.id} not found.` }] };
-
-    const rowIndex = task._rowIndex;
-    const updatedRow = [
-      task.ID,
-      args.task || task.Task,
-      args.assigned_to !== undefined ? args.assigned_to : task["Assigned To"],
-      args.status || task.Status,
-      args.priority || task.Priority,
-      args.due_date !== undefined ? args.due_date : task["Due Date"],
-    ];
-
-    await sheetsApi.spreadsheets.values.update({
-      spreadsheetId: CONFIG.SPREADSHEET_ID,
-      range: `Sheet1!A${rowIndex}:F${rowIndex}`,
-      valueInputOption: "RAW",
-      requestBody: { values: [updatedRow] },
-    });
-
-    const changes = [];
-    if (args.task) changes.push(`description → "${args.task}"`);
-    if (args.status) changes.push(`status → ${args.status}`);
-    if (args.priority) changes.push(`priority → ${args.priority}`);
-    if (args.assigned_to !== undefined) changes.push(`assigned to → ${args.assigned_to || "Unassigned"}`);
-    if (args.due_date !== undefined) changes.push(`due date → ${args.due_date || "Removed"}`);
-
-    logger.info("Task updated", { requestId, taskId: args.id, changes });
-    return { content: [{ type: "text", text: `Task #${args.id} updated: ${changes.join(", ")}` }] };
+    const { id, ...updates } = args;
+    const row = await updateTask(id, updates);
+    return { content: [{ type: "text", text: `✅ Task id=${row.id} updated.` }] };
   }
 
   if (name === "get_overdue_tasks") {
-    const tasks = await getAllTasks();
-    const today = getToday();
-    const overdue = tasks.filter((t) => t["Due Date"] && t["Due Date"] < today && t.Status.toLowerCase() !== "done");
-
-    if (overdue.length === 0) return { content: [{ type: "text", text: "No overdue tasks! You're all caught up." }] };
-
-    const formatted = overdue.map(
-      (t) => `🔴 #${t.ID} | ${t.Task} | Due: ${t["Due Date"]} | Status: ${t.Status} | Priority: ${t.Priority}`
+    const { rows } = await pool.query(
+      `SELECT id, task, status, priority, to_char(due_date, 'YYYY-MM-DD') AS due_date 
+       FROM tasks WHERE due_date < CURRENT_DATE AND status != 'Done'`
     );
-    return { content: [{ type: "text", text: `${overdue.length} overdue task(s):\n\n${formatted.join("\n")}` }] };
+    if (rows.length === 0) return { content: [{ type: "text", text: "No overdue tasks! You're all caught up." }] };
+    const formatted = rows.map(t => `🔴 #${t.id} | ${t.task} | Due: ${t.due_date} | Status: ${t.status} | Priority: ${t.priority}`);
+    return { content: [{ type: "text", text: `${rows.length} overdue task(s):\n\n${formatted.join("\n")}` }] };
   }
 
   if (name === "get_task_summary") {
-    const tasks = await getAllTasks();
-    if (tasks.length === 0) return { content: [{ type: "text", text: "No tasks in the sheet yet." }] };
-
-    const today = getToday();
-    const byStatus = {};
-    tasks.forEach((t) => { byStatus[t.Status || "Unknown"] = (byStatus[t.Status || "Unknown"] || 0) + 1; });
-    const byPriority = {};
-    tasks.forEach((t) => { byPriority[t.Priority || "Unknown"] = (byPriority[t.Priority || "Unknown"] || 0) + 1; });
-    const overdueCount = tasks.filter((t) => t["Due Date"] && t["Due Date"] < today && t.Status.toLowerCase() !== "done").length;
+    const { rows: stats } = await pool.query(`SELECT status, count(*) FROM tasks GROUP BY status`);
+    const { rows: pStats } = await pool.query(`SELECT priority, count(*) FROM tasks GROUP BY priority`);
+    const { rows: overdue } = await pool.query(`SELECT count(*) FROM tasks WHERE due_date < CURRENT_DATE AND status != 'Done'`);
+    const total = stats.reduce((acc, row) => acc + Number(row.count), 0);
+    if (total === 0) return { content: [{ type: "text", text: "No tasks in the database yet." }] };
 
     const summary = [
-      `Total tasks: ${tasks.length}`,
-      `By status → ${Object.entries(byStatus).map(([k, v]) => `${k}: ${v}`).join(" | ")}`,
-      `By priority → ${Object.entries(byPriority).map(([k, v]) => `${k}: ${v}`).join(" | ")}`,
-      `Overdue: ${overdueCount}`,
+      `Total tasks: ${total}`,
+      `By status → ${stats.map(r => `${r.status}: ${r.count}`).join(" | ")}`,
+      `By priority → ${pStats.map(r => `${r.priority}: ${r.count}`).join(" | ")}`,
+      `Overdue: ${overdue[0].count}`,
     ].join("\n");
     return { content: [{ type: "text", text: summary }] };
   }
 
-  // ===== DAILY STANDUP AUTO-REPORTER =====
-
   if (name === "generate_standup_data") {
-    const tasks = await getAllTasks();
+    const { rows: tasks } = await pool.query(`SELECT id, task, assigned_to, status, priority, to_char(due_date, 'YYYY-MM-DD') AS due_date FROM tasks`);
     const today = getToday();
     if (tasks.length === 0) return { content: [{ type: "text", text: "No tasks found. Add some tasks first." }] };
 
-    const done = tasks.filter((t) => t.Status.toLowerCase() === "done");
-    const inProgress = tasks.filter((t) => t.Status.toLowerCase() === "in progress");
-    const toDo = tasks.filter((t) => t.Status.toLowerCase() === "to do");
-    const blocked = tasks.filter((t) => t.Status.toLowerCase() === "blocked");
-    const overdue = tasks.filter((t) => t["Due Date"] && t["Due Date"] < today && t.Status.toLowerCase() !== "done");
-    const dueToday = tasks.filter((t) => t["Due Date"] === today && t.Status.toLowerCase() !== "done");
-    const nextWeek = new Date(); nextWeek.setDate(nextWeek.getDate() + 7);
-    const dueThisWeek = tasks.filter((t) => t["Due Date"] && t["Due Date"] > today && t["Due Date"] <= nextWeek.toISOString().split("T")[0] && t.Status.toLowerCase() !== "done");
+    const done = tasks.filter((t) => t.status === "Done");
+    const inProgress = tasks.filter((t) => t.status === "In Progress");
+    const toDo = tasks.filter((t) => t.status === "To Do");
+    const blocked = tasks.filter((t) => t.status === "Blocked");
+    const overdue = tasks.filter((t) => t.due_date && t.due_date < today && t.status !== "Done");
+    const dueToday = tasks.filter((t) => t.due_date === today && t.status !== "Done");
 
-    const fmt = (list) => list.length === 0 ? "  (none)" : list.map((t) => `  #${t.ID} | ${t.Task} | ${t["Assigned To"] || "Unassigned"} | ${t.Priority} | Due: ${t["Due Date"] || "N/A"}`).join("\n");
+    const nextWeek = new Date(); nextWeek.setDate(nextWeek.getDate() + 7);
+    const dueThisWeek = tasks.filter((t) => t.due_date && t.due_date > today && t.due_date <= nextWeek.toISOString().split("T")[0] && t.status !== "Done");
+
+    const fmt = (list) => list.length === 0 ? "  (none)" : list.map((t) => `  #${t.id} | ${t.task} | ${t.assigned_to || "Unassigned"} | ${t.priority} | Due: ${t.due_date || "N/A"}`).join("\n");
 
     const data = [
       `===== STANDUP DATA FOR ${today} =====`, "",
@@ -519,57 +374,45 @@ async function executeToolHandler(name, args, requestId) {
       `===== END DATA =====`, "",
       `Analyze this data and write a standup report, then use save_standup_report to persist it.`,
     ].join("\n");
-
     return { content: [{ type: "text", text: data }] };
   }
 
   if (name === "save_standup_report") {
-    const { isDuplicate } = checkIdempotency("save_standup", { date: getToday() });
-    if (isDuplicate) {
-      logger.warn("Idempotency guard: duplicate standup save blocked", { requestId });
-      return { content: [{ type: "text", text: "Standup already saved for today (dedup guard)." }] };
-    }
-
-    const { sheets: sheetsApi } = await getAuth();
     const today = getToday();
+    const { isDuplicate } = checkIdempotency("save_standup", { date: today });
+    if (isDuplicate) return { content: [{ type: "text", text: "Standup already saved for today (dedup guard)." }] };
 
     if (!fs.existsSync(CONFIG.STANDUP_DIR)) fs.mkdirSync(CONFIG.STANDUP_DIR, { recursive: true });
     const filepath = path.join(CONFIG.STANDUP_DIR, `standup-${today}.md`);
     fs.writeFileSync(filepath, args.report_markdown);
 
-    await sheetsApi.spreadsheets.values.append({
-      spreadsheetId: CONFIG.SPREADSHEET_ID,
-      range: CONFIG.STANDUP_RANGE,
-      valueInputOption: "RAW",
-      requestBody: { values: [[today, args.done_summary, args.in_progress_summary, args.blocked_summary, String(args.overdue_count), args.ai_summary]] },
-    });
+    await pool.query(
+      `INSERT INTO standup_log (date, done_summary, in_progress_summary, blocked_summary, overdue_count, ai_summary)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       ON CONFLICT (date) DO UPDATE SET
+         done_summary = EXCLUDED.done_summary,
+         in_progress_summary = EXCLUDED.in_progress_summary,
+         blocked_summary = EXCLUDED.blocked_summary,
+         overdue_count = EXCLUDED.overdue_count,
+         ai_summary = EXCLUDED.ai_summary`,
+      [today, args.done_summary, args.in_progress_summary, args.blocked_summary, args.overdue_count, args.ai_summary]
+    );
 
-    logger.info("Standup report saved", { requestId, filepath });
-    return { content: [{ type: "text", text: `Standup report saved!\n📄 Local: ${filepath}\n📊 Sheet: New row in "Standup Log"` }] };
+    return { content: [{ type: "text", text: `Standup report saved!\n📄 Local: ${filepath}\n📊 DB: Saved to standup_log` }] };
   }
 
   if (name === "read_standup_history") {
-    const { sheets: sheetsApi } = await getAuth();
-    const res = await sheetsApi.spreadsheets.values.get({
-      spreadsheetId: CONFIG.SPREADSHEET_ID,
-      range: CONFIG.STANDUP_RANGE,
-    });
+    const { rows } = await pool.query(
+      `SELECT to_char(date, 'YYYY-MM-DD') as date, done_summary, in_progress_summary, blocked_summary, overdue_count, ai_summary 
+       FROM standup_log ORDER BY date DESC LIMIT 10`
+    );
+    if (rows.length === 0) return { content: [{ type: "text", text: "No standup history yet." }] };
 
-    const rows = res.data.values || [];
-    if (rows.length <= 1) return { content: [{ type: "text", text: "No standup history yet." }] };
-
-    const headers = rows[0];
-    const entries = rows.slice(1).map((row) => {
-      const entry = {};
-      headers.forEach((h, i) => { entry[h] = row[i] || ""; });
-      return entry;
-    });
-
-    const formatted = entries.map(
-      (e) => `📅 ${e.Date}\n  Done: ${e.Done}\n  In Progress: ${e["In Progress"]}\n  Blocked: ${e.Blocked}\n  Overdue: ${e.Overdue}\n  Summary: ${e.Summary}`
+    const formatted = rows.map(
+      (e) => `📅 ${e.date}\n  Done: ${e.done_summary}\n  In Progress: ${e.in_progress_summary}\n  Blocked: ${e.blocked_summary}\n  Overdue: ${e.overdue_count}\n  Summary: ${e.ai_summary}`
     ).join("\n\n");
 
-    return { content: [{ type: "text", text: `Standup History (${entries.length} entries):\n\n${formatted}` }] };
+    return { content: [{ type: "text", text: `Standup History (${rows.length} entries):\n\n${formatted}` }] };
   }
 
   throw new Error("Unknown tool: " + name);
@@ -582,4 +425,4 @@ server.connect(transport).catch((err) => {
   process.exit(1);
 });
 
-logger.info("MCP Task Orchestrator v2.0.0 is running");
+logger.info("MCP Task Orchestrator v2.0.0 is running (Supabase Edition)");

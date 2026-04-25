@@ -123,7 +123,7 @@ return [{ json: { values: rows } }];
 
 | Project | Current Data Layer | Migration Priority | Notes |
 |:---|:---|:---|:---|
-| MCP Orchestrator | Google Sheets | **High** | Replace with Supabase; already uses env-based config |
+| MCP Orchestrator | **Supabase (PostgreSQL)** | ✅ Done | Replaced Google Sheets with direct pg connection pooling |
 | Invoice Vision Auditor | Google Sheets | **High** | Benefits from ACID for financial data integrity |
 | AI Lead Gen Machine | Google Sheets | **Medium** | CRM data; Supabase enables proper relational modeling |
 | Signal Pipeline | Google Sheets | **Medium** | Already has pgvector in Infinite Memory Vault — reuse |
