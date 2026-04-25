@@ -9,6 +9,52 @@ import pool from './db.js';
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
+import { z } from "zod";
+
+// ===== INPUT VALIDATION SCHEMAS =====
+const SCHEMAS = {
+  read_file: z.object({
+    path: z.string().min(1, "Path is required"),
+  }),
+  write_file: z.object({
+    path: z.string().min(1, "Path is required"),
+    text: z.string(),
+  }),
+  list_files: z.object({
+    dir: z.string().optional(),
+  }),
+  add_task: z.object({
+    task: z.string().min(1, "Task description is required"),
+    assigned_to: z.string().optional(),
+    status: z.enum(["To Do", "In Progress", "Done", "Blocked"]).optional(),
+    priority: z.enum(["High", "Medium", "Low"]).optional(),
+    due_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format").optional().nullable(),
+  }),
+  update_task: z.object({
+    id: z.number().int().positive(),
+    task: z.string().optional(),
+    assigned_to: z.string().optional(),
+    status: z.enum(["To Do", "In Progress", "Done", "Blocked"]).optional(),
+    priority: z.enum(["High", "Medium", "Low"]).optional(),
+    due_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format").optional().nullable(),
+  }),
+  save_standup_report: z.object({
+    report_markdown: z.string().min(1),
+    done_summary: z.string(),
+    in_progress_summary: z.string(),
+    blocked_summary: z.string(),
+    overdue_count: z.number(),
+    ai_summary: z.string(),
+  }),
+  list_tasks: z.object({
+    status: z.enum(["To Do", "In Progress", "Done", "Blocked"]).optional(),
+    priority: z.enum(["High", "Medium", "Low"]).optional(),
+    assigned_to: z.string().optional(),
+  }),
+};
+
+// Simple schema-less validation for tools with no args
+const emptySchema = z.object({}).strict();
 
 // ===== STRUCTURED LOGGING =====
 function createLogger() {
@@ -261,12 +307,23 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   logger.tool(requestId, name, "STARTED", { args: Object.keys(args || {}) });
 
   try {
-    const result = await executeToolHandler(name, args, requestId);
+    // --- 🛡️ INPUT VALIDATION (WEEK 5 HARDENING) ---
+    const schema = SCHEMAS[name] || emptySchema;
+    const validatedArgs = schema.parse(args);
+
+    const result = await executeToolHandler(name, validatedArgs, requestId);
     const durationMs = Date.now() - startTime;
     logger.tool(requestId, name, "SUCCESS", { durationMs });
     return result;
   } catch (err) {
     const durationMs = Date.now() - startTime;
+    if (err instanceof z.ZodError) {
+      logger.tool(requestId, name, "VALIDATION_FAILED", { errors: err.errors });
+      return {
+        content: [{ type: "text", text: `VALIDATION ERROR: ${err.errors.map(e => `${e.path}: ${e.message}`).join(", ")}` }],
+        isError: true
+      };
+    }
     logger.tool(requestId, name, "FAILED", { durationMs, error: err.message });
     return { content: [{ type: "text", text: `ERROR [${requestId.slice(0, 8)}]: ${err.message}` }], isError: true };
   }

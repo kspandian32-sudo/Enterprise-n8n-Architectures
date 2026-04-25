@@ -50,7 +50,8 @@ graph TD
     *   Targeted prospect identification with GPT-4o intent classification and dynamic blacklist suppression.
 
 ### 📂 [Layer 2: Core Intelligence](./layer-2-core/)
-*   **[Claude MCP Orchestrator](./layer-2-core/Claude-MCP-Task-Orchestrator/)** — *Node.js, 14 Tools, v2.0*
+*   **[Claude MCP Orchestrator](./layer-2-core/Claude-MCP-Task-Orchestrator/)** — *Node.js, 14 Tools, v2.0 (Hardened)*
+    *   **Zod Validation:** All tool calls now undergo strict schema validation to prevent prompt injection and malformed inputs.
     *   The central brain using JSON-RPC to manage planning, execution, and self-reflection.
 *   **[Agent Decision Trace](./docs/AGENT_DECISION_TRACE.json)** — *Proof of Cognition*
     *   **CRITICAL EVIDENCE:** A step-by-step log showing the AI identifying a failure, critiquing its own plan, and autonomously pivoting its strategy.
@@ -58,6 +59,8 @@ graph TD
     *   Structured system prompts for the **Planner** and **Evaluator** agents, optimized for JSON-RPC determinism.
 
 ### 📂 [Layer 3: Memory](./layer-3-memory/)
+*   **[Centralized Log-Drain](./layer-3-memory/LOG_DRAIN_BLUEPRINT.json)** — *Global Observability*
+    *   A unified n8n pipeline for capturing execution logs across all 14 projects, pushing to Supabase with Telegram alerts for critical failures.
 *   **[Infinite Memory Vault](./layer-3-memory/Infinite-Memory-Vault/)** — *Supabase pgvector + Error Handler*
     *   Long-term episodic memory system powered by Supabase/pgvector for cross-session agent recall.
 *   **[Production Database Schema](./layer-3-memory/schema.sql)** — *PostgreSQL / Supabase*

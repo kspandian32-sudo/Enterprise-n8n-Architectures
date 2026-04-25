@@ -1,0 +1,89 @@
+{
+  "name": "Centralized Log-Drain (Supabase Edition)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "log-drain",
+        "options": {}
+      },
+      "name": "Webhook: Receive Log",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.level }}",
+              "value2": "ERROR"
+            }
+          ]
+        }
+      },
+      "name": "IF: Is Critical?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "table": "execution_logs",
+        "columns": "task_id, log_level, message, correlation_id",
+        "values": "={{ $json.task_id }}, {{ $json.level }}, {{ $json.message }}, {{ $json.correlation_id }}"
+      },
+      "name": "Supabase: Insert Log",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [800, 450]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "🚨 *CRITICAL ERROR DETECTED*\n\n*System:* {{ $json.system }}\n*Message:* {{ $json.message }}\n*ID:* `{{ $json.correlation_id }}`"
+      },
+      "name": "Telegram: Alert Admin",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [800, 150]
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Log": {
+      "main": [
+        [
+          {
+            "node": "IF: Is Critical?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: Is Critical?": {
+      "main": [
+        [
+          {
+            "node": "Telegram: Alert Admin",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Supabase: Insert Log",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Supabase: Insert Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
