@@ -39,4 +39,16 @@ Following the critique, the following "Elite" upgrades were implemented:
 | **Commercial ROI** | Documented in `proof-of-work/deployment-notes.md`. |
 
 ---
-**Status:** ALL auditor recommendations implemented. Portfolio verified for Production Enterprise engagement.
+
+## 🔬 Technical Deep Dive
+For a detailed analysis of the software engineering behind our most advanced component, see the **[Case Study: Gemini PDF Analyzer](./CASE_STUDY_GEMINI_NODE.md)**. This includes details on binary memory management and the newly implemented **Unit Testing Suite**.
+
+## 🗺️ Roadmap & Known Limitations
+To maintain a high standard of architectural transparency, we acknowledge the following areas for future hardening:
+
+1.  **Observability (In-Progress):** While `SAFE_MODE` handles logical isolation, we are currently designing a central **OpenTelemetry** bridge for n8n to track execution spans across sub-workflows.
+2.  **Model Drift (Planned):** The Feedback Loop currently optimizes the *Confidence Threshold*. The next evolution will include a **Prompt Auto-Optimizer** that rewrites the system prompt based on recurring edge cases.
+3.  **Secrets Management:** Moving from n8n-native credentials to a dedicated **HashiCorp Vault** or **AWS Secrets Manager** integration for high-compliance enterprise environments.
+
+---
+**Status:** ALL auditor recommendations implemented or roadmapped. Portfolio verified for Production Enterprise engagement.
