@@ -178,7 +178,7 @@
       "name": "Send Hot Signal Alert",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        2544,
+        2744,
         568
       ],
       "disabled": false
@@ -192,6 +192,50 @@
         112
       ],
       "disabled": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "e4085e89-5cb5-456d-be8b-c44cba5a5af9",
+              "leftValue": "={{ $env.SAFE_MODE }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c7205544-5bd1-4abd-b728-fbd8fce421a2",
+      "name": "Is SAFE_MODE? (Send Hot Signal Alert)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2344,
+        568
+      ],
+      "notes": "SAFE_MODE gate: When SAFE_MODE=true, skips the dangerous action and routes to a SIMULATED NoOp instead."
+    },
+    {
+      "parameters": {},
+      "id": "5be859e4-00a4-4fc2-88e9-d28d3fc6d3e2",
+      "name": "SIMULATED (Send Hot Signal Alert)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        718
+      ],
+      "notes": "SAFE_MODE: Simulated execution of \"Send Hot Signal Alert\". No real action taken."
     }
   ],
   "connections": {
@@ -370,7 +414,7 @@
       "main": [
         [
           {
-            "node": "Send Hot Signal Alert",
+            "node": "Is SAFE_MODE? (Send Hot Signal Alert)",
             "type": "main",
             "index": 0
           }
@@ -382,6 +426,24 @@
         [
           {
             "node": "Select Search Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is SAFE_MODE? (Send Hot Signal Alert)": {
+      "main": [
+        [
+          {
+            "node": "SIMULATED (Send Hot Signal Alert)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Hot Signal Alert",
             "type": "main",
             "index": 0
           }

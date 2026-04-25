@@ -1,4 +1,4 @@
-﻿{
+{
   "success": true,
   "data": {
     "updatedAt": "2026-02-04T16:14:49.754Z",
@@ -75,7 +75,7 @@
         "type": "n8n-nodes-base.wordpress",
         "typeVersion": 1,
         "position": [
-          800,
+          1000,
           0
         ],
         "credentials": {
@@ -223,6 +223,50 @@
           208,
           0
         ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": ""
+            },
+            "conditions": [
+              {
+                "id": "58c44339-ec34-4e2d-b7bb-001ed67ec683",
+                "leftValue": "={{ $env.SAFE_MODE }}",
+                "rightValue": "true",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "5059ef40-f1e9-4981-b671-df5b15e2c973",
+        "name": "Is SAFE_MODE? (Create WordPress Post)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          600,
+          0
+        ],
+        "notes": "SAFE_MODE gate: When SAFE_MODE=true, skips the dangerous action and routes to a SIMULATED NoOp instead."
+      },
+      {
+        "parameters": {},
+        "id": "fe76ec10-076b-49fd-b92d-bd86596f9000",
+        "name": "SIMULATED (Create WordPress Post)",
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          800,
+          150
+        ],
+        "notes": "SAFE_MODE: Simulated execution of \"Create WordPress Post\". No real action taken."
       }
     ],
     "connections": {
@@ -257,7 +301,7 @@
         "main": [
           [
             {
-              "node": "Create WordPress Post",
+              "node": "Is SAFE_MODE? (Create WordPress Post)",
               "type": "main",
               "index": 0
             },
@@ -328,6 +372,24 @@
             }
           ]
         ]
+      },
+      "Is SAFE_MODE? (Create WordPress Post)": {
+        "main": [
+          [
+            {
+              "node": "SIMULATED (Create WordPress Post)",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Create WordPress Post",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
       }
     },
     "settings": {
@@ -380,4 +442,3 @@
     "activeVersion": null
   }
 }
-

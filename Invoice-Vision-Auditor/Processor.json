@@ -1,1416 +1,1488 @@
-﻿{
-    "updatedAt":  "2026-04-14T21:53:59.057Z",
-    "createdAt":  "2026-03-22T19:59:37.253Z",
-    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-    "name":  "ðŸ“„ Invoice Vision Auditor â€” Auto-Processor",
-    "description":  null,
-    "active":  true,
-    "isArchived":  false,
-    "nodes":  [
-                  {
-                      "parameters":  {
-                                         "event":  "fileCreated",
-                                         "folderToWatch":  {
-                                                               "__rl":  true,
-                                                               "mode":  "id",
-                                                               "value":  "REPLACE_WITH_DRIVE_FOLDER_ID"
-                                                           },
-                                         "pollTimes":  {
-                                                           "item":  [
-                                                                        {
-                                                                            "mode":  "everyHour"
-                                                                        }
-                                                                    ]
-                                                       },
-                                         "triggerOn":  "specificFolder"
-                                     },
-                      "id":  "6c22cb98-f700-46b8-a0b7-07a769a71f1f",
-                      "name":  "New Invoice in Drive",
-                      "type":  "n8n-nodes-base.googleDriveTrigger",
-                      "typeVersion":  1,
-                      "position":  [
-                                       -608,
-                                       528
-                                   ],
-                      "credentials":  {
-                                          "googleDriveOAuth2Api":  {
-                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                       "name":  "Google Drive Account"
-                                                                   }
-                                      }
-                  },
-                  {
-                      "parameters":  {
-                                         "operation":  "download",
-                                         "fileId":  {
-                                                        "__rl":  true,
-                                                        "value":  "={{ $json.id }}",
-                                                        "mode":  "id"
-                                                    },
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "cf483750-13ad-4b1a-bcab-2e097bb73586",
-                      "name":  "Download Invoice PDF",
-                      "type":  "n8n-nodes-base.googleDrive",
-                      "typeVersion":  2,
-                      "position":  [
-                                       -384,
-                                       528
-                                   ],
-                      "credentials":  {
-                                          "googleDriveOAuth2Api":  {
-                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                       "name":  "Google Drive Account"
-                                                                   }
-                                      },
-                      "onError":  "continueRegularOutput"
-                  },
-                  {
-                      "parameters":  {
-                                         "operation":  "binaryToPropery",
-                                         "destinationKey":  "base64data",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "8513af5e-1f6a-428f-95b6-7280d0f52557",
-                      "name":  "PDF to Base64",
-                      "type":  "n8n-nodes-base.extractFromFile",
-                      "typeVersion":  1,
-                      "position":  [
-                                       -160,
-                                       528
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "const base64Data   = $input.first().json.base64data;\nconst triggerData  = $(\u0027New Invoice in Drive\u0027).first().json;\nconst fileName     = triggerData.name || \u0027unknown.pdf\u0027;\nconst fileId       = triggerData.id   || \u0027\u0027;\nconst prompt = \u0027You are an invoice auditor. Analyze this invoice PDF.\\nReturn ONLY a raw JSON object with no markdown and no code fences.\\nFields: vendor_name (string or null), invoice_number (string or null), invoice_date (YYYY-MM-DD or null), due_date (YYYY-MM-DD or null), line_items_count (integer or null), total_amount (number or null), currency (3-letter ISO code or null), has_signature (boolean), signature_valid (boolean - true ONLY for handwritten ink or rubber stamp not printed names), confidence_score (float 0.0 to 1.0), errors (array - include: No signature found, Total amount missing, Not a valid invoice, Invoice number missing - whichever apply), warnings (array - include: Due date has passed, Currency unclear - whichever apply). Return ONLY the JSON.\u0027;\nconst payload = { contents: [{ parts: [{ inline_data: { mime_type: \u0027application/pdf\u0027, data: base64Data } }, { text: prompt }] }], generationConfig: { temperature: 0.0, maxOutputTokens: 2048 } };\nreturn [{ json: { payload, file_name: fileName, file_id: fileId } }];"
-                                     },
-                      "id":  "a619216d-12a9-4361-bc34-44c23f30de01",
-                      "name":  "Build Gemini Payload",
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       64,
-                                       528
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "method":  "POST",
-                                         "url":  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-                                         "authentication":  "genericCredentialType",
-                                         "genericAuthType":  "httpQueryAuth",
-                                         "sendBody":  true,
-                                         "specifyBody":  "json",
-                                         "jsonBody":  "={{ JSON.stringify($json.payload) }}",
-                                         "options":  {
-                                                         "timeout":  90000
-                                                     }
-                                     },
-                      "id":  "3e12ef91-8321-498c-baa3-130b2457a40e",
-                      "name":  "Analyze with Gemini",
-                      "type":  "n8n-nodes-base.httpRequest",
-                      "typeVersion":  4.2,
-                      "position":  [
-                                       288,
-                                       528
-                                   ],
-                      "retryOnFail":  true,
-                      "maxTries":  3,
-                      "waitBetweenTries":  5000,
-                      "credentials":  {
-                                          "httpQueryAuth":  {
-                                                                "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                "name":  "Query Auth Account"
-                                                            }
-                                      },
-                      "onError":  "continueRegularOutput"
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "const geminiOutput = $input.first().json;\nconst fileMeta     = $(\u0027Build Gemini Payload\u0027).first().json;\nlet parsed;\ntry {\n  if (!geminiOutput || !geminiOutput.candidates || !geminiOutput.candidates[0]) {\n    throw new Error(\u0027Invalid Gemini response structure\u0027);\n  }\n  const raw   = geminiOutput.candidates[0].content.parts[0].text;\n  const start = raw.indexOf(\u0027{\u0027); const end = raw.lastIndexOf(\u0027}\u0027);\n  if (start === -1 || end === -1) throw new Error(\u0027No JSON in response\u0027);\n  parsed = JSON.parse(raw.slice(start, end + 1));\n} catch (e) {\n  parsed = { \n    vendor_name: null, \n    invoice_number: null, \n    invoice_date: null, \n    due_date: null, \n    line_items_count: null, \n    total_amount: null, \n    currency: null, \n    has_signature: false, \n    signature_valid: false, \n    confidence_score: 0.0, \n    errors: [\u0027AI parse failure: \u0027 + e.message], \n    warnings: [] \n  };\n}\nreturn [{ json: { \n  file_name: String(fileMeta.file_name||\u0027\u0027), \n  file_id: String(fileMeta.file_id||\u0027\u0027), \n  vendor_name: parsed.vendor_name||null, \n  invoice_number: String(parsed.invoice_number||\u0027\u0027), \n  invoice_date: parsed.invoice_date||null, \n  due_date: parsed.due_date||null, \n  line_items_count: parsed.line_items_count||null, \n  total_amount: (parsed.total_amount!==undefined\u0026\u0026parsed.total_amount!==null)?Number(parsed.total_amount):null, \n  currency: parsed.currency||null, \n  has_signature: Boolean(parsed.has_signature), \n  signature_valid: Boolean(parsed.signature_valid), \n  confidence_score: Math.min(1,Math.max(0,Number(parsed.confidence_score)||0)), \n  errors: Array.isArray(parsed.errors)?parsed.errors:[], \n  warnings: Array.isArray(parsed.warnings)?parsed.warnings:[], \n  processed_at: new Date().toISOString(), \n  source: \u0027auto\u0027 \n} }];"
-                                     },
-                      "id":  "c2a20b40-d855-44bb-a661-98178c473bee",
-                      "name":  "Parse Analysis Result",
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       512,
-                                       528
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "sheetId":  "REPLACE_WITH_YOUR_SHEET_ID",
-                                         "range":  "Verified!A:Z",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "f05997b5-a75a-4be6-9aa5-b09f4cc675eb",
-                      "name":  "Read Verified Sheet",
-                      "type":  "n8n-nodes-base.googleSheets",
-                      "typeVersion":  2,
-                      "position":  [
-                                       736,
-                                       528
-                                   ],
-                      "alwaysOutputData":  true,
-                      "credentials":  {
-                                          "googleSheetsOAuth2Api":  {
-                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                        "name":  "Google Sheets Account"
-                                                                    }
-                                      },
-                      "onError":  "continueRegularOutput"
-                  },
-                  {
-                      "parameters":  {
-                                         "sheetId":  "REPLACE_WITH_YOUR_SHEET_ID",
-                                         "range":  "Flagged Invoices!A:Z",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "b4c5341c-1ce6-441d-b08f-84a3d78bfd6c",
-                      "name":  "Read Flagged Sheet",
-                      "type":  "n8n-nodes-base.googleSheets",
-                      "typeVersion":  2,
-                      "position":  [
-                                       960,
-                                       528
-                                   ],
-                      "alwaysOutputData":  true,
-                      "credentials":  {
-                                          "googleSheetsOAuth2Api":  {
-                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                        "name":  "Google Sheets Account"
-                                                                    }
-                                      },
-                      "onError":  "continueRegularOutput"
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "// Get rows from BOTH sheets for duplicate scanning\nconst verifiedRows = $(\u0027Read Verified Sheet\u0027).all().map(i =\u003e i.json).filter(r =\u003e r.invoice_number);\nconst flaggedRows = $input.all().map(i =\u003e i.json).filter(r =\u003e r.invoice_number);\nconst allRows = [...verifiedRows, ...flaggedRows];\n\n// Current invoice being processed\nconst auditData = $(\u0027Parse Analysis Result\u0027).first().json;\nconst invNum = String(auditData.invoice_number || \u0027\u0027).toLowerCase().trim();\nconst vendor = String(auditData.vendor_name || \u0027\u0027).toLowerCase().trim();\n\nlet is_duplicate = false;\nlet duplicate_ref = null;\n\nif (invNum.length \u003e 2 \u0026\u0026 vendor.length \u003e 2) {\n  const match = allRows.find(r =\u003e\n    String(r.invoice_number || \u0027\u0027).toLowerCase().trim() === invNum \u0026\u0026\n    String(r.vendor_name || \u0027\u0027).toLowerCase().trim() === vendor\n  );\n  if (match) {\n    is_duplicate = true;\n    duplicate_ref = match.file_name || \u0027previous submission\u0027;\n  }\n}\n\nconst errors = [...(auditData.errors || [])];\nif (is_duplicate) errors.push(\u0027Possible duplicate of: \u0027 + duplicate_ref);\n\nreturn [{ json: { ...auditData, is_duplicate, duplicate_ref: duplicate_ref || null, errors } }];"
-                                     },
-                      "id":  "ccdb84c4-d7ab-4c33-88c0-18b6d771aee7",
-                      "name":  "Check for Duplicate",
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       1184,
-                                       528
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "conditions":  {
-                                                            "options":  {
-                                                                            "caseSensitive":  true,
-                                                                            "leftValue":  "",
-                                                                            "typeValidation":  "strict",
-                                                                            "version":  2
-                                                                        },
-                                                            "conditions":  [
-                                                                               {
-                                                                                   "id":  "cond-a08",
-                                                                                   "leftValue":  "={{ $json.confidence_score }}",
-                                                                                   "rightValue":  0.75,
-                                                                                   "operator":  {
-                                                                                                    "type":  "number",
-                                                                                                    "operation":  "lt"
-                                                                                                }
-                                                                               }
-                                                                           ],
-                                                            "combinator":  "and"
-                                                        },
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "240e37c2-4ad2-473a-b003-ba3f7ff2a036",
-                      "name":  "Is Low Confidence?",
-                      "type":  "n8n-nodes-base.if",
-                      "typeVersion":  2,
-                      "position":  [
-                                       1408,
-                                       528
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "operation":  "append",
-                                         "sheetId":  "REPLACE_WITH_YOUR_SHEET_ID",
-                                         "range":  "Needs Review!A:P",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "b30d8994-beac-4181-891b-83a62620ac65",
-                      "name":  "Log to Needs Review",
-                      "type":  "n8n-nodes-base.googleSheets",
-                      "typeVersion":  2,
-                      "position":  [
-                                       2080,
-                                       336
-                                   ],
-                      "credentials":  {
-                                          "googleSheetsOAuth2Api":  {
-                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                        "name":  "Google Sheets Account"
-                                                                    }
-                                      },
-                      "onError":  "continueRegularOutput"
-                  },
-                  {
-                      "parameters":  {
-                                         "conditions":  {
-                                                            "options":  {
-                                                                            "caseSensitive":  true,
-                                                                            "leftValue":  "",
-                                                                            "typeValidation":  "strict",
-                                                                            "version":  2
-                                                                        },
-                                                            "conditions":  [
-                                                                               {
-                                                                                   "id":  "cond-a10",
-                                                                                   "leftValue":  "={{ $json.errors.length }}",
-                                                                                   "rightValue":  0,
-                                                                                   "operator":  {
-                                                                                                    "type":  "number",
-                                                                                                    "operation":  "gt"
-                                                                                                }
-                                                                               }
-                                                                           ],
-                                                            "combinator":  "and"
-                                                        },
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "755a98a3-94c6-430c-a53e-0b59f5a1832e",
-                      "name":  "Is Flagged?",
-                      "type":  "n8n-nodes-base.if",
-                      "typeVersion":  2,
-                      "position":  [
-                                       1632,
-                                       624
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "operation":  "append",
-                                         "sheetId":  "REPLACE_WITH_YOUR_SHEET_ID",
-                                         "range":  "Flagged Invoices!A:P",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "6343302a-4eff-4c1e-887b-1a3c2c5f6b74",
-                      "name":  "Log to Flagged Sheet",
-                      "type":  "n8n-nodes-base.googleSheets",
-                      "typeVersion":  2,
-                      "position":  [
-                                       1856,
-                                       528
-                                   ],
-                      "credentials":  {
-                                          "googleSheetsOAuth2Api":  {
-                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                        "name":  "Google Sheets Account"
-                                                                    }
-                                      },
-                      "onError":  "continueRegularOutput"
-                  },
-                  {
-                      "parameters":  {
-                                         "method":  "PATCH",
-                                         "url":  "=https://www.googleapis.com/drive/v3/files/{{ $json.file_id }}",
-                                         "authentication":  "predefinedCredentialType",
-                                         "nodeCredentialType":  "googleDriveOAuth2Api",
-                                         "sendQuery":  true,
-                                         "queryParameters":  {
-                                                                 "parameters":  [
-                                                                                    {
-                                                                                        "name":  "addParents",
-                                                                                        "value":  "REPLACE_WITH_DRIVE_FOLDER_ID"
-                                                                                    },
-                                                                                    {
-                                                                                        "name":  "removeParents",
-                                                                                        "value":  "REPLACE_WITH_DRIVE_FOLDER_ID"
-                                                                                    },
-                                                                                    {
-                                                                                        "name":  "fields",
-                                                                                        "value":  "id,name,parents"
-                                                                                    }
-                                                                                ]
-                                                             },
-                                         "sendBody":  true,
-                                         "specifyBody":  "json",
-                                         "jsonBody":  "{}",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "392e5072-ed6d-47ac-b9c7-1615c2a0daf9",
-                      "name":  "Move to Flagged Folder",
-                      "type":  "n8n-nodes-base.httpRequest",
-                      "typeVersion":  4.2,
-                      "position":  [
-                                       2080,
-                                       528
-                                   ],
-                      "credentials":  {
-                                          "googleDriveOAuth2Api":  {
-                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                       "name":  "Google Drive Account"
-                                                                   }
-                                      },
-                      "onError":  "continueRegularOutput"
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "const d = $(\u0027Check for Duplicate\u0027).first().json;\nconst fileId = d.file_id || $input.first().json.id || \u0027\u0027;\nconst driveUrl = \u0027https://drive.google.com/file/d/\u0027 + fileId + \u0027/view\u0027;\nconst confidence = Math.round((d.confidence_score||0)*100);\nconst amount = (d.total_amount!==null\u0026\u0026d.total_amount!==undefined)?(d.currency||\u0027\u0027)+\u0027 \u0027+d.total_amount:\u0027Not found\u0027;\nconst dupLabel = d.is_duplicate?\u0027 [DUPLICATE]\u0027:\u0027\u0027;\nconst errRows = (d.errors||[]).map(e=\u003e\u0027\u003cli style=\"color:#c04828;margin:4px 0\"\u003e\u0027+e+\u0027\u003c/li\u003e\u0027).join(\u0027\u0027);\nconst warnRows = (d.warnings||[]).length?\u0027\u003cp\u003e\u003cb\u003eWarnings:\u003c/b\u003e\u003c/p\u003e\u003cul\u003e\u0027+(d.warnings||[]).map(w=\u003e\u0027\u003cli style=\"color:#e67e22;margin:4px 0\"\u003e\u0027+w+\u0027\u003c/li\u003e\u0027).join(\u0027\u0027)+\u0027\u003c/ul\u003e\u0027:\u0027\u0027;\nconst html = \u0027\u003cdiv style=\"font-family:Arial,sans-serif;max-width:580px\"\u003e\u003cdiv style=\"background:#c04828;padding:18px 24px;border-radius:8px 8px 0 0\"\u003e\u003ch2 style=\"color:#fff;margin:0;font-size:16px\"\u003eInvoice Flagged\u0027+dupLabel+\u0027\u003c/h2\u003e\u003c/div\u003e\u003cdiv style=\"padding:20px 24px;border:1px solid #ddd;border-top:none\"\u003e\u003ctable style=\"width:100%\"\u003e\u003ctr\u003e\u003ctd style=\"color:#666;padding:4px 12px 4px 0\"\u003eFile\u003c/td\u003e\u003ctd style=\"font-weight:700\"\u003e\u0027+(d.file_name||\u0027Unknown\u0027)+\u0027\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd style=\"color:#666;padding:4px 12px 4px 0\"\u003eVendor\u003c/td\u003e\u003ctd\u003e\u0027+(d.vendor_name||\u0027Not identified\u0027)+\u0027\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd style=\"color:#666;padding:4px 12px 4px 0\"\u003eInvoice #\u003c/td\u003e\u003ctd\u003e\u0027+(d.invoice_number||\u0027Not found\u0027)+\u0027\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd style=\"color:#666;padding:4px 12px 4px 0\"\u003eAmount\u003c/td\u003e\u003ctd\u003e\u0027+amount+\u0027\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd style=\"color:#666;padding:4px 12px 4px 0\"\u003eAI Confidence\u003c/td\u003e\u003ctd\u003e\u0027+confidence+\u0027%\u003c/td\u003e\u003c/tr\u003e\u003c/table\u003e\u003cp\u003e\u003cb\u003eProblems found:\u003c/b\u003e\u003c/p\u003e\u003cul\u003e\u0027+errRows+\u0027\u003c/ul\u003e\u0027+warnRows+\u0027\u003cp\u003e\u003ca href=\"\u0027+driveUrl+\u0027\" style=\"display:inline-block;background:#0f6e56;color:#fff;padding:10px 20px;text-decoration:none;border-radius:6px\"\u003eOpen in Google Drive\u003c/a\u003e\u003c/p\u003e\u003cp style=\"font-size:11px;color:#aaa\"\u003eProcessed: \u0027+d.processed_at+\u0027\u003c/p\u003e\u003c/div\u003e\u003c/div\u003e\u0027;\nreturn [{json:{subject:(d.is_duplicate?\u0027[DUPLICATE] \u0027:\u0027[FLAGGED] \u0027)+(d.file_name||\u0027Invoice\u0027),html}}];"
-                                     },
-                      "id":  "d9852578-e550-4fa7-9d45-c4db473c2bd7",
-                      "name":  "Build Flagging Alert",
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       2304,
-                                       432
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "fromEmail":  "your-email@example.com",
-                                         "toEmail":  "your-email@example.com",
-                                         "subject":  "={{ $json.subject }}",
-                                         "html":  "={{ $json.html }}",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "5b1b41d5-4c53-454e-adb1-81a98fa22fb6",
-                      "name":  "Send Instant Alert",
-                      "type":  "n8n-nodes-base.emailSend",
-                      "typeVersion":  2.1,
-                      "position":  [
-                                       2528,
-                                       432
-                                   ],
-                      "webhookId":  "143cb625-3eb3-4007-8cc3-5f86b92fc0d9",
-                      "credentials":  {
-                                          "smtp":  {
-                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                       "name":  "SMTP Account"
-                                                   }
-                                      },
-                      "onError":  "continueRegularOutput"
-                  },
-                  {
-                      "parameters":  {
-                                         "operation":  "append",
-                                         "sheetId":  "REPLACE_WITH_YOUR_SHEET_ID",
-                                         "range":  "Verified!A:P",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "79debc4c-8046-4834-8cd5-786946364ac2",
-                      "name":  "Log to Verified Sheet",
-                      "type":  "n8n-nodes-base.googleSheets",
-                      "typeVersion":  2,
-                      "position":  [
-                                       1856,
-                                       720
-                                   ],
-                      "credentials":  {
-                                          "googleSheetsOAuth2Api":  {
-                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                        "name":  "Google Sheets Account"
-                                                                    }
-                                      },
-                      "onError":  "continueRegularOutput"
-                  },
-                  {
-                      "parameters":  {
-                                         "method":  "PATCH",
-                                         "url":  "=https://www.googleapis.com/drive/v3/files/{{ $json.file_id }}",
-                                         "authentication":  "predefinedCredentialType",
-                                         "nodeCredentialType":  "googleDriveOAuth2Api",
-                                         "sendQuery":  true,
-                                         "queryParameters":  {
-                                                                 "parameters":  [
-                                                                                    {
-                                                                                        "name":  "addParents",
-                                                                                        "value":  "REPLACE_WITH_DRIVE_FOLDER_ID"
-                                                                                    },
-                                                                                    {
-                                                                                        "name":  "removeParents",
-                                                                                        "value":  "REPLACE_WITH_DRIVE_FOLDER_ID"
-                                                                                    },
-                                                                                    {
-                                                                                        "name":  "fields",
-                                                                                        "value":  "id,name,parents"
-                                                                                    }
-                                                                                ]
-                                                             },
-                                         "sendBody":  true,
-                                         "specifyBody":  "json",
-                                         "jsonBody":  "{}",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "f7138364-de53-4738-86a8-3aecf9d039b9",
-                      "name":  "Move to Verified Folder",
-                      "type":  "n8n-nodes-base.httpRequest",
-                      "typeVersion":  4.2,
-                      "position":  [
-                                       2080,
-                                       720
-                                   ],
-                      "credentials":  {
-                                          "googleDriveOAuth2Api":  {
-                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                       "name":  "Google Drive Account"
-                                                                   }
-                                      },
-                      "onError":  "continueRegularOutput"
-                  }
-              ],
-    "connections":  {
-                        "New Invoice in Drive":  {
-                                                     "main":  [
-                                                                  [
-                                                                      {
-                                                                          "node":  "Download Invoice PDF",
-                                                                          "type":  "main",
-                                                                          "index":  0
-                                                                      }
-                                                                  ]
-                                                              ]
-                                                 },
-                        "Download Invoice PDF":  {
-                                                     "main":  [
-                                                                  [
-                                                                      {
-                                                                          "node":  "PDF to Base64",
-                                                                          "type":  "main",
-                                                                          "index":  0
-                                                                      }
-                                                                  ]
-                                                              ]
-                                                 },
-                        "PDF to Base64":  {
-                                              "main":  [
-                                                           [
-                                                               {
-                                                                   "node":  "Build Gemini Payload",
-                                                                   "type":  "main",
-                                                                   "index":  0
-                                                               }
-                                                           ]
-                                                       ]
-                                          },
-                        "Build Gemini Payload":  {
-                                                     "main":  [
-                                                                  [
-                                                                      {
-                                                                          "node":  "Analyze with Gemini",
-                                                                          "type":  "main",
-                                                                          "index":  0
-                                                                      }
-                                                                  ]
-                                                              ]
-                                                 },
-                        "Analyze with Gemini":  {
-                                                    "main":  [
-                                                                 [
-                                                                     {
-                                                                         "node":  "Parse Analysis Result",
-                                                                         "type":  "main",
-                                                                         "index":  0
-                                                                     }
-                                                                 ]
-                                                             ]
-                                                },
-                        "Parse Analysis Result":  {
-                                                      "main":  [
-                                                                   [
-                                                                       {
-                                                                           "node":  "Read Verified Sheet",
-                                                                           "type":  "main",
-                                                                           "index":  0
-                                                                       }
-                                                                   ]
-                                                               ]
-                                                  },
-                        "Read Verified Sheet":  {
-                                                    "main":  [
-                                                                 [
-                                                                     {
-                                                                         "node":  "Read Flagged Sheet",
-                                                                         "type":  "main",
-                                                                         "index":  0
-                                                                     }
-                                                                 ]
-                                                             ]
-                                                },
-                        "Read Flagged Sheet":  {
-                                                   "main":  [
-                                                                [
-                                                                    {
-                                                                        "node":  "Check for Duplicate",
-                                                                        "type":  "main",
-                                                                        "index":  0
-                                                                    }
-                                                                ]
-                                                            ]
-                                               },
-                        "Check for Duplicate":  {
-                                                    "main":  [
-                                                                 [
-                                                                     {
-                                                                         "node":  "Is Low Confidence?",
-                                                                         "type":  "main",
-                                                                         "index":  0
-                                                                     }
-                                                                 ]
-                                                             ]
-                                                },
-                        "Is Low Confidence?":  {
-                                                   "main":  [
-                                                                [
-                                                                    {
-                                                                        "node":  "Log to Needs Review",
-                                                                        "type":  "main",
-                                                                        "index":  0
-                                                                    }
-                                                                ],
-                                                                [
-                                                                    {
-                                                                        "node":  "Is Flagged?",
-                                                                        "type":  "main",
-                                                                        "index":  0
-                                                                    }
-                                                                ]
-                                                            ]
-                                               },
-                        "Log to Needs Review":  {
-                                                    "main":  [
-                                                                 [
-                                                                     {
-                                                                         "node":  "Build Flagging Alert",
-                                                                         "type":  "main",
-                                                                         "index":  0
-                                                                     }
-                                                                 ]
-                                                             ]
-                                                },
-                        "Is Flagged?":  {
-                                            "main":  [
-                                                         [
-                                                             {
-                                                                 "node":  "Log to Flagged Sheet",
-                                                                 "type":  "main",
-                                                                 "index":  0
-                                                             }
-                                                         ],
-                                                         [
-                                                             {
-                                                                 "node":  "Log to Verified Sheet",
-                                                                 "type":  "main",
-                                                                 "index":  0
-                                                             }
-                                                         ]
-                                                     ]
-                                        },
-                        "Log to Flagged Sheet":  {
-                                                     "main":  [
-                                                                  [
-                                                                      {
-                                                                          "node":  "Move to Flagged Folder",
-                                                                          "type":  "main",
-                                                                          "index":  0
-                                                                      }
-                                                                  ]
-                                                              ]
-                                                 },
-                        "Move to Flagged Folder":  {
-                                                       "main":  [
-                                                                    [
-                                                                        {
-                                                                            "node":  "Build Flagging Alert",
-                                                                            "type":  "main",
-                                                                            "index":  0
-                                                                        }
-                                                                    ]
-                                                                ]
-                                                   },
-                        "Build Flagging Alert":  {
-                                                     "main":  [
-                                                                  [
-                                                                      {
-                                                                          "node":  "Send Instant Alert",
-                                                                          "type":  "main",
-                                                                          "index":  0
-                                                                      }
-                                                                  ]
-                                                              ]
-                                                 },
-                        "Log to Verified Sheet":  {
-                                                      "main":  [
-                                                                   [
-                                                                       {
-                                                                           "node":  "Move to Verified Folder",
-                                                                           "type":  "main",
-                                                                           "index":  0
-                                                                       }
-                                                                   ]
-                                                               ]
-                                                  }
-                    },
-    "settings":  {
-                     "executionOrder":  "v1",
-                     "binaryMode":  "separate",
-                     "callerPolicy":  "workflowsFromSameOwner",
-                     "availableInMCP":  false
-                 },
-    "staticData":  {
-                       "node:New Invoice in Drive":  {
-                                                         "lastTimeChecked":  "2026-04-24T10:05:07Z"
-                                                     }
-                   },
-    "meta":  null,
-    "pinData":  {
-
-                },
-    "versionId":  "7b0879b2-b4e3-4590-91d8-1fb0163c00e9",
-    "activeVersionId":  "7b0879b2-b4e3-4590-91d8-1fb0163c00e9",
-    "versionCounter":  112,
-    "triggerCount":  1,
-    "shared":  [
-                   {
-                       "updatedAt":  "2026-03-22T19:59:37.257Z",
-                       "createdAt":  "2026-03-22T19:59:37.257Z",
-                       "role":  "workflow:owner",
-                       "workflowId":  "4ctrfnpvBm2BpKxB",
-                       "projectId":  "4z38v6JO6ntgY8gF",
-                       "project":  {
-                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
-                                       "createdAt":  "2026-01-13T19:11:25.659Z",
-                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
-                                       "type":  "personal",
-                                       "icon":  null,
-                                       "description":  null,
-                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
-                                   }
-                   }
-               ],
-    "tags":  [
-
-             ],
-    "activeVersion":  {
-                          "updatedAt":  "2026-04-14T21:53:59.060Z",
-                          "createdAt":  "2026-04-14T21:53:59.060Z",
-                          "versionId":  "7b0879b2-b4e3-4590-91d8-1fb0163c00e9",
-                          "workflowId":  "4ctrfnpvBm2BpKxB",
-                          "nodes":  [
-                                        {
-                                            "parameters":  {
-                                                               "event":  "fileCreated",
-                                                               "folderToWatch":  {
-                                                                                     "__rl":  true,
-                                                                                     "mode":  "id",
-                                                                                     "value":  "REPLACE_WITH_DRIVE_FOLDER_ID"
-                                                                                 },
-                                                               "pollTimes":  {
-                                                                                 "item":  [
-                                                                                              {
-                                                                                                  "mode":  "everyHour"
-                                                                                              }
-                                                                                          ]
-                                                                             },
-                                                               "triggerOn":  "specificFolder"
-                                                           },
-                                            "id":  "6c22cb98-f700-46b8-a0b7-07a769a71f1f",
-                                            "name":  "New Invoice in Drive",
-                                            "type":  "n8n-nodes-base.googleDriveTrigger",
-                                            "typeVersion":  1,
-                                            "position":  [
-                                                             -608,
-                                                             528
-                                                         ],
-                                            "credentials":  {
-                                                                "googleDriveOAuth2Api":  {
-                                                                                             "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                                             "name":  "Google Drive Account"
-                                                                                         }
-                                                            }
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "operation":  "download",
-                                                               "fileId":  {
-                                                                              "__rl":  true,
-                                                                              "value":  "={{ $json.id }}",
-                                                                              "mode":  "id"
-                                                                          },
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "cf483750-13ad-4b1a-bcab-2e097bb73586",
-                                            "name":  "Download Invoice PDF",
-                                            "type":  "n8n-nodes-base.googleDrive",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             -384,
-                                                             528
-                                                         ],
-                                            "credentials":  {
-                                                                "googleDriveOAuth2Api":  {
-                                                                                             "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                                             "name":  "Google Drive Account"
-                                                                                         }
-                                                            },
-                                            "onError":  "continueRegularOutput"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "operation":  "binaryToPropery",
-                                                               "destinationKey":  "base64data",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "8513af5e-1f6a-428f-95b6-7280d0f52557",
-                                            "name":  "PDF to Base64",
-                                            "type":  "n8n-nodes-base.extractFromFile",
-                                            "typeVersion":  1,
-                                            "position":  [
-                                                             -160,
-                                                             528
-                                                         ]
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "jsCode":  "const base64Data   = $input.first().json.base64data;\nconst triggerData  = $(\u0027New Invoice in Drive\u0027).first().json;\nconst fileName     = triggerData.name || \u0027unknown.pdf\u0027;\nconst fileId       = triggerData.id   || \u0027\u0027;\nconst prompt = \u0027You are an invoice auditor. Analyze this invoice PDF.\\nReturn ONLY a raw JSON object with no markdown and no code fences.\\nFields: vendor_name (string or null), invoice_number (string or null), invoice_date (YYYY-MM-DD or null), due_date (YYYY-MM-DD or null), line_items_count (integer or null), total_amount (number or null), currency (3-letter ISO code or null), has_signature (boolean), signature_valid (boolean - true ONLY for handwritten ink or rubber stamp not printed names), confidence_score (float 0.0 to 1.0), errors (array - include: No signature found, Total amount missing, Not a valid invoice, Invoice number missing - whichever apply), warnings (array - include: Due date has passed, Currency unclear - whichever apply). Return ONLY the JSON.\u0027;\nconst payload = { contents: [{ parts: [{ inline_data: { mime_type: \u0027application/pdf\u0027, data: base64Data } }, { text: prompt }] }], generationConfig: { temperature: 0.0, maxOutputTokens: 2048 } };\nreturn [{ json: { payload, file_name: fileName, file_id: fileId } }];"
-                                                           },
-                                            "id":  "a619216d-12a9-4361-bc34-44c23f30de01",
-                                            "name":  "Build Gemini Payload",
-                                            "type":  "n8n-nodes-base.code",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             64,
-                                                             528
-                                                         ]
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "method":  "POST",
-                                                               "url":  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-                                                               "authentication":  "genericCredentialType",
-                                                               "genericAuthType":  "httpQueryAuth",
-                                                               "sendBody":  true,
-                                                               "specifyBody":  "json",
-                                                               "jsonBody":  "={{ JSON.stringify($json.payload) }}",
-                                                               "options":  {
-                                                                               "timeout":  90000
-                                                                           }
-                                                           },
-                                            "id":  "3e12ef91-8321-498c-baa3-130b2457a40e",
-                                            "name":  "Analyze with Gemini",
-                                            "type":  "n8n-nodes-base.httpRequest",
-                                            "typeVersion":  4.2,
-                                            "position":  [
-                                                             288,
-                                                             528
-                                                         ],
-                                            "retryOnFail":  true,
-                                            "maxTries":  3,
-                                            "waitBetweenTries":  5000,
-                                            "credentials":  {
-                                                                "httpQueryAuth":  {
-                                                                                      "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                                      "name":  "Query Auth Account"
-                                                                                  }
-                                                            },
-                                            "onError":  "continueRegularOutput"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "jsCode":  "const geminiOutput = $input.first().json;\nconst fileMeta     = $(\u0027Build Gemini Payload\u0027).first().json;\nlet parsed;\ntry {\n  if (!geminiOutput || !geminiOutput.candidates || !geminiOutput.candidates[0]) {\n    throw new Error(\u0027Invalid Gemini response structure\u0027);\n  }\n  const raw   = geminiOutput.candidates[0].content.parts[0].text;\n  const start = raw.indexOf(\u0027{\u0027); const end = raw.lastIndexOf(\u0027}\u0027);\n  if (start === -1 || end === -1) throw new Error(\u0027No JSON in response\u0027);\n  parsed = JSON.parse(raw.slice(start, end + 1));\n} catch (e) {\n  parsed = { \n    vendor_name: null, \n    invoice_number: null, \n    invoice_date: null, \n    due_date: null, \n    line_items_count: null, \n    total_amount: null, \n    currency: null, \n    has_signature: false, \n    signature_valid: false, \n    confidence_score: 0.0, \n    errors: [\u0027AI parse failure: \u0027 + e.message], \n    warnings: [] \n  };\n}\nreturn [{ json: { \n  file_name: String(fileMeta.file_name||\u0027\u0027), \n  file_id: String(fileMeta.file_id||\u0027\u0027), \n  vendor_name: parsed.vendor_name||null, \n  invoice_number: String(parsed.invoice_number||\u0027\u0027), \n  invoice_date: parsed.invoice_date||null, \n  due_date: parsed.due_date||null, \n  line_items_count: parsed.line_items_count||null, \n  total_amount: (parsed.total_amount!==undefined\u0026\u0026parsed.total_amount!==null)?Number(parsed.total_amount):null, \n  currency: parsed.currency||null, \n  has_signature: Boolean(parsed.has_signature), \n  signature_valid: Boolean(parsed.signature_valid), \n  confidence_score: Math.min(1,Math.max(0,Number(parsed.confidence_score)||0)), \n  errors: Array.isArray(parsed.errors)?parsed.errors:[], \n  warnings: Array.isArray(parsed.warnings)?parsed.warnings:[], \n  processed_at: new Date().toISOString(), \n  source: \u0027auto\u0027 \n} }];"
-                                                           },
-                                            "id":  "c2a20b40-d855-44bb-a661-98178c473bee",
-                                            "name":  "Parse Analysis Result",
-                                            "type":  "n8n-nodes-base.code",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             512,
-                                                             528
-                                                         ]
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "sheetId":  "REPLACE_WITH_YOUR_SHEET_ID",
-                                                               "range":  "Verified!A:Z",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "f05997b5-a75a-4be6-9aa5-b09f4cc675eb",
-                                            "name":  "Read Verified Sheet",
-                                            "type":  "n8n-nodes-base.googleSheets",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             736,
-                                                             528
-                                                         ],
-                                            "alwaysOutputData":  true,
-                                            "credentials":  {
-                                                                "googleSheetsOAuth2Api":  {
-                                                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                                              "name":  "Google Sheets Account"
-                                                                                          }
-                                                            },
-                                            "onError":  "continueRegularOutput"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "sheetId":  "REPLACE_WITH_YOUR_SHEET_ID",
-                                                               "range":  "Flagged Invoices!A:Z",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "b4c5341c-1ce6-441d-b08f-84a3d78bfd6c",
-                                            "name":  "Read Flagged Sheet",
-                                            "type":  "n8n-nodes-base.googleSheets",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             960,
-                                                             528
-                                                         ],
-                                            "alwaysOutputData":  true,
-                                            "credentials":  {
-                                                                "googleSheetsOAuth2Api":  {
-                                                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                                              "name":  "Google Sheets Account"
-                                                                                          }
-                                                            },
-                                            "onError":  "continueRegularOutput"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "jsCode":  "// Get rows from BOTH sheets for duplicate scanning\nconst verifiedRows = $(\u0027Read Verified Sheet\u0027).all().map(i =\u003e i.json).filter(r =\u003e r.invoice_number);\nconst flaggedRows = $input.all().map(i =\u003e i.json).filter(r =\u003e r.invoice_number);\nconst allRows = [...verifiedRows, ...flaggedRows];\n\n// Current invoice being processed\nconst auditData = $(\u0027Parse Analysis Result\u0027).first().json;\nconst invNum = String(auditData.invoice_number || \u0027\u0027).toLowerCase().trim();\nconst vendor = String(auditData.vendor_name || \u0027\u0027).toLowerCase().trim();\n\nlet is_duplicate = false;\nlet duplicate_ref = null;\n\nif (invNum.length \u003e 2 \u0026\u0026 vendor.length \u003e 2) {\n  const match = allRows.find(r =\u003e\n    String(r.invoice_number || \u0027\u0027).toLowerCase().trim() === invNum \u0026\u0026\n    String(r.vendor_name || \u0027\u0027).toLowerCase().trim() === vendor\n  );\n  if (match) {\n    is_duplicate = true;\n    duplicate_ref = match.file_name || \u0027previous submission\u0027;\n  }\n}\n\nconst errors = [...(auditData.errors || [])];\nif (is_duplicate) errors.push(\u0027Possible duplicate of: \u0027 + duplicate_ref);\n\nreturn [{ json: { ...auditData, is_duplicate, duplicate_ref: duplicate_ref || null, errors } }];"
-                                                           },
-                                            "id":  "ccdb84c4-d7ab-4c33-88c0-18b6d771aee7",
-                                            "name":  "Check for Duplicate",
-                                            "type":  "n8n-nodes-base.code",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             1184,
-                                                             528
-                                                         ]
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "conditions":  {
-                                                                                  "options":  {
-                                                                                                  "caseSensitive":  true,
-                                                                                                  "leftValue":  "",
-                                                                                                  "typeValidation":  "strict",
-                                                                                                  "version":  2
-                                                                                              },
-                                                                                  "conditions":  [
-                                                                                                     {
-                                                                                                         "id":  "cond-a08",
-                                                                                                         "leftValue":  "={{ $json.confidence_score }}",
-                                                                                                         "rightValue":  0.75,
-                                                                                                         "operator":  {
-                                                                                                                          "type":  "number",
-                                                                                                                          "operation":  "lt"
-                                                                                                                      }
-                                                                                                     }
-                                                                                                 ],
-                                                                                  "combinator":  "and"
-                                                                              },
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "240e37c2-4ad2-473a-b003-ba3f7ff2a036",
-                                            "name":  "Is Low Confidence?",
-                                            "type":  "n8n-nodes-base.if",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             1408,
-                                                             528
-                                                         ]
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "operation":  "append",
-                                                               "sheetId":  "REPLACE_WITH_YOUR_SHEET_ID",
-                                                               "range":  "Needs Review!A:P",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "b30d8994-beac-4181-891b-83a62620ac65",
-                                            "name":  "Log to Needs Review",
-                                            "type":  "n8n-nodes-base.googleSheets",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             2080,
-                                                             336
-                                                         ],
-                                            "credentials":  {
-                                                                "googleSheetsOAuth2Api":  {
-                                                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                                              "name":  "Google Sheets Account"
-                                                                                          }
-                                                            },
-                                            "onError":  "continueRegularOutput"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "conditions":  {
-                                                                                  "options":  {
-                                                                                                  "caseSensitive":  true,
-                                                                                                  "leftValue":  "",
-                                                                                                  "typeValidation":  "strict",
-                                                                                                  "version":  2
-                                                                                              },
-                                                                                  "conditions":  [
-                                                                                                     {
-                                                                                                         "id":  "cond-a10",
-                                                                                                         "leftValue":  "={{ $json.errors.length }}",
-                                                                                                         "rightValue":  0,
-                                                                                                         "operator":  {
-                                                                                                                          "type":  "number",
-                                                                                                                          "operation":  "gt"
-                                                                                                                      }
-                                                                                                     }
-                                                                                                 ],
-                                                                                  "combinator":  "and"
-                                                                              },
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "755a98a3-94c6-430c-a53e-0b59f5a1832e",
-                                            "name":  "Is Flagged?",
-                                            "type":  "n8n-nodes-base.if",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             1632,
-                                                             624
-                                                         ]
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "operation":  "append",
-                                                               "sheetId":  "REPLACE_WITH_YOUR_SHEET_ID",
-                                                               "range":  "Flagged Invoices!A:P",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "6343302a-4eff-4c1e-887b-1a3c2c5f6b74",
-                                            "name":  "Log to Flagged Sheet",
-                                            "type":  "n8n-nodes-base.googleSheets",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             1856,
-                                                             528
-                                                         ],
-                                            "credentials":  {
-                                                                "googleSheetsOAuth2Api":  {
-                                                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                                              "name":  "Google Sheets Account"
-                                                                                          }
-                                                            },
-                                            "onError":  "continueRegularOutput"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "method":  "PATCH",
-                                                               "url":  "=https://www.googleapis.com/drive/v3/files/{{ $json.file_id }}",
-                                                               "authentication":  "predefinedCredentialType",
-                                                               "nodeCredentialType":  "googleDriveOAuth2Api",
-                                                               "sendQuery":  true,
-                                                               "queryParameters":  {
-                                                                                       "parameters":  [
-                                                                                                          {
-                                                                                                              "name":  "addParents",
-                                                                                                              "value":  "REPLACE_WITH_DRIVE_FOLDER_ID"
-                                                                                                          },
-                                                                                                          {
-                                                                                                              "name":  "removeParents",
-                                                                                                              "value":  "REPLACE_WITH_DRIVE_FOLDER_ID"
-                                                                                                          },
-                                                                                                          {
-                                                                                                              "name":  "fields",
-                                                                                                              "value":  "id,name,parents"
-                                                                                                          }
-                                                                                                      ]
-                                                                                   },
-                                                               "sendBody":  true,
-                                                               "specifyBody":  "json",
-                                                               "jsonBody":  "{}",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "392e5072-ed6d-47ac-b9c7-1615c2a0daf9",
-                                            "name":  "Move to Flagged Folder",
-                                            "type":  "n8n-nodes-base.httpRequest",
-                                            "typeVersion":  4.2,
-                                            "position":  [
-                                                             2080,
-                                                             528
-                                                         ],
-                                            "credentials":  {
-                                                                "googleDriveOAuth2Api":  {
-                                                                                             "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                                             "name":  "Google Drive Account"
-                                                                                         }
-                                                            },
-                                            "onError":  "continueRegularOutput"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "jsCode":  "const d = $(\u0027Check for Duplicate\u0027).first().json;\nconst fileId = d.file_id || $input.first().json.id || \u0027\u0027;\nconst driveUrl = \u0027https://drive.google.com/file/d/\u0027 + fileId + \u0027/view\u0027;\nconst confidence = Math.round((d.confidence_score||0)*100);\nconst amount = (d.total_amount!==null\u0026\u0026d.total_amount!==undefined)?(d.currency||\u0027\u0027)+\u0027 \u0027+d.total_amount:\u0027Not found\u0027;\nconst dupLabel = d.is_duplicate?\u0027 [DUPLICATE]\u0027:\u0027\u0027;\nconst errRows = (d.errors||[]).map(e=\u003e\u0027\u003cli style=\"color:#c04828;margin:4px 0\"\u003e\u0027+e+\u0027\u003c/li\u003e\u0027).join(\u0027\u0027);\nconst warnRows = (d.warnings||[]).length?\u0027\u003cp\u003e\u003cb\u003eWarnings:\u003c/b\u003e\u003c/p\u003e\u003cul\u003e\u0027+(d.warnings||[]).map(w=\u003e\u0027\u003cli style=\"color:#e67e22;margin:4px 0\"\u003e\u0027+w+\u0027\u003c/li\u003e\u0027).join(\u0027\u0027)+\u0027\u003c/ul\u003e\u0027:\u0027\u0027;\nconst html = \u0027\u003cdiv style=\"font-family:Arial,sans-serif;max-width:580px\"\u003e\u003cdiv style=\"background:#c04828;padding:18px 24px;border-radius:8px 8px 0 0\"\u003e\u003ch2 style=\"color:#fff;margin:0;font-size:16px\"\u003eInvoice Flagged\u0027+dupLabel+\u0027\u003c/h2\u003e\u003c/div\u003e\u003cdiv style=\"padding:20px 24px;border:1px solid #ddd;border-top:none\"\u003e\u003ctable style=\"width:100%\"\u003e\u003ctr\u003e\u003ctd style=\"color:#666;padding:4px 12px 4px 0\"\u003eFile\u003c/td\u003e\u003ctd style=\"font-weight:700\"\u003e\u0027+(d.file_name||\u0027Unknown\u0027)+\u0027\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd style=\"color:#666;padding:4px 12px 4px 0\"\u003eVendor\u003c/td\u003e\u003ctd\u003e\u0027+(d.vendor_name||\u0027Not identified\u0027)+\u0027\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd style=\"color:#666;padding:4px 12px 4px 0\"\u003eInvoice #\u003c/td\u003e\u003ctd\u003e\u0027+(d.invoice_number||\u0027Not found\u0027)+\u0027\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd style=\"color:#666;padding:4px 12px 4px 0\"\u003eAmount\u003c/td\u003e\u003ctd\u003e\u0027+amount+\u0027\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd style=\"color:#666;padding:4px 12px 4px 0\"\u003eAI Confidence\u003c/td\u003e\u003ctd\u003e\u0027+confidence+\u0027%\u003c/td\u003e\u003c/tr\u003e\u003c/table\u003e\u003cp\u003e\u003cb\u003eProblems found:\u003c/b\u003e\u003c/p\u003e\u003cul\u003e\u0027+errRows+\u0027\u003c/ul\u003e\u0027+warnRows+\u0027\u003cp\u003e\u003ca href=\"\u0027+driveUrl+\u0027\" style=\"display:inline-block;background:#0f6e56;color:#fff;padding:10px 20px;text-decoration:none;border-radius:6px\"\u003eOpen in Google Drive\u003c/a\u003e\u003c/p\u003e\u003cp style=\"font-size:11px;color:#aaa\"\u003eProcessed: \u0027+d.processed_at+\u0027\u003c/p\u003e\u003c/div\u003e\u003c/div\u003e\u0027;\nreturn [{json:{subject:(d.is_duplicate?\u0027[DUPLICATE] \u0027:\u0027[FLAGGED] \u0027)+(d.file_name||\u0027Invoice\u0027),html}}];"
-                                                           },
-                                            "id":  "d9852578-e550-4fa7-9d45-c4db473c2bd7",
-                                            "name":  "Build Flagging Alert",
-                                            "type":  "n8n-nodes-base.code",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             2304,
-                                                             432
-                                                         ]
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "fromEmail":  "your-email@example.com",
-                                                               "toEmail":  "your-email@example.com",
-                                                               "subject":  "={{ $json.subject }}",
-                                                               "html":  "={{ $json.html }}",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "5b1b41d5-4c53-454e-adb1-81a98fa22fb6",
-                                            "name":  "Send Instant Alert",
-                                            "type":  "n8n-nodes-base.emailSend",
-                                            "typeVersion":  2.1,
-                                            "position":  [
-                                                             2528,
-                                                             432
-                                                         ],
-                                            "webhookId":  "143cb625-3eb3-4007-8cc3-5f86b92fc0d9",
-                                            "credentials":  {
-                                                                "smtp":  {
-                                                                             "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                             "name":  "SMTP Account"
-                                                                         }
-                                                            },
-                                            "onError":  "continueRegularOutput"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "operation":  "append",
-                                                               "sheetId":  "REPLACE_WITH_YOUR_SHEET_ID",
-                                                               "range":  "Verified!A:P",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "79debc4c-8046-4834-8cd5-786946364ac2",
-                                            "name":  "Log to Verified Sheet",
-                                            "type":  "n8n-nodes-base.googleSheets",
-                                            "typeVersion":  2,
-                                            "position":  [
-                                                             1856,
-                                                             720
-                                                         ],
-                                            "credentials":  {
-                                                                "googleSheetsOAuth2Api":  {
-                                                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                                              "name":  "Google Sheets Account"
-                                                                                          }
-                                                            },
-                                            "onError":  "continueRegularOutput"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "method":  "PATCH",
-                                                               "url":  "=https://www.googleapis.com/drive/v3/files/{{ $json.file_id }}",
-                                                               "authentication":  "predefinedCredentialType",
-                                                               "nodeCredentialType":  "googleDriveOAuth2Api",
-                                                               "sendQuery":  true,
-                                                               "queryParameters":  {
-                                                                                       "parameters":  [
-                                                                                                          {
-                                                                                                              "name":  "addParents",
-                                                                                                              "value":  "REPLACE_WITH_DRIVE_FOLDER_ID"
-                                                                                                          },
-                                                                                                          {
-                                                                                                              "name":  "removeParents",
-                                                                                                              "value":  "REPLACE_WITH_DRIVE_FOLDER_ID"
-                                                                                                          },
-                                                                                                          {
-                                                                                                              "name":  "fields",
-                                                                                                              "value":  "id,name,parents"
-                                                                                                          }
-                                                                                                      ]
-                                                                                   },
-                                                               "sendBody":  true,
-                                                               "specifyBody":  "json",
-                                                               "jsonBody":  "{}",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "id":  "f7138364-de53-4738-86a8-3aecf9d039b9",
-                                            "name":  "Move to Verified Folder",
-                                            "type":  "n8n-nodes-base.httpRequest",
-                                            "typeVersion":  4.2,
-                                            "position":  [
-                                                             2080,
-                                                             720
-                                                         ],
-                                            "credentials":  {
-                                                                "googleDriveOAuth2Api":  {
-                                                                                             "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                                                             "name":  "Google Drive Account"
-                                                                                         }
-                                                            },
-                                            "onError":  "continueRegularOutput"
-                                        }
-                                    ],
-                          "connections":  {
-                                              "New Invoice in Drive":  {
-                                                                           "main":  [
-                                                                                        [
-                                                                                            {
-                                                                                                "node":  "Download Invoice PDF",
-                                                                                                "type":  "main",
-                                                                                                "index":  0
-                                                                                            }
-                                                                                        ]
-                                                                                    ]
-                                                                       },
-                                              "Download Invoice PDF":  {
-                                                                           "main":  [
-                                                                                        [
-                                                                                            {
-                                                                                                "node":  "PDF to Base64",
-                                                                                                "type":  "main",
-                                                                                                "index":  0
-                                                                                            }
-                                                                                        ]
-                                                                                    ]
-                                                                       },
-                                              "PDF to Base64":  {
-                                                                    "main":  [
-                                                                                 [
-                                                                                     {
-                                                                                         "node":  "Build Gemini Payload",
-                                                                                         "type":  "main",
-                                                                                         "index":  0
-                                                                                     }
-                                                                                 ]
-                                                                             ]
-                                                                },
-                                              "Build Gemini Payload":  {
-                                                                           "main":  [
-                                                                                        [
-                                                                                            {
-                                                                                                "node":  "Analyze with Gemini",
-                                                                                                "type":  "main",
-                                                                                                "index":  0
-                                                                                            }
-                                                                                        ]
-                                                                                    ]
-                                                                       },
-                                              "Analyze with Gemini":  {
-                                                                          "main":  [
-                                                                                       [
-                                                                                           {
-                                                                                               "node":  "Parse Analysis Result",
-                                                                                               "type":  "main",
-                                                                                               "index":  0
-                                                                                           }
-                                                                                       ]
-                                                                                   ]
-                                                                      },
-                                              "Parse Analysis Result":  {
-                                                                            "main":  [
-                                                                                         [
-                                                                                             {
-                                                                                                 "node":  "Read Verified Sheet",
-                                                                                                 "type":  "main",
-                                                                                                 "index":  0
-                                                                                             }
-                                                                                         ]
-                                                                                     ]
-                                                                        },
-                                              "Read Verified Sheet":  {
-                                                                          "main":  [
-                                                                                       [
-                                                                                           {
-                                                                                               "node":  "Read Flagged Sheet",
-                                                                                               "type":  "main",
-                                                                                               "index":  0
-                                                                                           }
-                                                                                       ]
-                                                                                   ]
-                                                                      },
-                                              "Read Flagged Sheet":  {
-                                                                         "main":  [
-                                                                                      [
-                                                                                          {
-                                                                                              "node":  "Check for Duplicate",
-                                                                                              "type":  "main",
-                                                                                              "index":  0
-                                                                                          }
-                                                                                      ]
-                                                                                  ]
-                                                                     },
-                                              "Check for Duplicate":  {
-                                                                          "main":  [
-                                                                                       [
-                                                                                           {
-                                                                                               "node":  "Is Low Confidence?",
-                                                                                               "type":  "main",
-                                                                                               "index":  0
-                                                                                           }
-                                                                                       ]
-                                                                                   ]
-                                                                      },
-                                              "Is Low Confidence?":  {
-                                                                         "main":  [
-                                                                                      [
-                                                                                          {
-                                                                                              "node":  "Log to Needs Review",
-                                                                                              "type":  "main",
-                                                                                              "index":  0
-                                                                                          }
-                                                                                      ],
-                                                                                      [
-                                                                                          {
-                                                                                              "node":  "Is Flagged?",
-                                                                                              "type":  "main",
-                                                                                              "index":  0
-                                                                                          }
-                                                                                      ]
-                                                                                  ]
-                                                                     },
-                                              "Log to Needs Review":  {
-                                                                          "main":  [
-                                                                                       [
-                                                                                           {
-                                                                                               "node":  "Build Flagging Alert",
-                                                                                               "type":  "main",
-                                                                                               "index":  0
-                                                                                           }
-                                                                                       ]
-                                                                                   ]
-                                                                      },
-                                              "Is Flagged?":  {
-                                                                  "main":  [
-                                                                               [
-                                                                                   {
-                                                                                       "node":  "Log to Flagged Sheet",
-                                                                                       "type":  "main",
-                                                                                       "index":  0
-                                                                                   }
-                                                                               ],
-                                                                               [
-                                                                                   {
-                                                                                       "node":  "Log to Verified Sheet",
-                                                                                       "type":  "main",
-                                                                                       "index":  0
-                                                                                   }
-                                                                               ]
-                                                                           ]
-                                                              },
-                                              "Log to Flagged Sheet":  {
-                                                                           "main":  [
-                                                                                        [
-                                                                                            {
-                                                                                                "node":  "Move to Flagged Folder",
-                                                                                                "type":  "main",
-                                                                                                "index":  0
-                                                                                            }
-                                                                                        ]
-                                                                                    ]
-                                                                       },
-                                              "Move to Flagged Folder":  {
-                                                                             "main":  [
-                                                                                          [
-                                                                                              {
-                                                                                                  "node":  "Build Flagging Alert",
-                                                                                                  "type":  "main",
-                                                                                                  "index":  0
-                                                                                              }
-                                                                                          ]
-                                                                                      ]
-                                                                         },
-                                              "Build Flagging Alert":  {
-                                                                           "main":  [
-                                                                                        [
-                                                                                            {
-                                                                                                "node":  "Send Instant Alert",
-                                                                                                "type":  "main",
-                                                                                                "index":  0
-                                                                                            }
-                                                                                        ]
-                                                                                    ]
-                                                                       },
-                                              "Log to Verified Sheet":  {
-                                                                            "main":  [
-                                                                                         [
-                                                                                             {
-                                                                                                 "node":  "Move to Verified Folder",
-                                                                                                 "type":  "main",
-                                                                                                 "index":  0
-                                                                                             }
-                                                                                         ]
-                                                                                     ]
-                                                                        }
-                                          },
-                          "authors": "YOUR_NAME",
-                          "name":  null,
-                          "description":  null,
-                          "autosaved":  false,
-                          "workflowPublishHistory":  [
-                                                         {
-                                                             "createdAt":  "2026-04-14T21:54:00.198Z",
-                                                             "id":  814,
-                                                             "workflowId":  "4ctrfnpvBm2BpKxB",
-                                                             "versionId":  "7b0879b2-b4e3-4590-91d8-1fb0163c00e9",
-                                                             "event":  "activated",
-                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
-                                                         },
-                                                         {
-                                                             "createdAt":  "2026-04-14T21:53:59.252Z",
-                                                             "id":  813,
-                                                             "workflowId":  "4ctrfnpvBm2BpKxB",
-                                                             "versionId":  "7b0879b2-b4e3-4590-91d8-1fb0163c00e9",
-                                                             "event":  "deactivated",
-                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
-                                                         }
-                                                     ]
-                      }
+{
+  "updatedAt": "2026-04-14T21:53:59.057Z",
+  "createdAt": "2026-03-22T19:59:37.253Z",
+  "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+  "name": "ðŸ“„ Invoice Vision Auditor â€” Auto-Processor",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "event": "fileCreated",
+        "folderToWatch": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_WITH_DRIVE_FOLDER_ID"
+        },
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder"
+      },
+      "id": "6c22cb98-f700-46b8-a0b7-07a769a71f1f",
+      "name": "New Invoice in Drive",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        528
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Drive Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "cf483750-13ad-4b1a-bcab-2e097bb73586",
+      "name": "Download Invoice PDF",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        528
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Drive Account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "base64data",
+        "options": {}
+      },
+      "id": "8513af5e-1f6a-428f-95b6-7280d0f52557",
+      "name": "PDF to Base64",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const base64Data   = $input.first().json.base64data;\nconst triggerData  = $('New Invoice in Drive').first().json;\nconst fileName     = triggerData.name || 'unknown.pdf';\nconst fileId       = triggerData.id   || '';\nconst prompt = 'You are an invoice auditor. Analyze this invoice PDF.\\nReturn ONLY a raw JSON object with no markdown and no code fences.\\nFields: vendor_name (string or null), invoice_number (string or null), invoice_date (YYYY-MM-DD or null), due_date (YYYY-MM-DD or null), line_items_count (integer or null), total_amount (number or null), currency (3-letter ISO code or null), has_signature (boolean), signature_valid (boolean - true ONLY for handwritten ink or rubber stamp not printed names), confidence_score (float 0.0 to 1.0), errors (array - include: No signature found, Total amount missing, Not a valid invoice, Invoice number missing - whichever apply), warnings (array - include: Due date has passed, Currency unclear - whichever apply). Return ONLY the JSON.';\nconst payload = { contents: [{ parts: [{ inline_data: { mime_type: 'application/pdf', data: base64Data } }, { text: prompt }] }], generationConfig: { temperature: 0.0, maxOutputTokens: 2048 } };\nreturn [{ json: { payload, file_name: fileName, file_id: fileId } }];"
+      },
+      "id": "a619216d-12a9-4361-bc34-44c23f30de01",
+      "name": "Build Gemini Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.payload) }}",
+        "options": {
+          "timeout": 90000
+        }
+      },
+      "id": "3e12ef91-8321-498c-baa3-130b2457a40e",
+      "name": "Analyze with Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        528
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Query Auth Account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const geminiOutput = $input.first().json;\nconst fileMeta     = $('Build Gemini Payload').first().json;\nlet parsed;\ntry {\n  if (!geminiOutput || !geminiOutput.candidates || !geminiOutput.candidates[0]) {\n    throw new Error('Invalid Gemini response structure');\n  }\n  const raw   = geminiOutput.candidates[0].content.parts[0].text;\n  const start = raw.indexOf('{'); const end = raw.lastIndexOf('}');\n  if (start === -1 || end === -1) throw new Error('No JSON in response');\n  parsed = JSON.parse(raw.slice(start, end + 1));\n} catch (e) {\n  parsed = { \n    vendor_name: null, \n    invoice_number: null, \n    invoice_date: null, \n    due_date: null, \n    line_items_count: null, \n    total_amount: null, \n    currency: null, \n    has_signature: false, \n    signature_valid: false, \n    confidence_score: 0.0, \n    errors: ['AI parse failure: ' + e.message], \n    warnings: [] \n  };\n}\nreturn [{ json: { \n  file_name: String(fileMeta.file_name||''), \n  file_id: String(fileMeta.file_id||''), \n  vendor_name: parsed.vendor_name||null, \n  invoice_number: String(parsed.invoice_number||''), \n  invoice_date: parsed.invoice_date||null, \n  due_date: parsed.due_date||null, \n  line_items_count: parsed.line_items_count||null, \n  total_amount: (parsed.total_amount!==undefined&&parsed.total_amount!==null)?Number(parsed.total_amount):null, \n  currency: parsed.currency||null, \n  has_signature: Boolean(parsed.has_signature), \n  signature_valid: Boolean(parsed.signature_valid), \n  confidence_score: Math.min(1,Math.max(0,Number(parsed.confidence_score)||0)), \n  errors: Array.isArray(parsed.errors)?parsed.errors:[], \n  warnings: Array.isArray(parsed.warnings)?parsed.warnings:[], \n  processed_at: new Date().toISOString(), \n  source: 'auto' \n} }];"
+      },
+      "id": "c2a20b40-d855-44bb-a661-98178c473bee",
+      "name": "Parse Analysis Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "sheetId": "REPLACE_WITH_YOUR_SHEET_ID",
+        "range": "Verified!A:Z",
+        "options": {}
+      },
+      "id": "f05997b5-a75a-4be6-9aa5-b09f4cc675eb",
+      "name": "Read Verified Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [
+        736,
+        528
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Sheets Account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sheetId": "REPLACE_WITH_YOUR_SHEET_ID",
+        "range": "Flagged Invoices!A:Z",
+        "options": {}
+      },
+      "id": "b4c5341c-1ce6-441d-b08f-84a3d78bfd6c",
+      "name": "Read Flagged Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [
+        960,
+        528
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Sheets Account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get rows from BOTH sheets for duplicate scanning\nconst verifiedRows = $('Read Verified Sheet').all().map(i => i.json).filter(r => r.invoice_number);\nconst flaggedRows = $input.all().map(i => i.json).filter(r => r.invoice_number);\nconst allRows = [...verifiedRows, ...flaggedRows];\n\n// Current invoice being processed\nconst auditData = $('Parse Analysis Result').first().json;\nconst invNum = String(auditData.invoice_number || '').toLowerCase().trim();\nconst vendor = String(auditData.vendor_name || '').toLowerCase().trim();\n\nlet is_duplicate = false;\nlet duplicate_ref = null;\n\nif (invNum.length > 2 && vendor.length > 2) {\n  const match = allRows.find(r =>\n    String(r.invoice_number || '').toLowerCase().trim() === invNum &&\n    String(r.vendor_name || '').toLowerCase().trim() === vendor\n  );\n  if (match) {\n    is_duplicate = true;\n    duplicate_ref = match.file_name || 'previous submission';\n  }\n}\n\nconst errors = [...(auditData.errors || [])];\nif (is_duplicate) errors.push('Possible duplicate of: ' + duplicate_ref);\n\nreturn [{ json: { ...auditData, is_duplicate, duplicate_ref: duplicate_ref || null, errors } }];"
+      },
+      "id": "ccdb84c4-d7ab-4c33-88c0-18b6d771aee7",
+      "name": "Check for Duplicate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-a08",
+              "leftValue": "={{ $json.confidence_score }}",
+              "rightValue": 0.75,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "240e37c2-4ad2-473a-b003-ba3f7ff2a036",
+      "name": "Is Low Confidence?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "REPLACE_WITH_YOUR_SHEET_ID",
+        "range": "Needs Review!A:P",
+        "options": {}
+      },
+      "id": "b30d8994-beac-4181-891b-83a62620ac65",
+      "name": "Log to Needs Review",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        336
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Sheets Account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-a10",
+              "leftValue": "={{ $json.errors.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "755a98a3-94c6-430c-a53e-0b59f5a1832e",
+      "name": "Is Flagged?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "REPLACE_WITH_YOUR_SHEET_ID",
+        "range": "Flagged Invoices!A:P",
+        "options": {}
+      },
+      "id": "6343302a-4eff-4c1e-887b-1a3c2c5f6b74",
+      "name": "Log to Flagged Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [
+        1856,
+        528
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Sheets Account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.file_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "addParents",
+              "value": "REPLACE_WITH_DRIVE_FOLDER_ID"
+            },
+            {
+              "name": "removeParents",
+              "value": "REPLACE_WITH_DRIVE_FOLDER_ID"
+            },
+            {
+              "name": "fields",
+              "value": "id,name,parents"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {}
+      },
+      "id": "392e5072-ed6d-47ac-b9c7-1615c2a0daf9",
+      "name": "Move to Flagged Folder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2280,
+        528
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Drive Account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $('Check for Duplicate').first().json;\nconst fileId = d.file_id || $input.first().json.id || '';\nconst driveUrl = 'https://drive.google.com/file/d/' + fileId + '/view';\nconst confidence = Math.round((d.confidence_score||0)*100);\nconst amount = (d.total_amount!==null&&d.total_amount!==undefined)?(d.currency||'')+' '+d.total_amount:'Not found';\nconst dupLabel = d.is_duplicate?' [DUPLICATE]':'';\nconst errRows = (d.errors||[]).map(e=>'<li style=\"color:#c04828;margin:4px 0\">'+e+'</li>').join('');\nconst warnRows = (d.warnings||[]).length?'<p><b>Warnings:</b></p><ul>'+(d.warnings||[]).map(w=>'<li style=\"color:#e67e22;margin:4px 0\">'+w+'</li>').join('')+'</ul>':'';\nconst html = '<div style=\"font-family:Arial,sans-serif;max-width:580px\"><div style=\"background:#c04828;padding:18px 24px;border-radius:8px 8px 0 0\"><h2 style=\"color:#fff;margin:0;font-size:16px\">Invoice Flagged'+dupLabel+'</h2></div><div style=\"padding:20px 24px;border:1px solid #ddd;border-top:none\"><table style=\"width:100%\"><tr><td style=\"color:#666;padding:4px 12px 4px 0\">File</td><td style=\"font-weight:700\">'+(d.file_name||'Unknown')+'</td></tr><tr><td style=\"color:#666;padding:4px 12px 4px 0\">Vendor</td><td>'+(d.vendor_name||'Not identified')+'</td></tr><tr><td style=\"color:#666;padding:4px 12px 4px 0\">Invoice #</td><td>'+(d.invoice_number||'Not found')+'</td></tr><tr><td style=\"color:#666;padding:4px 12px 4px 0\">Amount</td><td>'+amount+'</td></tr><tr><td style=\"color:#666;padding:4px 12px 4px 0\">AI Confidence</td><td>'+confidence+'%</td></tr></table><p><b>Problems found:</b></p><ul>'+errRows+'</ul>'+warnRows+'<p><a href=\"'+driveUrl+'\" style=\"display:inline-block;background:#0f6e56;color:#fff;padding:10px 20px;text-decoration:none;border-radius:6px\">Open in Google Drive</a></p><p style=\"font-size:11px;color:#aaa\">Processed: '+d.processed_at+'</p></div></div>';\nreturn [{json:{subject:(d.is_duplicate?'[DUPLICATE] ':'[FLAGGED] ')+(d.file_name||'Invoice'),html}}];"
+      },
+      "id": "d9852578-e550-4fa7-9d45-c4db473c2bd7",
+      "name": "Build Flagging Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "your-email@example.com",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "5b1b41d5-4c53-454e-adb1-81a98fa22fb6",
+      "name": "Send Instant Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2528,
+        432
+      ],
+      "webhookId": "143cb625-3eb3-4007-8cc3-5f86b92fc0d9",
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "SMTP Account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "REPLACE_WITH_YOUR_SHEET_ID",
+        "range": "Verified!A:P",
+        "options": {}
+      },
+      "id": "79debc4c-8046-4834-8cd5-786946364ac2",
+      "name": "Log to Verified Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [
+        1856,
+        720
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Sheets Account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.file_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "addParents",
+              "value": "REPLACE_WITH_DRIVE_FOLDER_ID"
+            },
+            {
+              "name": "removeParents",
+              "value": "REPLACE_WITH_DRIVE_FOLDER_ID"
+            },
+            {
+              "name": "fields",
+              "value": "id,name,parents"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {}
+      },
+      "id": "f7138364-de53-4738-86a8-3aecf9d039b9",
+      "name": "Move to Verified Folder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2280,
+        720
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Drive Account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "9f220229-7058-4be8-9898-451296cb7596",
+              "leftValue": "={{ $env.SAFE_MODE }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "46c3290e-3a35-48ec-b099-c7b10ea5dfd9",
+      "name": "Is SAFE_MODE? (Move to Flagged Folder)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1880,
+        528
+      ],
+      "notes": "SAFE_MODE gate: When SAFE_MODE=true, skips the dangerous action and routes to a SIMULATED NoOp instead."
+    },
+    {
+      "parameters": {},
+      "id": "01808599-e15e-4560-ae7a-20f201c82905",
+      "name": "SIMULATED (Move to Flagged Folder)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        678
+      ],
+      "notes": "SAFE_MODE: Simulated execution of \"Move to Flagged Folder\". No real action taken."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "e7030923-d613-4656-b83b-8530be6e9654",
+              "leftValue": "={{ $env.SAFE_MODE }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "310a2828-2e86-4f36-a2b6-78bd964455f4",
+      "name": "Is SAFE_MODE? (Move to Verified Folder)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1880,
+        720
+      ],
+      "notes": "SAFE_MODE gate: When SAFE_MODE=true, skips the dangerous action and routes to a SIMULATED NoOp instead."
+    },
+    {
+      "parameters": {},
+      "id": "be522dfe-1a69-4b1c-b4d2-69b610fcce62",
+      "name": "SIMULATED (Move to Verified Folder)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        870
+      ],
+      "notes": "SAFE_MODE: Simulated execution of \"Move to Verified Folder\". No real action taken."
+    }
+  ],
+  "connections": {
+    "New Invoice in Drive": {
+      "main": [
+        [
+          {
+            "node": "Download Invoice PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Invoice PDF": {
+      "main": [
+        [
+          {
+            "node": "PDF to Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF to Base64": {
+      "main": [
+        [
+          {
+            "node": "Build Gemini Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Gemini Payload": {
+      "main": [
+        [
+          {
+            "node": "Analyze with Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze with Gemini": {
+      "main": [
+        [
+          {
+            "node": "Parse Analysis Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Analysis Result": {
+      "main": [
+        [
+          {
+            "node": "Read Verified Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Verified Sheet": {
+      "main": [
+        [
+          {
+            "node": "Read Flagged Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Flagged Sheet": {
+      "main": [
+        [
+          {
+            "node": "Check for Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Duplicate": {
+      "main": [
+        [
+          {
+            "node": "Is Low Confidence?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Low Confidence?": {
+      "main": [
+        [
+          {
+            "node": "Log to Needs Review",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Flagged?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Needs Review": {
+      "main": [
+        [
+          {
+            "node": "Build Flagging Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Flagged?": {
+      "main": [
+        [
+          {
+            "node": "Log to Flagged Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log to Verified Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Flagged Sheet": {
+      "main": [
+        [
+          {
+            "node": "Is SAFE_MODE? (Move to Flagged Folder)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move to Flagged Folder": {
+      "main": [
+        [
+          {
+            "node": "Build Flagging Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Flagging Alert": {
+      "main": [
+        [
+          {
+            "node": "Send Instant Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Verified Sheet": {
+      "main": [
+        [
+          {
+            "node": "Is SAFE_MODE? (Move to Verified Folder)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is SAFE_MODE? (Move to Flagged Folder)": {
+      "main": [
+        [
+          {
+            "node": "SIMULATED (Move to Flagged Folder)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Move to Flagged Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is SAFE_MODE? (Move to Verified Folder)": {
+      "main": [
+        [
+          {
+            "node": "SIMULATED (Move to Verified Folder)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Move to Verified Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:New Invoice in Drive": {
+      "lastTimeChecked": "2026-04-24T10:05:07Z"
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "7b0879b2-b4e3-4590-91d8-1fb0163c00e9",
+  "activeVersionId": "7b0879b2-b4e3-4590-91d8-1fb0163c00e9",
+  "versionCounter": 112,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-22T19:59:37.257Z",
+      "createdAt": "2026-03-22T19:59:37.257Z",
+      "role": "workflow:owner",
+      "workflowId": "4ctrfnpvBm2BpKxB",
+      "projectId": "4z38v6JO6ntgY8gF",
+      "project": {
+        "updatedAt": "2026-01-13T19:13:51.671Z",
+        "createdAt": "2026-01-13T19:11:25.659Z",
+        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+        "name": "YOUR_NAME <your-email@example.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-04-14T21:53:59.060Z",
+    "createdAt": "2026-04-14T21:53:59.060Z",
+    "versionId": "7b0879b2-b4e3-4590-91d8-1fb0163c00e9",
+    "workflowId": "4ctrfnpvBm2BpKxB",
+    "nodes": [
+      {
+        "parameters": {
+          "event": "fileCreated",
+          "folderToWatch": {
+            "__rl": true,
+            "mode": "id",
+            "value": "REPLACE_WITH_DRIVE_FOLDER_ID"
+          },
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyHour"
+              }
+            ]
+          },
+          "triggerOn": "specificFolder"
+        },
+        "id": "6c22cb98-f700-46b8-a0b7-07a769a71f1f",
+        "name": "New Invoice in Drive",
+        "type": "n8n-nodes-base.googleDriveTrigger",
+        "typeVersion": 1,
+        "position": [
+          -608,
+          528
+        ],
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Drive Account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "id": "cf483750-13ad-4b1a-bcab-2e097bb73586",
+        "name": "Download Invoice PDF",
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 2,
+        "position": [
+          -384,
+          528
+        ],
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Drive Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "operation": "binaryToPropery",
+          "destinationKey": "base64data",
+          "options": {}
+        },
+        "id": "8513af5e-1f6a-428f-95b6-7280d0f52557",
+        "name": "PDF to Base64",
+        "type": "n8n-nodes-base.extractFromFile",
+        "typeVersion": 1,
+        "position": [
+          -160,
+          528
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const base64Data   = $input.first().json.base64data;\nconst triggerData  = $('New Invoice in Drive').first().json;\nconst fileName     = triggerData.name || 'unknown.pdf';\nconst fileId       = triggerData.id   || '';\nconst prompt = 'You are an invoice auditor. Analyze this invoice PDF.\\nReturn ONLY a raw JSON object with no markdown and no code fences.\\nFields: vendor_name (string or null), invoice_number (string or null), invoice_date (YYYY-MM-DD or null), due_date (YYYY-MM-DD or null), line_items_count (integer or null), total_amount (number or null), currency (3-letter ISO code or null), has_signature (boolean), signature_valid (boolean - true ONLY for handwritten ink or rubber stamp not printed names), confidence_score (float 0.0 to 1.0), errors (array - include: No signature found, Total amount missing, Not a valid invoice, Invoice number missing - whichever apply), warnings (array - include: Due date has passed, Currency unclear - whichever apply). Return ONLY the JSON.';\nconst payload = { contents: [{ parts: [{ inline_data: { mime_type: 'application/pdf', data: base64Data } }, { text: prompt }] }], generationConfig: { temperature: 0.0, maxOutputTokens: 2048 } };\nreturn [{ json: { payload, file_name: fileName, file_id: fileId } }];"
+        },
+        "id": "a619216d-12a9-4361-bc34-44c23f30de01",
+        "name": "Build Gemini Payload",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          64,
+          528
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpQueryAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify($json.payload) }}",
+          "options": {
+            "timeout": 90000
+          }
+        },
+        "id": "3e12ef91-8321-498c-baa3-130b2457a40e",
+        "name": "Analyze with Gemini",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          288,
+          528
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "httpQueryAuth": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Query Auth Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const geminiOutput = $input.first().json;\nconst fileMeta     = $('Build Gemini Payload').first().json;\nlet parsed;\ntry {\n  if (!geminiOutput || !geminiOutput.candidates || !geminiOutput.candidates[0]) {\n    throw new Error('Invalid Gemini response structure');\n  }\n  const raw   = geminiOutput.candidates[0].content.parts[0].text;\n  const start = raw.indexOf('{'); const end = raw.lastIndexOf('}');\n  if (start === -1 || end === -1) throw new Error('No JSON in response');\n  parsed = JSON.parse(raw.slice(start, end + 1));\n} catch (e) {\n  parsed = { \n    vendor_name: null, \n    invoice_number: null, \n    invoice_date: null, \n    due_date: null, \n    line_items_count: null, \n    total_amount: null, \n    currency: null, \n    has_signature: false, \n    signature_valid: false, \n    confidence_score: 0.0, \n    errors: ['AI parse failure: ' + e.message], \n    warnings: [] \n  };\n}\nreturn [{ json: { \n  file_name: String(fileMeta.file_name||''), \n  file_id: String(fileMeta.file_id||''), \n  vendor_name: parsed.vendor_name||null, \n  invoice_number: String(parsed.invoice_number||''), \n  invoice_date: parsed.invoice_date||null, \n  due_date: parsed.due_date||null, \n  line_items_count: parsed.line_items_count||null, \n  total_amount: (parsed.total_amount!==undefined&&parsed.total_amount!==null)?Number(parsed.total_amount):null, \n  currency: parsed.currency||null, \n  has_signature: Boolean(parsed.has_signature), \n  signature_valid: Boolean(parsed.signature_valid), \n  confidence_score: Math.min(1,Math.max(0,Number(parsed.confidence_score)||0)), \n  errors: Array.isArray(parsed.errors)?parsed.errors:[], \n  warnings: Array.isArray(parsed.warnings)?parsed.warnings:[], \n  processed_at: new Date().toISOString(), \n  source: 'auto' \n} }];"
+        },
+        "id": "c2a20b40-d855-44bb-a661-98178c473bee",
+        "name": "Parse Analysis Result",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          512,
+          528
+        ]
+      },
+      {
+        "parameters": {
+          "sheetId": "REPLACE_WITH_YOUR_SHEET_ID",
+          "range": "Verified!A:Z",
+          "options": {}
+        },
+        "id": "f05997b5-a75a-4be6-9aa5-b09f4cc675eb",
+        "name": "Read Verified Sheet",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 2,
+        "position": [
+          736,
+          528
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Sheets Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "sheetId": "REPLACE_WITH_YOUR_SHEET_ID",
+          "range": "Flagged Invoices!A:Z",
+          "options": {}
+        },
+        "id": "b4c5341c-1ce6-441d-b08f-84a3d78bfd6c",
+        "name": "Read Flagged Sheet",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 2,
+        "position": [
+          960,
+          528
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Sheets Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get rows from BOTH sheets for duplicate scanning\nconst verifiedRows = $('Read Verified Sheet').all().map(i => i.json).filter(r => r.invoice_number);\nconst flaggedRows = $input.all().map(i => i.json).filter(r => r.invoice_number);\nconst allRows = [...verifiedRows, ...flaggedRows];\n\n// Current invoice being processed\nconst auditData = $('Parse Analysis Result').first().json;\nconst invNum = String(auditData.invoice_number || '').toLowerCase().trim();\nconst vendor = String(auditData.vendor_name || '').toLowerCase().trim();\n\nlet is_duplicate = false;\nlet duplicate_ref = null;\n\nif (invNum.length > 2 && vendor.length > 2) {\n  const match = allRows.find(r =>\n    String(r.invoice_number || '').toLowerCase().trim() === invNum &&\n    String(r.vendor_name || '').toLowerCase().trim() === vendor\n  );\n  if (match) {\n    is_duplicate = true;\n    duplicate_ref = match.file_name || 'previous submission';\n  }\n}\n\nconst errors = [...(auditData.errors || [])];\nif (is_duplicate) errors.push('Possible duplicate of: ' + duplicate_ref);\n\nreturn [{ json: { ...auditData, is_duplicate, duplicate_ref: duplicate_ref || null, errors } }];"
+        },
+        "id": "ccdb84c4-d7ab-4c33-88c0-18b6d771aee7",
+        "name": "Check for Duplicate",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1184,
+          528
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "cond-a08",
+                "leftValue": "={{ $json.confidence_score }}",
+                "rightValue": 0.75,
+                "operator": {
+                  "type": "number",
+                  "operation": "lt"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "240e37c2-4ad2-473a-b003-ba3f7ff2a036",
+        "name": "Is Low Confidence?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1408,
+          528
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "sheetId": "REPLACE_WITH_YOUR_SHEET_ID",
+          "range": "Needs Review!A:P",
+          "options": {}
+        },
+        "id": "b30d8994-beac-4181-891b-83a62620ac65",
+        "name": "Log to Needs Review",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 2,
+        "position": [
+          2080,
+          336
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Sheets Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "cond-a10",
+                "leftValue": "={{ $json.errors.length }}",
+                "rightValue": 0,
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "755a98a3-94c6-430c-a53e-0b59f5a1832e",
+        "name": "Is Flagged?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1632,
+          624
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "sheetId": "REPLACE_WITH_YOUR_SHEET_ID",
+          "range": "Flagged Invoices!A:P",
+          "options": {}
+        },
+        "id": "6343302a-4eff-4c1e-887b-1a3c2c5f6b74",
+        "name": "Log to Flagged Sheet",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 2,
+        "position": [
+          1856,
+          528
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Sheets Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "method": "PATCH",
+          "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.file_id }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleDriveOAuth2Api",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "addParents",
+                "value": "REPLACE_WITH_DRIVE_FOLDER_ID"
+              },
+              {
+                "name": "removeParents",
+                "value": "REPLACE_WITH_DRIVE_FOLDER_ID"
+              },
+              {
+                "name": "fields",
+                "value": "id,name,parents"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "{}",
+          "options": {}
+        },
+        "id": "392e5072-ed6d-47ac-b9c7-1615c2a0daf9",
+        "name": "Move to Flagged Folder",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2080,
+          528
+        ],
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Drive Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const d = $('Check for Duplicate').first().json;\nconst fileId = d.file_id || $input.first().json.id || '';\nconst driveUrl = 'https://drive.google.com/file/d/' + fileId + '/view';\nconst confidence = Math.round((d.confidence_score||0)*100);\nconst amount = (d.total_amount!==null&&d.total_amount!==undefined)?(d.currency||'')+' '+d.total_amount:'Not found';\nconst dupLabel = d.is_duplicate?' [DUPLICATE]':'';\nconst errRows = (d.errors||[]).map(e=>'<li style=\"color:#c04828;margin:4px 0\">'+e+'</li>').join('');\nconst warnRows = (d.warnings||[]).length?'<p><b>Warnings:</b></p><ul>'+(d.warnings||[]).map(w=>'<li style=\"color:#e67e22;margin:4px 0\">'+w+'</li>').join('')+'</ul>':'';\nconst html = '<div style=\"font-family:Arial,sans-serif;max-width:580px\"><div style=\"background:#c04828;padding:18px 24px;border-radius:8px 8px 0 0\"><h2 style=\"color:#fff;margin:0;font-size:16px\">Invoice Flagged'+dupLabel+'</h2></div><div style=\"padding:20px 24px;border:1px solid #ddd;border-top:none\"><table style=\"width:100%\"><tr><td style=\"color:#666;padding:4px 12px 4px 0\">File</td><td style=\"font-weight:700\">'+(d.file_name||'Unknown')+'</td></tr><tr><td style=\"color:#666;padding:4px 12px 4px 0\">Vendor</td><td>'+(d.vendor_name||'Not identified')+'</td></tr><tr><td style=\"color:#666;padding:4px 12px 4px 0\">Invoice #</td><td>'+(d.invoice_number||'Not found')+'</td></tr><tr><td style=\"color:#666;padding:4px 12px 4px 0\">Amount</td><td>'+amount+'</td></tr><tr><td style=\"color:#666;padding:4px 12px 4px 0\">AI Confidence</td><td>'+confidence+'%</td></tr></table><p><b>Problems found:</b></p><ul>'+errRows+'</ul>'+warnRows+'<p><a href=\"'+driveUrl+'\" style=\"display:inline-block;background:#0f6e56;color:#fff;padding:10px 20px;text-decoration:none;border-radius:6px\">Open in Google Drive</a></p><p style=\"font-size:11px;color:#aaa\">Processed: '+d.processed_at+'</p></div></div>';\nreturn [{json:{subject:(d.is_duplicate?'[DUPLICATE] ':'[FLAGGED] ')+(d.file_name||'Invoice'),html}}];"
+        },
+        "id": "d9852578-e550-4fa7-9d45-c4db473c2bd7",
+        "name": "Build Flagging Alert",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2304,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "fromEmail": "your-email@example.com",
+          "toEmail": "your-email@example.com",
+          "subject": "={{ $json.subject }}",
+          "html": "={{ $json.html }}",
+          "options": {}
+        },
+        "id": "5b1b41d5-4c53-454e-adb1-81a98fa22fb6",
+        "name": "Send Instant Alert",
+        "type": "n8n-nodes-base.emailSend",
+        "typeVersion": 2.1,
+        "position": [
+          2528,
+          432
+        ],
+        "webhookId": "143cb625-3eb3-4007-8cc3-5f86b92fc0d9",
+        "credentials": {
+          "smtp": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "SMTP Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "sheetId": "REPLACE_WITH_YOUR_SHEET_ID",
+          "range": "Verified!A:P",
+          "options": {}
+        },
+        "id": "79debc4c-8046-4834-8cd5-786946364ac2",
+        "name": "Log to Verified Sheet",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 2,
+        "position": [
+          1856,
+          720
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Sheets Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "method": "PATCH",
+          "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.file_id }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleDriveOAuth2Api",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "addParents",
+                "value": "REPLACE_WITH_DRIVE_FOLDER_ID"
+              },
+              {
+                "name": "removeParents",
+                "value": "REPLACE_WITH_DRIVE_FOLDER_ID"
+              },
+              {
+                "name": "fields",
+                "value": "id,name,parents"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "{}",
+          "options": {}
+        },
+        "id": "f7138364-de53-4738-86a8-3aecf9d039b9",
+        "name": "Move to Verified Folder",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2080,
+          720
+        ],
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Drive Account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      }
+    ],
+    "connections": {
+      "New Invoice in Drive": {
+        "main": [
+          [
+            {
+              "node": "Download Invoice PDF",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Download Invoice PDF": {
+        "main": [
+          [
+            {
+              "node": "PDF to Base64",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "PDF to Base64": {
+        "main": [
+          [
+            {
+              "node": "Build Gemini Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Gemini Payload": {
+        "main": [
+          [
+            {
+              "node": "Analyze with Gemini",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Analyze with Gemini": {
+        "main": [
+          [
+            {
+              "node": "Parse Analysis Result",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Analysis Result": {
+        "main": [
+          [
+            {
+              "node": "Read Verified Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Verified Sheet": {
+        "main": [
+          [
+            {
+              "node": "Read Flagged Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Flagged Sheet": {
+        "main": [
+          [
+            {
+              "node": "Check for Duplicate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check for Duplicate": {
+        "main": [
+          [
+            {
+              "node": "Is Low Confidence?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Low Confidence?": {
+        "main": [
+          [
+            {
+              "node": "Log to Needs Review",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Is Flagged?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log to Needs Review": {
+        "main": [
+          [
+            {
+              "node": "Build Flagging Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Flagged?": {
+        "main": [
+          [
+            {
+              "node": "Log to Flagged Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Log to Verified Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log to Flagged Sheet": {
+        "main": [
+          [
+            {
+              "node": "Move to Flagged Folder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Move to Flagged Folder": {
+        "main": [
+          [
+            {
+              "node": "Build Flagging Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Flagging Alert": {
+        "main": [
+          [
+            {
+              "node": "Send Instant Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log to Verified Sheet": {
+        "main": [
+          [
+            {
+              "node": "Move to Verified Folder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "YOUR_NAME",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-04-14T21:54:00.198Z",
+        "id": 814,
+        "workflowId": "4ctrfnpvBm2BpKxB",
+        "versionId": "7b0879b2-b4e3-4590-91d8-1fb0163c00e9",
+        "event": "activated",
+        "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+      },
+      {
+        "createdAt": "2026-04-14T21:53:59.252Z",
+        "id": 813,
+        "workflowId": "4ctrfnpvBm2BpKxB",
+        "versionId": "7b0879b2-b4e3-4590-91d8-1fb0163c00e9",
+        "event": "deactivated",
+        "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+      }
+    ]
+  }
 }
