@@ -38,7 +38,13 @@
       "name": "💾 Memory: Read Calendar",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
-      "position": [448, 0]
+      "position": [448, 0],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "AI Lead Gen Machine Google Sheets"
+        }
+      }
     },
     {
       "parameters": {
@@ -122,7 +128,13 @@
       "name": "💾 Memory: Mark Posted",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
-      "position": [1344, 0]
+      "position": [1344, 0],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "AI Lead Gen Machine Google Sheets"
+        }
+      }
     },
     {
       "parameters": {
