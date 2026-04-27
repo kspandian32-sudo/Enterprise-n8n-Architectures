@@ -28,8 +28,8 @@
     },
     {
       "parameters": {
-        "documentId": "1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg",
-        "sheetName": "Calendar",
+        "documentId": "={{ '1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg' }}",
+        "sheetName": "={{ 'Calendar' }}",
         "filtersUI": {
           "values": [{ "lookupColumn": "Posted", "lookupValue": "No" }]
         }
@@ -37,7 +37,7 @@
       "id": "6d8a1662-0038-4f0d-9694-4fbf4444cecd",
       "name": "💾 Memory: Read Calendar",
       "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
+      "typeVersion": 4.5,
       "position": [448, 0],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -116,8 +116,8 @@
     {
       "parameters": {
         "operation": "update",
-        "documentId": "1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg",
-        "sheetName": "Calendar",
+        "documentId": "={{ '1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg' }}",
+        "sheetName": "={{ 'Calendar' }}",
         "columns": {
           "mappingMode": "defineBelow",
           "matchingColumns": ["row_number"],
@@ -127,7 +127,7 @@
       "id": "622d4fb1-e7be-4871-9cec-717942e78f27",
       "name": "💾 Memory: Mark Posted",
       "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
+      "typeVersion": 4.5,
       "position": [1344, 0],
       "credentials": {
         "googleSheetsOAuth2Api": {
