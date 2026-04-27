@@ -61,11 +61,12 @@
           "conditions": [
             {
               "leftValue": "={{ $json.Posted }}",
-              "operator": { "operation": "equals", "type": "string" },
+              "operator": { "name": "filter.operator.equals", "operation": "equals", "type": "string" },
               "rightValue": "No"
             }
           ]
-        }
+        },
+        "options": { "looseTypeValidation": true }
       },
       "id": "4cdc19cc-f8fa-46cf-a8e3-8b7a27468bdc",
       "name": "🛡️ Gate: Filter Due",
@@ -80,11 +81,12 @@
           "conditions": [
             {
               "leftValue": "={{ $json[\"Image Status\"] }}",
-              "operator": { "operation": "startsWith", "type": "string" },
+              "operator": { "name": "filter.operator.startsWith", "operation": "startsWith", "type": "string" },
               "rightValue": "http"
             }
           ]
-        }
+        },
+        "options": { "looseTypeValidation": true }
       },
       "id": "has-image-gate-id",
       "name": "🛡️ Gate: Has Image?",
@@ -99,11 +101,12 @@
           "conditions": [
             {
               "leftValue": "={{ $(\"⚙️ Global Config\").first().json.safeMode }}",
-              "operator": { "operation": "equals", "type": "boolean" },
+              "operator": { "name": "filter.operator.equals", "operation": "equals", "type": "boolean" },
               "rightValue": true
             }
           ]
-        }
+        },
+        "options": { "looseTypeValidation": true }
       },
       "id": "9aa49b76-de74-4da9-b48a-713fd8b2560f",
       "name": "🛡️ Gate: Safe Mode",
