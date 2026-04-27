@@ -65,6 +65,25 @@
           "combinator": "and",
           "conditions": [
             {
+              "leftValue": "={{ $json[\"Image Status\"] }}",
+              "operator": { "operation": "startsWith", "type": "string" },
+              "rightValue": "http"
+            }
+          ]
+        }
+      },
+      "id": "has-image-gate-id",
+      "name": "🛡️ Gate: Has Image?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [850, -150]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
               "leftValue": "={{ $(\"⚙️ Global Config\").first().json.safeMode }}",
               "operator": { "operation": "equals", "type": "boolean" },
               "rightValue": true
@@ -76,7 +95,7 @@
       "name": "🛡️ Gate: Safe Mode",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [896, 0]
+      "position": [1050, 0]
     },
     {
       "parameters": {
@@ -128,7 +147,8 @@
     "🗓️ Trigger: Schedule": { "main": [[{ "node": "⚙️ Global Config", "type": "main", "index": 0 }]] },
     "⚙️ Global Config": { "main": [[{ "node": "💾 Memory: Read Calendar", "type": "main", "index": 0 }]] },
     "💾 Memory: Read Calendar": { "main": [[{ "node": "🛡️ Gate: Filter Due", "type": "main", "index": 0 }]] },
-    "🛡️ Gate: Filter Due": { "main": [[{ "node": "🛡️ Gate: Safe Mode", "type": "main", "index": 0 }]] },
+    "🛡️ Gate: Filter Due": { "main": [[{ "node": "🛡️ Gate: Has Image?", "type": "main", "index": 0 }]] },
+    "🛡️ Gate: Has Image?": { "main": [[{ "node": "💾 Memory: Mark Posted", "type": "main", "index": 0 }], [{ "node": "🛡️ Gate: Safe Mode", "type": "main", "index": 0 }]] },
     "🛡️ Gate: Safe Mode": { "main": [[{ "node": "💾 Memory: Mark Posted", "type": "main", "index": 0 }], [{ "node": "🚀 Execute: Mock Publish", "type": "main", "index": 0 }]] },
     "🚀 Execute: Mock Publish": { "main": [[{ "node": "💾 Memory: Mark Posted", "type": "main", "index": 0 }]] },
     "💾 Memory: Mark Posted": { "main": [[{ "node": "📝 Log: Success", "type": "main", "index": 0 }]] }
