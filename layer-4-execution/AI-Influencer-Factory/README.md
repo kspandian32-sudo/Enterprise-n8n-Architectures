@@ -16,6 +16,7 @@ This solution follows the **5-Layer Enterprise n8n Standard**:
 
 *   **Global Configuration**: Centralized `⚙️ Global Config` node for 10-second environment migration.
 *   **Safe Mode Protocol**: Toggle risk-free testing for all execution nodes.
+*   **Manual Image Overwrite**: Priority logic to use human-provided image URLs from the spreadsheet, bypassing AI generation.
 *   **Defensive Parsing**: Regex-based JSON sanitization to handle non-deterministic AI output.
 *   **Observability**: Real-time telemetry streamed to external log drains via `📝 Log` nodes.
 *   **Closed-Loop Ops**: Moves from "Prompt Kit" to "Autonomous Content Asset Library."

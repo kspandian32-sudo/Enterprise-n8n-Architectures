@@ -91,7 +91,7 @@ graph TD
 *   **[AI Proposal Autopilot](./layer-4-execution/AI-Proposal-Invoice-Autopilot/)** — *Full Sales Lifecycle*
     *   End-to-end automation from lead intake to Google Slides generation and invoicing.
 *   **[AI Influencer Factory](./layer-4-execution/AI-Influencer-Factory/)** — *v3 Enterprise Edition*
-    *   Autonomous persona generation and 30-day scheduled publishing with multi-modal AI (Ideogram/OpenAI) and "Safe Mode" hardening.
+    *   Autonomous persona generation and 30-day scheduled publishing with multi-modal AI (Ideogram/OpenAI), "Safe Mode" hardening, and **Manual Image Overwrite** support.
 
 ### 📂 [Layer 5: Extensions](./layer-5-extensions/)
 *   **[Gemini PDF Node](./layer-5-extensions/n8n-nodes-gemini-pdf-analyzer/)** — *Custom n8n Extension*
