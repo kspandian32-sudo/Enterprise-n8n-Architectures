@@ -28,8 +28,8 @@
     },
     {
       "parameters": {
-        "documentId": "={{ $json.spreadsheetId }}",
-        "sheetName": "={{ $json.calendarSheetName }}",
+        "documentId": "1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg",
+        "sheetName": "Calendar",
         "filtersUI": {
           "values": [{ "lookupColumn": "Posted", "lookupValue": "No" }]
         }
@@ -110,8 +110,8 @@
     {
       "parameters": {
         "operation": "update",
-        "documentId": "={{ $json.spreadsheetId }}",
-        "sheetName": "={{ $json.calendarSheetName }}",
+        "documentId": "1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg",
+        "sheetName": "Calendar",
         "columns": {
           "mappingMode": "defineBelow",
           "matchingColumns": ["row_number"],
