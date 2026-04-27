@@ -30,6 +30,7 @@ graph TD
         G[Invoice Auditor]
         H[Legal AI]
         I[Content Alchemist]
+        J[AI Influencer Factory]
     end
     
     B --> C
@@ -37,6 +38,7 @@ graph TD
     D --> G
     D --> H
     D --> I
+    D --> J
 ```
 
 ---
@@ -88,6 +90,8 @@ graph TD
     *   Sophisticated video production engine with multi-lane processing (Nano, Veo, Sora) and dynamic lane switching.
 *   **[AI Proposal Autopilot](./layer-4-execution/AI-Proposal-Invoice-Autopilot/)** — *Full Sales Lifecycle*
     *   End-to-end automation from lead intake to Google Slides generation and invoicing.
+*   **[AI Influencer Factory](./layer-4-execution/AI-Influencer-Factory/)** — *v3 Enterprise Edition*
+    *   Autonomous persona generation and 30-day scheduled publishing with multi-modal AI (Ideogram/OpenAI) and "Safe Mode" hardening.
 
 ### 📂 [Layer 5: Extensions](./layer-5-extensions/)
 *   **[Gemini PDF Node](./layer-5-extensions/n8n-nodes-gemini-pdf-analyzer/)** — *Custom n8n Extension*
@@ -123,6 +127,7 @@ This portfolio implements a **Global SAFE_MODE Toggle** across 4 major automatio
 - **Invoice Vision Auditor**: Gates file movements / external API writes.
 - **Signal Pipeline**: Gates email alerting / intent notifications.
 - **Auto-Blogger**: Gates WordPress publishing API.
+- **AI Influencer Factory**: Gates Ideogram image generation and Instagram publishing.
 
 **Architecture:** Destructive actions are programmatically gated by environment-based IF branches (`SAFE_MODE=true`). This ensures that developers can run end-to-end tests without triggering real-world side effects. Designed for the n8n Community Edition by leveraging system environment variables instead of Enterprise-only UI features.
 
@@ -135,6 +140,7 @@ This portfolio implements a **Global SAFE_MODE Toggle** across 4 major automatio
 | Content Alchemist | ~2 hrs/post (transcribe + write + design) | ~3 min/post (voice → published) | **40× faster, consistent quality** |
 | Signal Pipeline | ~45 min/scan (manual job board review) | ~90 sec/scan (AI scored + deduped) | **30× speed, zero missed signals** |
 | Auto-Blogger | ~3 hrs/article (research + write + publish) | ~2 min/article (prompt → WordPress) | **90× faster production** |
+| AI Influencer Factory | ~5 hrs/persona (research + 30-day plan) | ~5 min/persona (form → full strategy) | **60× throughput** |
 
 ---
 
