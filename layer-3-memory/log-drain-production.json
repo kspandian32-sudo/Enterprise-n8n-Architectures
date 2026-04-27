@@ -1,139 +1,681 @@
-{
-  "name": "Centralized Log-Drain (Production Stack)",
-  "nodes": [
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "log-drain-v1",
-        "options": {}
-      },
-      "name": "Webhook: Receive Log",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1,
-      "position": [250, 300]
-    },
-    {
-      "parameters": {
-        "jsCode": "// Code node: Normalize Log Entry\nconst entry = $input.first().json;\n\nreturn [{\n  json: {\n    workflow_name: entry.workflow_name ?? 'unknown',\n    tool_name:     entry.tool_name ?? null,\n    level:         ['debug','info','warn','error'].includes(entry.level) ? entry.level : 'info',\n    message:       String(entry.message ?? '').slice(0, 2000),\n    metadata:      typeof entry.metadata === 'object' ? entry.metadata : {},\n    ts:            entry.ts ?? new Date().toISOString(),\n    session_id:    entry.session_id ?? null,\n  }\n}];"
-      },
-      "name": "Code: Normalize",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 1,
-      "position": [450, 300]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "string": [
-            {
-              "value1": "={{ $json.level }}",
-              "value2": "error"
-            }
-          ]
-        }
-      },
-      "name": "IF: Is Error?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
-      "position": [650, 300]
-    },
-    {
-      "parameters": {
-        "chatId": "YOUR_TELEGRAM_CHAT_ID",
-        "text": "🚨 *ERROR in {{ $json.workflow_name }}*\nTool: {{ $json.tool_name }}\nMessage: {{ $json.message }}\nTimestamp: {{ $json.ts }}",
-        "additionalFields": {
-          "parse_mode": "Markdown"
-        }
-      },
-      "name": "Telegram: Alert Admin",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1,
-      "position": [850, 150]
-    },
-    {
-      "parameters": {
-        "operation": "insert",
-        "table": "execution_logs",
-        "columns": "workflow_name, tool_name, level, message, metadata, session_id, created_at",
-        "values": "={{ $json.workflow_name }}, {{ $json.tool_name }}, {{ $json.level }}, {{ $json.message }}, {{ JSON.stringify($json.metadata) }}, {{ $json.session_id }}, {{ $json.ts }}"
-      },
-      "name": "Supabase: Insert Log",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [1050, 300]
-    },
-    {
-      "parameters": {
-        "mode": "append"
-      },
-      "name": "Merge",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 1,
-      "position": [850, 300]
-    }
-  ],
-  "connections": {
-    "Webhook: Receive Log": {
-      "main": [
-        [
-          {
-            "node": "Code: Normalize",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code: Normalize": {
-      "main": [
-        [
-          {
-            "node": "IF: Is Error?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "IF: Is Error?": {
-      "main": [
-        [
-          {
-            "node": "Telegram: Alert Admin",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Telegram: Alert Admin": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge": {
-      "main": [
-        [
-          {
-            "node": "Supabase: Insert Log",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
-  }
+﻿{
+    "updatedAt":  "2026-04-25T19:15:49.487Z",
+    "createdAt":  "2026-04-25T19:14:19.192Z",
+    "id":  "FEK7PNwR6I3XZygD",
+    "name":  "Log-Drain â€” Centralized Sub-workflow",
+    "description":  null,
+    "active":  true,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "id":  "node-webhook",
+                      "name":  "Webhook Trigger",
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       240,
+                                       300
+                                   ],
+                      "parameters":  {
+                                         "path":  "log-drain",
+                                         "httpMethod":  "POST",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "webhookId":  "54b4aff7-ebfe-462b-8f98-10dfb2ff05e6",
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "id":  "node-normalize",
+                      "name":  "Normalize Entry",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       480,
+                                       300
+                                   ],
+                      "parameters":  {
+                                         "jsCode":  "const raw = $input.first().json.body ?? $input.first().json;\n\nconst validLevels = [\u0027debug\u0027, \u0027info\u0027, \u0027warn\u0027, \u0027error\u0027];\n\nconst entry = {\n  workflow_name: String(raw.workflow_name ?? \u0027unknown\u0027).slice(0, 100),\n  tool_name:     raw.tool_name ? String(raw.tool_name).slice(0, 100) : null,\n  level:         validLevels.includes(raw.level) ? raw.level : \u0027info\u0027,\n  message:       String(raw.message ?? \u0027\u0027).slice(0, 2000),\n  metadata:      (raw.metadata \u0026\u0026 typeof raw.metadata === \u0027object\u0027) ? raw.metadata : {},\n  session_id:    raw.session_id ? String(raw.session_id).slice(0, 100) : null,\n  created_at:    raw.ts ?? new Date().toISOString(),\n};\n\nreturn [{ json: entry }];"
+                                     }
+                  },
+                  {
+                      "id":  "node-if",
+                      "name":  "Is Error Level",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       720,
+                                       300
+                                   ],
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "version":  2,
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  false,
+                                                                            "typeValidation":  "strict"
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "cond-1",
+                                                                                   "leftValue":  "={{ $json.level }}",
+                                                                                   "rightValue":  "error",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "equals"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        }
+                                     },
+                      "onError":  "continueErrorOutput"
+                  },
+                  {
+                      "id":  "node-telegram",
+                      "name":  "Telegram Alert",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       960,
+                                       160
+                                   ],
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "=https://api.telegram.org/bot{{$env.TELEGRAM_BOT_TOKEN}}/sendMessage",
+                                         "sendBody":  true,
+                                         "contentType":  "json",
+                                         "body":  {
+                                                      "values":  [
+                                                                     {
+                                                                         "name":  "chat_id",
+                                                                         "value":  "={{$env.TELEGRAM_CHAT_ID}}"
+                                                                     },
+                                                                     {
+                                                                         "name":  "parse_mode",
+                                                                         "value":  "Markdown"
+                                                                     },
+                                                                     {
+                                                                         "name":  "text",
+                                                                         "value":  "=*ERROR* in `{{ $json.workflow_name }}`\n*Tool:* `{{ $json.tool_name ?? \u0027n/a\u0027 }}`\n*Message:* {{ $json.message }}\n*Time:* {{ $json.created_at }}\n*Session:* `{{ $json.session_id ?? \u0027n/a\u0027 }}`"
+                                                                     }
+                                                                 ]
+                                                  },
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "neverError":  true
+                                                                                       }
+                                                                      }
+                                                     }
+                                     },
+                      "maxTries":  3,
+                      "onError":  "continueRegularOutput",
+                      "retryOnFail":  true,
+                      "waitBetweenTries":  2000
+                  },
+                  {
+                      "id":  "node-merge",
+                      "name":  "Merge Branches",
+                      "type":  "n8n-nodes-base.merge",
+                      "typeVersion":  3.2,
+                      "position":  [
+                                       1200,
+                                       300
+                                   ],
+                      "parameters":  {
+                                         "mode":  "append"
+                                     }
+                  },
+                  {
+                      "id":  "node-supabase",
+                      "name":  "Supabase Insert",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       1440,
+                                       300
+                                   ],
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{$env.SUPABASE_URL}}/rest/v1/execution_logs",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "apikey",
+                                                                                         "value":  "={{$env.SUPABASE_SERVICE_ROLE_KEY}}"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Authorization",
+                                                                                         "value":  "=Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Prefer",
+                                                                                         "value":  "return=minimal"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "contentType":  "json",
+                                         "body":  {
+                                                      "values":  [
+                                                                     {
+                                                                         "name":  "workflow_name",
+                                                                         "value":  "={{ $json.workflow_name }}"
+                                                                     },
+                                                                     {
+                                                                         "name":  "tool_name",
+                                                                         "value":  "={{ $json.tool_name }}"
+                                                                     },
+                                                                     {
+                                                                         "name":  "level",
+                                                                         "value":  "={{ $json.level }}"
+                                                                     },
+                                                                     {
+                                                                         "name":  "message",
+                                                                         "value":  "={{ $json.message }}"
+                                                                     },
+                                                                     {
+                                                                         "name":  "metadata",
+                                                                         "value":  "={{ JSON.stringify($json.metadata) }}"
+                                                                     },
+                                                                     {
+                                                                         "name":  "session_id",
+                                                                         "value":  "={{ $json.session_id }}"
+                                                                     },
+                                                                     {
+                                                                         "name":  "created_at",
+                                                                         "value":  "={{ $json.created_at }}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "neverError":  true
+                                                                                       }
+                                                                      }
+                                                     }
+                                     },
+                      "maxTries":  3,
+                      "onError":  "continueRegularOutput",
+                      "retryOnFail":  true,
+                      "waitBetweenTries":  5000
+                  },
+                  {
+                      "id":  "node-respond",
+                      "name":  "Respond OK",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       1680,
+                                       300
+                                   ],
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={ \"ok\": true }"
+                                     }
+                  }
+              ],
+    "connections":  {
+                        "Webhook Trigger":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Normalize Entry",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Normalize Entry":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Is Error Level",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Is Error Level":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Telegram Alert",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ],
+                                                            [
+                                                                {
+                                                                    "node":  "Merge Branches",
+                                                                    "type":  "main",
+                                                                    "index":  1
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Telegram Alert":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Merge Branches",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Merge Branches":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Supabase Insert",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Supabase Insert":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Respond OK",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false
+                 },
+    "staticData":  null,
+    "meta":  null,
+    "pinData":  null,
+    "versionId":  "07cf8a72-2367-4f2f-a9da-5621f3b313f2",
+    "activeVersionId":  "07cf8a72-2367-4f2f-a9da-5621f3b313f2",
+    "versionCounter":  11,
+    "triggerCount":  1,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-25T19:14:19.231Z",
+                       "createdAt":  "2026-04-25T19:14:19.231Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "FEK7PNwR6I3XZygD",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id":  "4z38v6JO6ntgY8gF",
+                                       "name":  "PANDIAN K S \u003ckspandia@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  {
+                          "updatedAt":  "2026-04-25T21:20:53.000Z",
+                          "createdAt":  "2026-04-25T19:15:49.515Z",
+                          "versionId":  "07cf8a72-2367-4f2f-a9da-5621f3b313f2",
+                          "workflowId":  "FEK7PNwR6I3XZygD",
+                          "nodes":  [
+                                        {
+                                            "id":  "node-webhook",
+                                            "name":  "Webhook Trigger",
+                                            "type":  "n8n-nodes-base.webhook",
+                                            "typeVersion":  2.1,
+                                            "position":  [
+                                                             240,
+                                                             300
+                                                         ],
+                                            "parameters":  {
+                                                               "path":  "log-drain",
+                                                               "httpMethod":  "POST",
+                                                               "responseMode":  "responseNode",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "webhookId":  "54b4aff7-ebfe-462b-8f98-10dfb2ff05e6",
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "id":  "node-normalize",
+                                            "name":  "Normalize Entry",
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             480,
+                                                             300
+                                                         ],
+                                            "parameters":  {
+                                                               "jsCode":  "const raw = $input.first().json.body ?? $input.first().json;\n\nconst validLevels = [\u0027debug\u0027, \u0027info\u0027, \u0027warn\u0027, \u0027error\u0027];\n\nconst entry = {\n  workflow_name: String(raw.workflow_name ?? \u0027unknown\u0027).slice(0, 100),\n  tool_name:     raw.tool_name ? String(raw.tool_name).slice(0, 100) : null,\n  level:         validLevels.includes(raw.level) ? raw.level : \u0027info\u0027,\n  message:       String(raw.message ?? \u0027\u0027).slice(0, 2000),\n  metadata:      (raw.metadata \u0026\u0026 typeof raw.metadata === \u0027object\u0027) ? raw.metadata : {},\n  session_id:    raw.session_id ? String(raw.session_id).slice(0, 100) : null,\n  created_at:    raw.ts ?? new Date().toISOString(),\n};\n\nreturn [{ json: entry }];"
+                                                           }
+                                        },
+                                        {
+                                            "id":  "node-if",
+                                            "name":  "Is Error Level",
+                                            "type":  "n8n-nodes-base.if",
+                                            "typeVersion":  2.3,
+                                            "position":  [
+                                                             720,
+                                                             300
+                                                         ],
+                                            "parameters":  {
+                                                               "conditions":  {
+                                                                                  "options":  {
+                                                                                                  "version":  2,
+                                                                                                  "leftValue":  "",
+                                                                                                  "caseSensitive":  false,
+                                                                                                  "typeValidation":  "strict"
+                                                                                              },
+                                                                                  "conditions":  [
+                                                                                                     {
+                                                                                                         "id":  "cond-1",
+                                                                                                         "leftValue":  "={{ $json.level }}",
+                                                                                                         "rightValue":  "error",
+                                                                                                         "operator":  {
+                                                                                                                          "type":  "string",
+                                                                                                                          "operation":  "equals"
+                                                                                                                      }
+                                                                                                     }
+                                                                                                 ],
+                                                                                  "combinator":  "and"
+                                                                              }
+                                                           },
+                                            "onError":  "continueErrorOutput"
+                                        },
+                                        {
+                                            "id":  "node-telegram",
+                                            "name":  "Telegram Alert",
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             960,
+                                                             160
+                                                         ],
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "=https://api.telegram.org/bot{{$env.TELEGRAM_BOT_TOKEN}}/sendMessage",
+                                                               "sendBody":  true,
+                                                               "contentType":  "json",
+                                                               "body":  {
+                                                                            "values":  [
+                                                                                           {
+                                                                                               "name":  "chat_id",
+                                                                                               "value":  "={{$env.TELEGRAM_CHAT_ID}}"
+                                                                                           },
+                                                                                           {
+                                                                                               "name":  "parse_mode",
+                                                                                               "value":  "Markdown"
+                                                                                           },
+                                                                                           {
+                                                                                               "name":  "text",
+                                                                                               "value":  "=*ERROR* in `{{ $json.workflow_name }}`\n*Tool:* `{{ $json.tool_name ?? \u0027n/a\u0027 }}`\n*Message:* {{ $json.message }}\n*Time:* {{ $json.created_at }}\n*Session:* `{{ $json.session_id ?? \u0027n/a\u0027 }}`"
+                                                                                           }
+                                                                                       ]
+                                                                        },
+                                                               "options":  {
+                                                                               "response":  {
+                                                                                                "response":  {
+                                                                                                                 "neverError":  true
+                                                                                                             }
+                                                                                            }
+                                                                           }
+                                                           },
+                                            "maxTries":  3,
+                                            "onError":  "continueRegularOutput",
+                                            "retryOnFail":  true,
+                                            "waitBetweenTries":  2000
+                                        },
+                                        {
+                                            "id":  "node-merge",
+                                            "name":  "Merge Branches",
+                                            "type":  "n8n-nodes-base.merge",
+                                            "typeVersion":  3.2,
+                                            "position":  [
+                                                             1200,
+                                                             300
+                                                         ],
+                                            "parameters":  {
+                                                               "mode":  "append"
+                                                           }
+                                        },
+                                        {
+                                            "id":  "node-supabase",
+                                            "name":  "Supabase Insert",
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             1440,
+                                                             300
+                                                         ],
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "={{$env.SUPABASE_URL}}/rest/v1/execution_logs",
+                                                               "sendHeaders":  true,
+                                                               "headerParameters":  {
+                                                                                        "parameters":  [
+                                                                                                           {
+                                                                                                               "name":  "apikey",
+                                                                                                               "value":  "={{$env.SUPABASE_SERVICE_ROLE_KEY}}"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Authorization",
+                                                                                                               "value":  "=Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Content-Type",
+                                                                                                               "value":  "application/json"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "name":  "Prefer",
+                                                                                                               "value":  "return=minimal"
+                                                                                                           }
+                                                                                                       ]
+                                                                                    },
+                                                               "sendBody":  true,
+                                                               "contentType":  "json",
+                                                               "body":  {
+                                                                            "values":  [
+                                                                                           {
+                                                                                               "name":  "workflow_name",
+                                                                                               "value":  "={{ $json.workflow_name }}"
+                                                                                           },
+                                                                                           {
+                                                                                               "name":  "tool_name",
+                                                                                               "value":  "={{ $json.tool_name }}"
+                                                                                           },
+                                                                                           {
+                                                                                               "name":  "level",
+                                                                                               "value":  "={{ $json.level }}"
+                                                                                           },
+                                                                                           {
+                                                                                               "name":  "message",
+                                                                                               "value":  "={{ $json.message }}"
+                                                                                           },
+                                                                                           {
+                                                                                               "name":  "metadata",
+                                                                                               "value":  "={{ JSON.stringify($json.metadata) }}"
+                                                                                           },
+                                                                                           {
+                                                                                               "name":  "session_id",
+                                                                                               "value":  "={{ $json.session_id }}"
+                                                                                           },
+                                                                                           {
+                                                                                               "name":  "created_at",
+                                                                                               "value":  "={{ $json.created_at }}"
+                                                                                           }
+                                                                                       ]
+                                                                        },
+                                                               "options":  {
+                                                                               "response":  {
+                                                                                                "response":  {
+                                                                                                                 "neverError":  true
+                                                                                                             }
+                                                                                            }
+                                                                           }
+                                                           },
+                                            "maxTries":  3,
+                                            "onError":  "continueRegularOutput",
+                                            "retryOnFail":  true,
+                                            "waitBetweenTries":  5000
+                                        },
+                                        {
+                                            "id":  "node-respond",
+                                            "name":  "Respond OK",
+                                            "type":  "n8n-nodes-base.respondToWebhook",
+                                            "typeVersion":  1.5,
+                                            "position":  [
+                                                             1680,
+                                                             300
+                                                         ],
+                                            "parameters":  {
+                                                               "respondWith":  "json",
+                                                               "responseBody":  "={ \"ok\": true }"
+                                                           }
+                                        }
+                                    ],
+                          "connections":  {
+                                              "Webhook Trigger":  {
+                                                                      "main":  [
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "Normalize Entry",
+                                                                                           "type":  "main",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                                  },
+                                              "Normalize Entry":  {
+                                                                      "main":  [
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "Is Error Level",
+                                                                                           "type":  "main",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                                  },
+                                              "Is Error Level":  {
+                                                                     "main":  [
+                                                                                  [
+                                                                                      {
+                                                                                          "node":  "Telegram Alert",
+                                                                                          "type":  "main",
+                                                                                          "index":  0
+                                                                                      }
+                                                                                  ],
+                                                                                  [
+                                                                                      {
+                                                                                          "node":  "Merge Branches",
+                                                                                          "type":  "main",
+                                                                                          "index":  1
+                                                                                      }
+                                                                                  ]
+                                                                              ]
+                                                                 },
+                                              "Telegram Alert":  {
+                                                                     "main":  [
+                                                                                  [
+                                                                                      {
+                                                                                          "node":  "Merge Branches",
+                                                                                          "type":  "main",
+                                                                                          "index":  0
+                                                                                      }
+                                                                                  ]
+                                                                              ]
+                                                                 },
+                                              "Merge Branches":  {
+                                                                     "main":  [
+                                                                                  [
+                                                                                      {
+                                                                                          "node":  "Supabase Insert",
+                                                                                          "type":  "main",
+                                                                                          "index":  0
+                                                                                      }
+                                                                                  ]
+                                                                              ]
+                                                                 },
+                                              "Supabase Insert":  {
+                                                                      "main":  [
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "Respond OK",
+                                                                                           "type":  "main",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                                  }
+                                          },
+                          "authors":  "PANDIAN K S",
+                          "name":  "Version 07cf8a72",
+                          "description":  "",
+                          "autosaved":  false,
+                          "workflowPublishHistory":  [
+                                                         {
+                                                             "createdAt":  "2026-04-25T19:50:56.132Z",
+                                                             "id":  1484,
+                                                             "workflowId":  "FEK7PNwR6I3XZygD",
+                                                             "versionId":  "07cf8a72-2367-4f2f-a9da-5621f3b313f2",
+                                                             "event":  "activated",
+                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                                         },
+                                                         {
+                                                             "createdAt":  "2026-04-25T20:13:01.068Z",
+                                                             "id":  1494,
+                                                             "workflowId":  "FEK7PNwR6I3XZygD",
+                                                             "versionId":  "07cf8a72-2367-4f2f-a9da-5621f3b313f2",
+                                                             "event":  "activated",
+                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                                         },
+                                                         {
+                                                             "createdAt":  "2026-04-25T21:20:53.476Z",
+                                                             "id":  1524,
+                                                             "workflowId":  "FEK7PNwR6I3XZygD",
+                                                             "versionId":  "07cf8a72-2367-4f2f-a9da-5621f3b313f2",
+                                                             "event":  "activated",
+                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                                         },
+                                                         {
+                                                             "createdAt":  "2026-04-25T20:12:10.681Z",
+                                                             "id":  1493,
+                                                             "workflowId":  "FEK7PNwR6I3XZygD",
+                                                             "versionId":  "07cf8a72-2367-4f2f-a9da-5621f3b313f2",
+                                                             "event":  "deactivated",
+                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                                         },
+                                                         {
+                                                             "createdAt":  "2026-04-25T21:20:34.261Z",
+                                                             "id":  1523,
+                                                             "workflowId":  "FEK7PNwR6I3XZygD",
+                                                             "versionId":  "07cf8a72-2367-4f2f-a9da-5621f3b313f2",
+                                                             "event":  "deactivated",
+                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                                         }
+                                                     ]
+                      }
 }

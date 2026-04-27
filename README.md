@@ -46,8 +46,10 @@ graph TD
 ### 📂 [Layer 1: Perception](./layer-1-perception/)
 *   **[Signal Pipeline](./layer-1-perception/Signal-Pipeline/)** — *Scanner + Error-Alert Sub-Workflow*
     *   Autonomous job/market signal ingestion with AI-powered intent analysis and tech stack detection.
-*   **[AI Lead Gen Machine](./layer-1-perception/AI-Lead-Gen-Machine/)** — *3 Workflows, 260KB, SAFE_MODE*
-    *   Targeted prospect identification with GPT-4o intent classification and dynamic blacklist suppression.
+*   **[AI Lead Gen Machine](./layer-1-perception/AI-Lead-Gen-Machine/)** — *v7.6 Resilient Upgrade (SMTP)*
+    *   **A: Main Campaign** — Targeted prospect identification with GPT-4o intent classification.
+    *   **B: Reply Handler** — Autonomous reply/bounce detection with dynamic CRM updates.
+    *   **C: Breakup Sequence** — Automated follow-up logic with blacklist suppression safety.
 
 ### 📂 [Layer 2: Core Intelligence](./layer-2-core/)
 *   **[Claude MCP Orchestrator](./layer-2-core/Claude-MCP-Task-Orchestrator/)** — *Node.js, 14 Tools, v2.0 (Hardened)*
@@ -59,13 +61,13 @@ graph TD
     *   Structured system prompts for the **Planner** and **Evaluator** agents, optimized for JSON-RPC determinism.
 
 ### 📂 [Layer 3: Memory](./layer-3-memory/)
-*   **[Production Log-Drain](./layer-3-memory/log-drain-production.json)** — *Claude-Pattern Observability*
+*   **[Production Log-Drain](./layer-3-memory/log-drain-production.json)** — *v4.4 Unified Observability*
     *   **Status:** LIVE at ID `FEK7PNwR6I3XZygD` (Production instance).
-    *   A centralized n8n pipeline for capturing execution logs across the entire stack. Features input normalization, error-based Telegram alerting, and unified Supabase logging.
+    *   **v7.6 Resilient Upgrade:** Centralized n8n pipeline for capturing execution logs across the entire stack. Features zero-hardcoding security (Supabase/Telegram via env vars), input normalization, and error-based Telegram alerting.
 *   **[Infinite Memory Vault](./layer-3-memory/Infinite-Memory-Vault/)** — *Supabase pgvector + Error Handler*
     *   Long-term episodic memory system powered by Supabase/pgvector for cross-session agent recall.
-*   **[Production Database Schema](./layer-3-memory/schema.sql)** — *PostgreSQL / Supabase*
-    *   Relational schema for stateful task tracking, lead management, and vector-based semantic memory.
+*   **[Production Database Schema](./layer-3-memory/schema.sql)** — *v7.6 Resilient*
+    *   Relational schema for stateful task tracking, lead management, and the `execution_logs` table for centralized observability.
 
 ### 📂 [Layer 4: Execution](./layer-4-execution/)
 *   **[Invoice Vision Auditor](./layer-4-execution/Invoice-Vision-Auditor/)** — *3 Workflows, 60+ Nodes*
@@ -192,4 +194,15 @@ Google Sheets is used intentionally as a **zero-infrastructure bootstrap layer**
 > **Security**: All credentials, API keys, emails, and personal identifiers have been removed. No production secrets exist in this repository's history.
 
 ---
+---
+
+## 🛠️ v7.6 Resilient Upgrade (April 2026)
+
+This repository has been hardened with the **v7.6 Resilient Standard**, focusing on security, observability, and modularity:
+
+1.  **Zero-Hardcoding Security:** All Telegram bot tokens, Chat IDs, and Supabase credentials have been moved to environment variables (`$env.TELEGRAM_BOT_TOKEN`, etc.).
+2.  **Centralized Observability:** All workflows now pipe errors through the unified **Log-Drain (v4.4)** sub-workflow, which handles both Supabase logging and Telegram alerts.
+3.  **Type-Strict Logic:** Critical `IF` nodes and `Code` nodes have been refactored for strict type validation to prevent silent routing failures.
+4.  **Google Sheets Resilience:** CRM update nodes now use explicit range definitions and `onError: continueRegularOutput` to ensure that tracking failures do not crash the primary automation logic.
+
 *Maintained by [kspandian32-sudo](https://github.com/kspandian32-sudo)*

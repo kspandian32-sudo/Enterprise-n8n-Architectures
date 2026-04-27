@@ -1,10 +1,10 @@
 ﻿{
-    "updatedAt":  "2026-04-20T06:42:07.000Z",
+    "updatedAt":  "2026-04-26T06:18:33.120Z",
     "createdAt":  "2026-04-20T06:42:07.556Z",
-    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "id":  "aOhqZMSBwd9ZCSuT",
     "name":  "v7.6 FIXED - WF-A Main Campaign (SMTP)",
     "description":  null,
-    "active":  false,
+    "active":  true,
     "isArchived":  false,
     "nodes":  [
                   {
@@ -83,7 +83,7 @@
                       "typeVersion":  4.7,
                       "credentials":  {
                                           "googleSheetsOAuth2Api":  {
-                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "id":  "hiWj9Xv9QRzG92uS",
                                                                         "name":  "AI Lead Gen Machine Google Sheets"
                                                                     }
                                       },
@@ -91,7 +91,7 @@
                   },
                   {
                       "parameters":  {
-                                         "jsCode":  "const contacts = $input.all();\nconst form = $(\u0027Launch Campaign Form\u0027).first().json;\nconst results = [];\nfor (const item of contacts) {\n  const r = item.json;\n  const email = (r[\u0027Email\u0027] || \u0027\u0027).trim();\n  const status = (r[\u0027Email Status\u0027] || r[\u0027Status\u0027] || \u0027\u0027).trim().toLowerCase();\n  if (email \u0026\u0026 (status === \u0027verified\u0027 || status === \u0027new lead\u0027)) {\n    const firstName = (r[\u0027First Name\u0027] || \u0027\u0027).trim();\n    const lastName = (r[\u0027Last Name\u0027] || \u0027\u0027).trim();\n    const companyName = (r[\u0027Company Name\u0027] || \u0027\u0027).trim();\n    const title = (r[\u0027Title\u0027] || \u0027\u0027).trim();\n    const industry = (r[\u0027Industry\u0027] || \u0027\u0027).trim();\n    const agencyName = (form[\u0027Your Agency Name\u0027] || \u0027\u0027).trim();\n    const service = (form[\u0027Service You Are Selling\u0027] || \u0027\u0027).trim();\n    const uvp = (form[\u0027Your Unique Value Proposition\u0027] || \u0027\u0027).trim();\n    const senderEmail = (form[\u0027Your Sender Email\u0027] || \u0027\u0027).trim();\n    const senderName = (form[\u0027Your Full Name\u0027] || \u0027\u0027).trim();\n    const compCtx = [industry, r[\u0027# Employees\u0027], r.Technologies].filter(Boolean).join(\u0027 | \u0027);\n    const loc = [r.City, r.Country].filter(Boolean).join(\u0027, \u0027);\n    const fullName = (firstName + \u0027 \u0027 + lastName).trim();\n    results.push({ json: {\n      // Space-keyed (for sheets)\n      \u0027Agency Name\u0027: agencyName, \u0027Service\u0027: service, \u0027UVP\u0027: uvp, \u0027Sender Email\u0027: senderEmail, \u0027Sender Name\u0027: senderName,\n      \u0027Email\u0027: email, \u0027First Name\u0027: firstName, \u0027Last Name\u0027: lastName, \u0027Company Name\u0027: companyName,\n      \u0027Title\u0027: title, \u0027Industry\u0027: industry, \u0027Website\u0027: r.Website || \u0027\u0027,\n      // camelCase (for prompts/code)\n      agencyName, service, uvp, senderEmail, senderName,\n      email, firstName, lastName, companyName, title, industry,\n      fullName, companyContext: compCtx, location: loc\n    }});\n  }\n}\nreturn results;"
+                                         "jsCode":  "const contacts = $input.all();\nconst form = $(\u0027Launch Campaign Form\u0027).first().json;\nconst results = [];\nfor (const item of contacts) {\n  const r = item.json;\n  const email = (r[\u0027Email\u0027] || \u0027\u0027).trim();\n  const status = (r[\u0027Email Status\u0027] || r[\u0027Status\u0027] || \u0027\u0027).trim().toLowerCase();\n  if (email \u0026\u0026 (status === \u0027verified\u0027 || status === \u0027new lead\u0027)) {\n    const firstName = (r[\u0027First Name\u0027] || \u0027\u0027).trim();\n    const lastName = (r[\u0027Last Name\u0027] || \u0027\u0027).trim();\n    const companyName = (r[\u0027Company Name\u0027] || \u0027\u0027).trim();\n    const title = (r[\u0027Title\u0027] || \u0027\u0027).trim();\n    const industry = (r[\u0027Industry\u0027] || \u0027\u0027).trim();\n    const agencyName = (form[\u0027Your Agency Name\u0027] || \u0027\u0027).trim();\n    const service = (form[\u0027Service You Are Selling\u0027] || \u0027\u0027).trim();\n    const uvp = (form[\u0027Your Unique Value Proposition\u0027] || \u0027\u0027).trim();\n    const senderEmail = (form[\u0027Your Sender Email\u0027] || \u0027\u0027).trim();\n    const senderName = (form[\u0027Your Full Name\u0027] || \u0027\u0027).trim();\n    const compCtx = [industry, r[\u0027# Employees\u0027], r.Technologies].filter(Boolean).join(\u0027 | \u0027);\n    const loc = [r.City, r.Country].filter(Boolean).join(\u0027, \u0027);\n    const fullName = (firstName + \u0027 \u0027 + lastName).trim();\n    results.push({\n      json: {\n        \u0027Agency Name\u0027: agencyName, \u0027Service\u0027: service, \u0027UVP\u0027: uvp, \u0027Sender Email\u0027: senderEmail, \u0027Sender Name\u0027: senderName,\n        \u0027Email\u0027: email, \u0027First Name\u0027: firstName, \u0027Last Name\u0027: lastName, \u0027Company Name\u0027: companyName,\n        \u0027Title\u0027: title, \u0027Industry\u0027: industry, \u0027Website\u0027: r.Website || \u0027\u0027,\n        agencyName, service, uvp, senderEmail, senderName,\n        email, firstName, lastName, companyName, title, industry,\n        fullName, companyContext: compCtx, location: loc\n      }\n    });\n  }\n}\nreturn results;"
                                      },
                       "id":  "eacc8d36-4ba1-4b01-a8c7-a63ebc86e5b0",
                       "name":  "Filter Verified + Merge",
@@ -209,7 +209,7 @@
                       "typeVersion":  1.1,
                       "credentials":  {
                                           "openAiApi":  {
-                                                            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                            "id":  "So1Wi5RlSonVFbIN",
                                                             "name":  "OpenAI fresh-key"
                                                         }
                                       },
@@ -247,7 +247,7 @@
                       "typeVersion":  1.1,
                       "credentials":  {
                                           "openAiApi":  {
-                                                            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                            "id":  "So1Wi5RlSonVFbIN",
                                                             "name":  "OpenAI fresh-key"
                                                         }
                                       },
@@ -298,7 +298,7 @@
                       "typeVersion":  1.1,
                       "credentials":  {
                                           "openAiApi":  {
-                                                            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                            "id":  "So1Wi5RlSonVFbIN",
                                                             "name":  "OpenAI fresh-key"
                                                         }
                                       },
@@ -381,7 +381,7 @@
                       "typeVersion":  4.7,
                       "credentials":  {
                                           "googleSheetsOAuth2Api":  {
-                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "id":  "hiWj9Xv9QRzG92uS",
                                                                         "name":  "AI Lead Gen Machine Google Sheets"
                                                                     }
                                       },
@@ -389,12 +389,9 @@
                   },
                   {
                       "parameters":  {
-                                         "chatId":  "7392899748",
-                                         "text":  "=âš ï¸ LEAD NEEDS REVIEW\nName: {{ $json[\"First Name\"] }} {{ $json[\"Last Name\"] }}\nCompany: {{ $json[\"Company Name\"] }}\nEmail: {{ $json[\"Email\"] }}\nScore: {{ $json[\"Quality Score\"] }}/50\nNotes: {{ $json[\"Quality Notes\"] }}",
-                                         "additionalFields":  {
-
-                                                              },
-                                         "operation":  "sendMessage"
+                                         "chatId":  "={{$env.TELEGRAM_CHAT_ID}}",
+                                         "operation":  "sendMessage",
+                                         "text":  "=âš ï¸ Lead Needs Review\nName: {{ $json.fullName }}\nScore: {{ $json[\u0027Quality Score\u0027] }}\nVerdict: {{ $json.Verdict }}\nNotes: {{ $json[\u0027Quality Notes\u0027] }}"
                                      },
                       "id":  "76600da8-86d9-473c-af45-2a987f54ffff",
                       "name":  "Telegram: Lead Needs Review",
@@ -407,7 +404,7 @@
                       "webhookId":  "e40834c9-959e-4727-9abd-162995cc1793",
                       "credentials":  {
                                           "telegramApi":  {
-                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "id":  "FNjJr1wAENbF6WRc",
                                                               "name":  "AI Lead Gen Machine Telegram account"
                                                           }
                                       },
@@ -455,7 +452,7 @@
                       "retryOnFail":  true,
                       "credentials":  {
                                           "googleSheetsOAuth2Api":  {
-                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "id":  "hiWj9Xv9QRzG92uS",
                                                                         "name":  "AI Lead Gen Machine Google Sheets"
                                                                     }
                                       },
@@ -502,7 +499,7 @@
                       "alwaysOutputData":  true,
                       "credentials":  {
                                           "googleSheetsOAuth2Api":  {
-                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "id":  "hiWj9Xv9QRzG92uS",
                                                                         "name":  "AI Lead Gen Machine Google Sheets"
                                                                     }
                                       },
@@ -619,8 +616,8 @@
                       "webhookId":  "f71c2fb8-e71a-42e9-99ef-1ad7ff8e1ac4",
                       "credentials":  {
                                           "smtp":  {
-                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                                       "name":  "SMTP Account"
+                                                       "id":  "udtIzlJq8iqmL3aZ",
+                                                       "name":  "SMTP account - kspandian32"
                                                    }
                                       },
                       "onError":  "continueRegularOutput"
@@ -667,7 +664,7 @@
                       "retryOnFail":  true,
                       "credentials":  {
                                           "googleSheetsOAuth2Api":  {
-                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "id":  "hiWj9Xv9QRzG92uS",
                                                                         "name":  "AI Lead Gen Machine Google Sheets"
                                                                     }
                                       },
@@ -675,12 +672,9 @@
                   },
                   {
                       "parameters":  {
-                                         "chatId":  "7392899748",
-                                         "text":  "=ðŸ“§ Email 1 {{ $json.Simulated === \u0027YES\u0027 ? \u0027SIMULATED\u0027 : \u0027Sent\u0027 }}\nRecipient: {{ $json[\"First Name\"] }} {{ $json[\"Last Name\"] }}\nCompany: {{ $json[\"Company Name\"] }}\nEmail: {{ $json[\"Email\"] }}\nScore: {{ $json[\"Lead Score\"] }}/100 | Tier: {{ $json.Tier }}\nQuality: {{ $json[\"Quality Score\"] }}/50\nStatus: {{ $json.Status }}",
-                                         "additionalFields":  {
-
-                                                              },
-                                         "operation":  "sendMessage"
+                                         "chatId":  "={{$env.TELEGRAM_CHAT_ID}}",
+                                         "operation":  "sendMessage",
+                                         "text":  "=âœ… Email 1 Sent\nRecipient: {{ $json[\u0027First Name\u0027] }} {{ $json[\u0027Last Name\u0027] }}\nCompany: {{ $json[\u0027Company Name\u0027] }}\nStatus: {{ $json.Status }}"
                                      },
                       "id":  "094972f4-c213-4b27-a566-e3624a975966",
                       "name":  "Telegram: Email 1 Sent",
@@ -693,11 +687,67 @@
                       "webhookId":  "7ebda068-961e-42d6-995b-0167bddfe106",
                       "credentials":  {
                                           "telegramApi":  {
-                                                              "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                              "id":  "FNjJr1wAENbF6WRc",
                                                               "name":  "AI Lead Gen Machine Telegram account"
                                                           }
                                       },
                       "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "id":  "afa12f7e-23de-4298-8554-b1efdf0334cf",
+                      "name":  "Error Trigger",
+                      "type":  "n8n-nodes-base.errorTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -2600,
+                                       600
+                                   ],
+                      "parameters":  {
+
+                                     }
+                  },
+                  {
+                      "id":  "2e910b43-2404-4091-9ad5-9d0cec781635",
+                      "name":  "Log-Drain HTTP",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       -2400,
+                                       600
+                                   ],
+                      "parameters":  {
+                                         "bodyParameters":  {
+                                                                "parameters":  [
+                                                                                   {
+                                                                                       "name":  "workflow_name",
+                                                                                       "value":  "={{ $workflow.name }}"
+                                                                                   },
+                                                                                   {
+                                                                                       "name":  "tool_name",
+                                                                                       "value":  "={{ $json.execution.error.nodeName ?? \u0027Global\u0027 }}"
+                                                                                   },
+                                                                                   {
+                                                                                       "name":  "level",
+                                                                                       "value":  "error"
+                                                                                   },
+                                                                                   {
+                                                                                       "name":  "message",
+                                                                                       "value":  "={{ $json.execution.error.message }}"
+                                                                                   },
+                                                                                   {
+                                                                                       "name":  "metadata",
+                                                                                       "value":  "={{ $json }}"
+                                                                                   },
+                                                                                   {
+                                                                                       "name":  "session_id",
+                                                                                       "value":  "={{ $execution.id }}"
+                                                                                   }
+                                                                               ]
+                                                            },
+                                         "method":  "POST",
+                                         "sendBody":  true,
+                                         "url":  "https://n8n.pureremedysolutions.com/webhook/log-drain"
+                                     }
                   }
               ],
     "connections":  {
@@ -1001,20 +1051,33 @@
                                                             }
                                                         ]
                                                     ]
-                                       }
+                                       },
+                        "Error Trigger":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Log-Drain HTTP",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          }
                     },
     "settings":  {
                      "executionOrder":  "v1",
-                     "binaryMode":  "separate"
+                     "binaryMode":  "separate",
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false
                  },
     "staticData":  null,
     "meta":  null,
     "pinData":  {
 
                 },
-    "versionId":  "834c31eb-d132-48bf-88d6-d128bb96b4b6",
-    "activeVersionId":  null,
-    "versionCounter":  5,
+    "versionId":  "f7b217bf-40ce-4e2d-8a5d-c204ceb5ebbd",
+    "activeVersionId":  "f7b217bf-40ce-4e2d-8a5d-c204ceb5ebbd",
+    "versionCounter":  28,
     "triggerCount":  1,
     "shared":  [
                    {
@@ -1026,8 +1089,8 @@
                        "project":  {
                                        "updatedAt":  "2026-01-13T19:13:51.671Z",
                                        "createdAt":  "2026-01-13T19:11:25.659Z",
-                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "id":  "4z38v6JO6ntgY8gF",
+                                       "name":  "PANDIAN K S \u003ckspandia@gmail.com\u003e",
                                        "type":  "personal",
                                        "icon":  null,
                                        "description":  null,
@@ -1038,5 +1101,1090 @@
     "tags":  [
 
              ],
-    "activeVersion":  null
+    "activeVersion":  {
+                          "updatedAt":  "2026-04-26T06:18:33.125Z",
+                          "createdAt":  "2026-04-26T06:18:33.125Z",
+                          "versionId":  "f7b217bf-40ce-4e2d-8a5d-c204ceb5ebbd",
+                          "workflowId":  "aOhqZMSBwd9ZCSuT",
+                          "nodes":  [
+                                        {
+                                            "parameters":  {
+                                                               "formTitle":  "Launch Lead Gen Campaign",
+                                                               "formDescription":  "Enter your agency details. System scores leads, routes to GPT-4o or GPT-4o-mini, quality-gates emails, checks blacklist, notifies you on Telegram.",
+                                                               "formFields":  {
+                                                                                  "values":  [
+                                                                                                 {
+                                                                                                     "fieldLabel":  "Your Agency Name",
+                                                                                                     "fieldType":  "string",
+                                                                                                     "placeholder":  "e.g. Pure Remedy Solutions",
+                                                                                                     "requiredField":  true
+                                                                                                 },
+                                                                                                 {
+                                                                                                     "fieldLabel":  "Service You Are Selling",
+                                                                                                     "fieldType":  "string",
+                                                                                                     "placeholder":  "e.g. AI Automation Setup",
+                                                                                                     "requiredField":  true
+                                                                                                 },
+                                                                                                 {
+                                                                                                     "fieldLabel":  "Your Unique Value Proposition",
+                                                                                                     "fieldType":  "textarea",
+                                                                                                     "placeholder":  "e.g. We replace 30k/month SaaS with n8n automations",
+                                                                                                     "requiredField":  true
+                                                                                                 },
+                                                                                                 {
+                                                                                                     "fieldLabel":  "Your Sender Email",
+                                                                                                     "fieldType":  "string",
+                                                                                                     "placeholder":  "you@youragency.com",
+                                                                                                     "requiredField":  true
+                                                                                                 },
+                                                                                                 {
+                                                                                                     "fieldLabel":  "Your Full Name",
+                                                                                                     "fieldType":  "string",
+                                                                                                     "placeholder":  "Your name for email signature",
+                                                                                                     "requiredField":  true
+                                                                                                 }
+                                                                                             ]
+                                                                              },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "e6b31263-2a11-4858-958f-fba4bbaea38d",
+                                            "name":  "Launch Campaign Form",
+                                            "position":  [
+                                                             -2464,
+                                                             192
+                                                         ],
+                                            "type":  "n8n-nodes-base.formTrigger",
+                                            "typeVersion":  2.5,
+                                            "webhookId":  "0e583710-4a17-4a0e-9be6-deeee1744a4b"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "documentId":  {
+                                                                                  "mode":  "id",
+                                                                                  "value":  "1t2tnM8hxS9nni5mH-V_0HqW-DkpdlTmcOH-5Kxn0SBs"
+                                                                              },
+                                                               "sheetName":  {
+                                                                                 "mode":  "id",
+                                                                                 "value":  "396649262"
+                                                                             },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "0a98e3dd-b582-43f9-9bd6-a19e8f251a35",
+                                            "name":  "Read Apollo Contacts Sheet",
+                                            "position":  [
+                                                             -2240,
+                                                             192
+                                                         ],
+                                            "type":  "n8n-nodes-base.googleSheets",
+                                            "typeVersion":  4.7,
+                                            "credentials":  {
+                                                                "googleSheetsOAuth2Api":  {
+                                                                                              "id":  "hiWj9Xv9QRzG92uS",
+                                                                                              "name":  "AI Lead Gen Machine Google Sheets"
+                                                                                          }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "const contacts = $input.all();\nconst form = $(\u0027Launch Campaign Form\u0027).first().json;\nconst results = [];\nfor (const item of contacts) {\n  const r = item.json;\n  const email = (r[\u0027Email\u0027] || \u0027\u0027).trim();\n  const status = (r[\u0027Email Status\u0027] || r[\u0027Status\u0027] || \u0027\u0027).trim().toLowerCase();\n  if (email \u0026\u0026 (status === \u0027verified\u0027 || status === \u0027new lead\u0027)) {\n    const firstName = (r[\u0027First Name\u0027] || \u0027\u0027).trim();\n    const lastName = (r[\u0027Last Name\u0027] || \u0027\u0027).trim();\n    const companyName = (r[\u0027Company Name\u0027] || \u0027\u0027).trim();\n    const title = (r[\u0027Title\u0027] || \u0027\u0027).trim();\n    const industry = (r[\u0027Industry\u0027] || \u0027\u0027).trim();\n    const agencyName = (form[\u0027Your Agency Name\u0027] || \u0027\u0027).trim();\n    const service = (form[\u0027Service You Are Selling\u0027] || \u0027\u0027).trim();\n    const uvp = (form[\u0027Your Unique Value Proposition\u0027] || \u0027\u0027).trim();\n    const senderEmail = (form[\u0027Your Sender Email\u0027] || \u0027\u0027).trim();\n    const senderName = (form[\u0027Your Full Name\u0027] || \u0027\u0027).trim();\n    const compCtx = [industry, r[\u0027# Employees\u0027], r.Technologies].filter(Boolean).join(\u0027 | \u0027);\n    const loc = [r.City, r.Country].filter(Boolean).join(\u0027, \u0027);\n    const fullName = (firstName + \u0027 \u0027 + lastName).trim();\n    results.push({\n      json: {\n        \u0027Agency Name\u0027: agencyName, \u0027Service\u0027: service, \u0027UVP\u0027: uvp, \u0027Sender Email\u0027: senderEmail, \u0027Sender Name\u0027: senderName,\n        \u0027Email\u0027: email, \u0027First Name\u0027: firstName, \u0027Last Name\u0027: lastName, \u0027Company Name\u0027: companyName,\n        \u0027Title\u0027: title, \u0027Industry\u0027: industry, \u0027Website\u0027: r.Website || \u0027\u0027,\n        agencyName, service, uvp, senderEmail, senderName,\n        email, firstName, lastName, companyName, title, industry,\n        fullName, companyContext: compCtx, location: loc\n      }\n    });\n  }\n}\nreturn results;"
+                                                           },
+                                            "id":  "eacc8d36-4ba1-4b01-a8c7-a63ebc86e5b0",
+                                            "name":  "Filter Verified + Merge",
+                                            "position":  [
+                                                             -2016,
+                                                             192
+                                                         ],
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "return $input.all().map(item =\u003e {\n  const lead = item.json;\n  let score = 0;\n  const title = (lead.title || lead.Title || \u0027\u0027).toLowerCase();\n  if (title.includes(\u0027ceo\u0027) || title.includes(\u0027founder\u0027) || title.includes(\u0027owner\u0027)) score += 40;\n  else if (title.includes(\u0027vp\u0027) || title.includes(\u0027director\u0027)) score += 30;\n  else score += 15;\n  const emp = parseInt(String(lead.Employees || lead.numEmployees || \u00270\u0027).replace(/\\D/g,\u0027\u0027), 10) || 0;\n  if (emp \u003e 500) score += 30; else if (emp \u003e 50) score += 20; else score += 10;\n  score = Math.min(score, 100);\n  const tier = score \u003e= 60 ? \u0027premium\u0027 : \u0027standard\u0027;\n  return { json: { ...lead, leadScore: score, tier, leadTier: tier.toUpperCase(), gptModel: tier === \u0027premium\u0027 ? \u0027gpt-4o\u0027 : \u0027gpt-4o-mini\u0027, \u0027Lead Score\u0027: score, \u0027Tier\u0027: tier.toUpperCase() } };\n});"
+                                                           },
+                                            "id":  "b5f8c8e4-1a09-43c9-b230-74b565c532e8",
+                                            "name":  "Lead Scoring",
+                                            "position":  [
+                                                             -1792,
+                                                             192
+                                                         ],
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "conditions":  {
+                                                                                  "combinator":  "and",
+                                                                                  "conditions":  [
+                                                                                                     {
+                                                                                                         "id":  "tier-check",
+                                                                                                         "leftValue":  "={{ $json.tier }}",
+                                                                                                         "operator":  {
+                                                                                                                          "operation":  "equals",
+                                                                                                                          "type":  "string"
+                                                                                                                      },
+                                                                                                         "rightValue":  "premium"
+                                                                                                     }
+                                                                                                 ],
+                                                                                  "options":  {
+                                                                                                  "version":  2,
+                                                                                                  "leftValue":  "",
+                                                                                                  "caseSensitive":  true,
+                                                                                                  "typeValidation":  "strict"
+                                                                                              }
+                                                                              },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "bd6fe515-4dac-47e0-9193-0c02f7b0b2e6",
+                                            "name":  "Route Tier",
+                                            "position":  [
+                                                             -1568,
+                                                             176
+                                                         ],
+                                            "type":  "n8n-nodes-base.if",
+                                            "typeVersion":  2.3,
+                                            "onError":  "continueErrorOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "return $input.all().map(item =\u003e {\n  const lead = item.json;\n  const systemPrompt = \"You are an expert cold email copywriter for \" + lead.agencyName + \". Write brutally short, hyper-personalized cold emails that get replies.\\nRULES: Reference something SPECIFIC. Under 100 words per body. No jargon. Sound human. One soft CTA. RESPOND ONLY with valid JSON, no markdown.\";\n  const userPrompt = \"Write a 3-email sequence for:\\nPROSPECT: \" + lead.fullName + \" | \" + lead.title + \" | \" + lead.companyName + \"\\n\" + lead.companyContext + \"\\nLocation: \" + lead.location + \"\\n[PREMIUM LEAD Score: \" + lead.leadScore + \"/100]\\nSENDER: \" + lead.senderName + \" from \" + lead.agencyName + \" | \" + lead.service + \" | \" + lead.uvp + \"\\nReturn EXACTLY: {\\\"email1_subject\\\":\\\"...\\\",\\\"email1_body\\\":\\\"...\\\",\\\"email2_subject\\\":\\\"...\\\",\\\"email2_body\\\":\\\"...\\\",\\\"email3_subject\\\":\\\"...\\\",\\\"email3_body\\\":\\\"...\\\"}\";\n  return { json: { ...lead, systemPrompt, userPrompt } };\n});"
+                                                           },
+                                            "id":  "57c99d82-a2f2-4c9f-88a0-9cfb3b00839c",
+                                            "name":  "Build Prompt (Premium)",
+                                            "position":  [
+                                                             -1344,
+                                                             96
+                                                         ],
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "return $input.all().map(item =\u003e {\n  const lead = item.json;\n  const systemPrompt = \"You are a cold email copywriter for \" + lead.agencyName + \". Write short, specific, personalized cold emails.\\nRULES: Reference their industry. Under 100 words per body. No jargon. Sound human. RESPOND ONLY with valid JSON, no markdown.\";\n  const userPrompt = \"Write a 3-email sequence for:\\nPROSPECT: \" + lead.fullName + \" | \" + lead.title + \" | \" + lead.companyName + \"\\n\" + lead.companyContext + \"\\nSENDER: \" + lead.senderName + \" from \" + lead.agencyName + \" | \" + lead.service + \" | \" + lead.uvp + \"\\nReturn EXACTLY: {\\\"email1_subject\\\":\\\"...\\\",\\\"email1_body\\\":\\\"...\\\",\\\"email2_subject\\\":\\\"...\\\",\\\"email2_body\\\":\\\"...\\\",\\\"email3_subject\\\":\\\"...\\\",\\\"email3_body\\\":\\\"...\\\"}\";\n  return { json: { ...lead, systemPrompt, userPrompt } };\n});"
+                                                           },
+                                            "id":  "6f21dd83-8ea2-4a33-a308-d5538f84454b",
+                                            "name":  "Build Prompt (Standard)",
+                                            "position":  [
+                                                             -1344,
+                                                             288
+                                                         ],
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "resource":  "chat",
+                                                               "prompt":  {
+                                                                              "messages":  [
+                                                                                               {
+                                                                                                   "role":  "system",
+                                                                                                   "content":  "={{ $json.systemPrompt }}"
+                                                                                               },
+                                                                                               {
+                                                                                                   "content":  "={{ $json.userPrompt }}"
+                                                                                               }
+                                                                                           ]
+                                                                          },
+                                                               "options":  {
+                                                                               "maxTokens":  1400,
+                                                                               "temperature":  0.7
+                                                                           },
+                                                               "requestOptions":  {
+
+                                                                                  }
+                                                           },
+                                            "id":  "ef93ae14-3071-4454-8401-fad3c0c044a3",
+                                            "name":  "GPT Premium",
+                                            "position":  [
+                                                             -1120,
+                                                             96
+                                                         ],
+                                            "type":  "n8n-nodes-base.openAi",
+                                            "typeVersion":  1.1,
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "So1Wi5RlSonVFbIN",
+                                                                                  "name":  "OpenAI fresh-key"
+                                                                              }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "resource":  "chat",
+                                                               "prompt":  {
+                                                                              "messages":  [
+                                                                                               {
+                                                                                                   "role":  "system",
+                                                                                                   "content":  "={{ $json.systemPrompt }}"
+                                                                                               },
+                                                                                               {
+                                                                                                   "content":  "={{ $json.userPrompt }}"
+                                                                                               }
+                                                                                           ]
+                                                                          },
+                                                               "options":  {
+                                                                               "maxTokens":  1200,
+                                                                               "temperature":  0.75
+                                                                           },
+                                                               "requestOptions":  {
+
+                                                                                  }
+                                                           },
+                                            "id":  "c80db916-bf4f-42f4-b4f9-581a6ed34ad4",
+                                            "name":  "GPT Standard",
+                                            "position":  [
+                                                             -1120,
+                                                             288
+                                                         ],
+                                            "type":  "n8n-nodes-base.openAi",
+                                            "typeVersion":  1.1,
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "So1Wi5RlSonVFbIN",
+                                                                                  "name":  "OpenAI fresh-key"
+                                                                              }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "// Merge GPT outputs with their originating lead data via pairedItem linking.\nconst aiItems = $input.all();\nlet premium = []; try { premium = $(\u0027Build Prompt (Premium)\u0027).all(); } catch(e) {}\nlet standard = []; try { standard = $(\u0027Build Prompt (Standard)\u0027).all(); } catch(e) {}\nconst allLeads = [...premium, ...standard];\nreturn aiItems.map((item, index) =\u003e {\n  const aiResp = item.json;\n  const lead = allLeads[index] ? allLeads[index].json : {};\n  let emails = {};\n  try {\n    const raw = aiResp.message ? aiResp.message.content : (aiResp.choices ? aiResp.choices[0].message.content : \u0027{}\u0027);\n    emails = JSON.parse(String(raw).replace(/```json\\n?/g, \u0027\u0027).replace(/```/g, \u0027\u0027).trim());\n  } catch(e) {\n    emails = {\n      email1_subject: \u0027Quick question, \u0027 + (lead.firstName || \u0027there\u0027),\n      email1_body: \u0027Hi \u0027 + (lead.firstName || \u0027\u0027) + \u0027, reaching out about \u0027 + (lead.service || \u0027automation\u0027) + \u0027. Worth a quick chat?\u0027,\n      email2_subject: \u0027Following up\u0027,\n      email2_body: \u0027Just wanted to bump this up.\u0027,\n      email3_subject: \u0027Closing the loop\u0027,\n      email3_body: \u0027Should I stop reaching out?\u0027\n    };\n  }\n  return { json: { ...lead, ...emails, status: \u0027Email 1 Prepared\u0027 } };\n});"
+                                                           },
+                                            "id":  "c79523a8-4139-4b48-9c5b-d9f1c453c22d",
+                                            "name":  "Parse AI Emails \u0026 Merge",
+                                            "position":  [
+                                                             -896,
+                                                             192
+                                                         ],
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "resource":  "chat",
+                                                               "prompt":  {
+                                                                              "messages":  [
+                                                                                               {
+                                                                                                   "role":  "system",
+                                                                                                   "content":  "You are a cold email quality auditor. Score the 3-email sequence on 5 dimensions each 1-10: Personalization, Relevance, Clarity, CTA_Strength, Human_feel. Total out of 50. Verdict: SEND if \u003e=35, REVIEW if \u003c35. Respond ONLY with JSON, no markdown: {\"personalization\":N,\"relevance\":N,\"clarity\":N,\"cta_strength\":N,\"human_feel\":N,\"total\":N,\"verdict\":\"SEND or REVIEW\",\"notes\":\"one-line reason\"}"
+                                                                                               },
+                                                                                               {
+                                                                                                   "content":  "=Score for {{ $json.fullName }} at {{ $json.companyName }} ({{ $json.industry }}):\nE1 Sub: {{ $json.email1_subject }}\nE1 Body: {{ $json.email1_body }}\nE2 Sub: {{ $json.email2_subject }}\nE2 Body: {{ $json.email2_body }}\nE3 Sub: {{ $json.email3_subject }}\nE3 Body: {{ $json.email3_body }}"
+                                                                                               }
+                                                                                           ]
+                                                                          },
+                                                               "options":  {
+                                                                               "maxTokens":  300,
+                                                                               "temperature":  0.3
+                                                                           },
+                                                               "requestOptions":  {
+
+                                                                                  }
+                                                           },
+                                            "id":  "3984e9a6-60d2-432c-86d7-5908ccf471be",
+                                            "name":  "AI Quality Gate",
+                                            "position":  [
+                                                             -672,
+                                                             192
+                                                         ],
+                                            "type":  "n8n-nodes-base.openAi",
+                                            "typeVersion":  1.1,
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "So1Wi5RlSonVFbIN",
+                                                                                  "name":  "OpenAI fresh-key"
+                                                                              }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "const aiScores = $input.all();\nlet leads = [];\ntry { leads = $(\u0027Parse AI Emails \u0026 Merge\u0027).all(); } catch(e) {}\nreturn aiScores.map((item, index) =\u003e {\n  const scoreRaw = item.json;\n  let scoreData = {};\n  try {\n    const content = scoreRaw.message?.content || scoreRaw.choices?.[0]?.message?.content || \u0027{}\u0027;\n    scoreData = JSON.parse(String(content).replace(/```json\\n?/g,\u0027\u0027).replace(/```/g,\u0027\u0027).trim());\n  } catch(e) { scoreData = { total: 35, verdict: \u0027SEND\u0027, notes: \u0027parse fallback\u0027 }; }\n  const lead = leads[index] ? leads[index].json : {};\n  return { json: {\n    ...lead,\n    \u0027Quality Score\u0027: scoreData.total || 0,\n    \u0027Verdict\u0027: (scoreData.verdict || \u0027REVIEW\u0027).toUpperCase(),\n    \u0027Quality Notes\u0027: scoreData.notes || \u0027\u0027,\n    \u0027Status\u0027: (scoreData.verdict || \u0027\u0027).toUpperCase() === \u0027SEND\u0027 ? \u0027Ready\u0027 : \u0027In Review\u0027\n  } };\n});"
+                                                           },
+                                            "id":  "7c5a5f2f-f64f-490c-befd-b64962ca293c",
+                                            "name":  "Parse Quality Score",
+                                            "position":  [
+                                                             -448,
+                                                             192
+                                                         ],
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "conditions":  {
+                                                                                  "conditions":  [
+                                                                                                     {
+                                                                                                         "rightValue":  "SEND",
+                                                                                                         "leftValue":  "={{ $json.Verdict }}",
+                                                                                                         "operator":  {
+                                                                                                                          "operation":  "equals",
+                                                                                                                          "type":  "string"
+                                                                                                                      },
+                                                                                                         "id":  "gate-match-std"
+                                                                                                     }
+                                                                                                 ],
+                                                                                  "combinator":  "and",
+                                                                                  "options":  {
+                                                                                                  "version":  2,
+                                                                                                  "leftValue":  "",
+                                                                                                  "caseSensitive":  true,
+                                                                                                  "typeValidation":  "strict"
+                                                                                              }
+                                                                              },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "2c492b3b-2d7d-4b7e-9a0b-20f82080ee08",
+                                            "name":  "Quality Gate: SEND or REVIEW?",
+                                            "position":  [
+                                                             -224,
+                                                             176
+                                                         ],
+                                            "type":  "n8n-nodes-base.if",
+                                            "typeVersion":  2.3,
+                                            "onError":  "continueErrorOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "operation":  "append",
+                                                               "documentId":  {
+                                                                                  "mode":  "id",
+                                                                                  "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                                              },
+                                                               "sheetName":  {
+                                                                                 "mode":  "id",
+                                                                                 "value":  "550480164"
+                                                                             },
+                                                               "columns":  {
+                                                                               "mappingMode":  "autoMapInputData"
+                                                                           },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "ee191af5-c3c4-480b-8dfa-60068526c9d4",
+                                            "name":  "Log to Review Queue",
+                                            "position":  [
+                                                             0,
+                                                             0
+                                                         ],
+                                            "type":  "n8n-nodes-base.googleSheets",
+                                            "typeVersion":  4.7,
+                                            "credentials":  {
+                                                                "googleSheetsOAuth2Api":  {
+                                                                                              "id":  "hiWj9Xv9QRzG92uS",
+                                                                                              "name":  "AI Lead Gen Machine Google Sheets"
+                                                                                          }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "chatId":  "={{$env.TELEGRAM_CHAT_ID}}",
+                                                               "operation":  "sendMessage",
+                                                               "text":  "=âš ï¸ Lead Needs Review\nName: {{ $json.fullName }}\nScore: {{ $json[\u0027Quality Score\u0027] }}\nVerdict: {{ $json.Verdict }}\nNotes: {{ $json[\u0027Quality Notes\u0027] }}"
+                                                           },
+                                            "id":  "76600da8-86d9-473c-af45-2a987f54ffff",
+                                            "name":  "Telegram: Lead Needs Review",
+                                            "position":  [
+                                                             0,
+                                                             192
+                                                         ],
+                                            "type":  "n8n-nodes-base.telegram",
+                                            "typeVersion":  1.2,
+                                            "webhookId":  "e40834c9-959e-4727-9abd-162995cc1793",
+                                            "credentials":  {
+                                                                "telegramApi":  {
+                                                                                    "id":  "FNjJr1wAENbF6WRc",
+                                                                                    "name":  "AI Lead Gen Machine Telegram account"
+                                                                                }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "return $input.all().map(item =\u003e {\n  const lead = item.json;\n  return { json: {\n    ...lead,\n    \u0027First Name\u0027: lead[\u0027First Name\u0027] || lead.firstName || \u0027\u0027,\n    \u0027Last Name\u0027: lead[\u0027Last Name\u0027] || lead.lastName || \u0027\u0027,\n    \u0027Company Name\u0027: lead[\u0027Company Name\u0027] || lead.companyName || \u0027\u0027,\n    \u0027Email\u0027: lead.Email || lead.email || \u0027\u0027,\n    \u0027Lead Score\u0027: lead[\u0027Lead Score\u0027] || lead.leadScore || 0,\n    \u0027Tier\u0027: lead.Tier || lead.leadTier || \u0027STANDARD\u0027,\n    \u0027GPT Model\u0027: lead.gptModel || (lead.tier === \u0027premium\u0027 ? \u0027gpt-4o\u0027 : \u0027gpt-4o-mini\u0027),\n    \u0027Verdict\u0027: lead.Verdict || \u0027SEND\u0027,\n    \u0027Quality Score\u0027: lead[\u0027Quality Score\u0027] || 0,\n    \u0027Status\u0027: \u0027Passed Quality Gate\u0027,\n    \u0027Timestamp\u0027: new Date().toISOString()\n  } };\n});"
+                                                           },
+                                            "id":  "25d40c86-cca4-427a-96db-1abff7da120b",
+                                            "name":  "Decision Dashboard Builder",
+                                            "position":  [
+                                                             0,
+                                                             384
+                                                         ],
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "operation":  "append",
+                                                               "documentId":  {
+                                                                                  "mode":  "id",
+                                                                                  "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                                              },
+                                                               "sheetName":  {
+                                                                                 "mode":  "id",
+                                                                                 "value":  "1828942124"
+                                                                             },
+                                                               "columns":  {
+                                                                               "mappingMode":  "autoMapInputData"
+                                                                           },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "0e458bb2-c0f7-4254-8aa8-1d6df1751e35",
+                                            "name":  "Write Dashboard",
+                                            "position":  [
+                                                             208,
+                                                             496
+                                                         ],
+                                            "type":  "n8n-nodes-base.googleSheets",
+                                            "typeVersion":  4.7,
+                                            "retryOnFail":  true,
+                                            "credentials":  {
+                                                                "googleSheetsOAuth2Api":  {
+                                                                                              "id":  "hiWj9Xv9QRzG92uS",
+                                                                                              "name":  "AI Lead Gen Machine Google Sheets"
+                                                                                          }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "// Collapse all leads to a single trigger item so Blacklist Lookup runs ONCE.\nif ($itemIndex === 0) {\n  return [{ json: { _blacklistTrigger: true } }];\n}\nreturn [];"
+                                                           },
+                                            "id":  "ae55df99-b2d0-4ac6-bba4-bca929c081f5",
+                                            "name":  "Consolidate for Blacklist",
+                                            "position":  [
+                                                             336,
+                                                             304
+                                                         ],
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "documentId":  {
+                                                                                  "mode":  "id",
+                                                                                  "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                                              },
+                                                               "sheetName":  {
+                                                                                 "mode":  "id",
+                                                                                 "value":  "487226189"
+                                                                             },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "402e8612-9afd-415b-aac6-e08949285db2",
+                                            "name":  "Blacklist Lookup",
+                                            "position":  [
+                                                             448,
+                                                             304
+                                                         ],
+                                            "type":  "n8n-nodes-base.googleSheets",
+                                            "typeVersion":  4.7,
+                                            "retryOnFail":  true,
+                                            "maxTries":  3,
+                                            "waitBetweenTries":  3000,
+                                            "alwaysOutputData":  true,
+                                            "credentials":  {
+                                                                "googleSheetsOAuth2Api":  {
+                                                                                              "id":  "hiWj9Xv9QRzG92uS",
+                                                                                              "name":  "AI Lead Gen Machine Google Sheets"
+                                                                                          }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "// Collect blacklist emails from the single Blacklist Lookup read\nconst items = $input.all();\nconst blacklistEmails = items\n  .filter(r =\u003e r.json \u0026\u0026 !r.json.error \u0026\u0026 !r.json._blacklistTrigger)\n  .map(r =\u003e (r.json.Email || r.json.email || \u0027\u0027).toLowerCase().trim())\n  .filter(Boolean);\n\n// Retrieve leads from Decision Dashboard Builder\nlet leads = [];\ntry { leads = $(\u0027Decision Dashboard Builder\u0027).all(); } catch(e) { leads = []; }\n\nif (leads.length === 0) {\n  return [{ json: { _noLeads: true, _blacklistEmails: [] } }];\n}\n\nreturn leads.map(leadItem =\u003e ({\n  json: { ...leadItem.json, _blacklistEmails: blacklistEmails }\n}));"
+                                                           },
+                                            "id":  "a8fb05bf-8c86-4d17-9088-7a6be6496c49",
+                                            "name":  "Blacklist Safety Net",
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             560,
+                                                             192
+                                                         ]
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "// Filter out blacklisted leads and strip helper field\nconst clean = [];\nfor (const item of $input.all()) {\n  const { _blacklistEmails, _noLeads, ...leadData } = item.json;\n  if (_noLeads) continue;\n  const blacklist = Array.isArray(_blacklistEmails) ? _blacklistEmails : [];\n  const email = (leadData.Email || leadData.email || \u0027\u0027).toLowerCase().trim();\n  if (email \u0026\u0026 blacklist.includes(email)) continue;\n  clean.push({ json: { ...leadData } });\n}\nreturn clean;"
+                                                           },
+                                            "id":  "5cbfa010-ad80-4314-819d-9828fa753eb7",
+                                            "name":  "Blacklist Gate",
+                                            "position":  [
+                                                             672,
+                                                             384
+                                                         ],
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "conditions":  {
+                                                                                  "combinator":  "and",
+                                                                                  "conditions":  [
+                                                                                                     {
+                                                                                                         "id":  "safe-mode-check",
+                                                                                                         "leftValue":  "={{ $env.SAFE_MODE }}",
+                                                                                                         "operator":  {
+                                                                                                                          "operation":  "equals",
+                                                                                                                          "type":  "string"
+                                                                                                                      },
+                                                                                                         "rightValue":  "true"
+                                                                                                     }
+                                                                                                 ],
+                                                                                  "options":  {
+                                                                                                  "version":  2,
+                                                                                                  "leftValue":  "",
+                                                                                                  "caseSensitive":  true,
+                                                                                                  "typeValidation":  "strict"
+                                                                                              }
+                                                                              },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "f7fc41c1-13cd-441a-b558-9792e9e43409",
+                                            "name":  "SAFE MODE Check",
+                                            "position":  [
+                                                             896,
+                                                             368
+                                                         ],
+                                            "type":  "n8n-nodes-base.if",
+                                            "typeVersion":  2.3,
+                                            "onError":  "continueErrorOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "// Simulated send â€” preserve ALL lead + email fields for CRM\nreturn $input.all().map(item =\u003e {\n  const lead = item.json;\n  const emailSlug = (lead.Email || lead.email || \u0027unknown\u0027).replace(/[^a-zA-Z0-9]/g,\u0027\u0027).toLowerCase().substring(0,15);\n  const fakeId = \u0027SIM-\u0027 + emailSlug + \u0027-\u0027 + Date.now();\n  return { json: {\n    \u0027Thread ID\u0027: fakeId,\n    \u0027Status\u0027: \u0027Email 1 Sent (Simulated)\u0027,\n    \u0027Email 1 Sent At\u0027: new Date().toISOString(),\n    \u0027First Name\u0027: lead[\u0027First Name\u0027] || lead.firstName || \u0027\u0027,\n    \u0027Last Name\u0027: lead[\u0027Last Name\u0027] || lead.lastName || \u0027\u0027,\n    \u0027Company Name\u0027: lead[\u0027Company Name\u0027] || lead.companyName || \u0027\u0027,\n    \u0027Email\u0027: lead.Email || lead.email || \u0027\u0027,\n    \u0027Title\u0027: lead.Title || lead.title || \u0027\u0027,\n    \u0027Industry\u0027: lead.Industry || lead.industry || \u0027\u0027,\n    \u0027Agency Name\u0027: lead[\u0027Agency Name\u0027] || lead.agencyName || \u0027\u0027,\n    \u0027Service\u0027: lead.Service || lead.service || \u0027\u0027,\n    \u0027UVP\u0027: lead.UVP || lead.uvp || \u0027\u0027,\n    \u0027Sender Email\u0027: lead[\u0027Sender Email\u0027] || lead.senderEmail || \u0027\u0027,\n    \u0027Sender Name\u0027: lead[\u0027Sender Name\u0027] || lead.senderName || \u0027\u0027,\n    \u0027Lead Score\u0027: lead[\u0027Lead Score\u0027] || lead.leadScore || 0,\n    \u0027Tier\u0027: lead.Tier || lead.leadTier || \u0027STANDARD\u0027,\n    \u0027GPT Model\u0027: lead.gptModel || (lead.tier === \u0027premium\u0027 ? \u0027gpt-4o\u0027 : \u0027gpt-4o-mini\u0027),\n    \u0027Quality Score\u0027: lead[\u0027Quality Score\u0027] || 0,\n    \u0027Quality Notes\u0027: lead[\u0027Quality Notes\u0027] || \u0027\u0027,\n    \u0027Verdict\u0027: lead.Verdict || \u0027SEND\u0027,\n    \u0027Email 1 Subject\u0027: lead.email1_subject || \u0027\u0027,\n    \u0027Email 1 Body\u0027: lead.email1_body || \u0027\u0027,\n    \u0027Email 2 Subject\u0027: lead.email2_subject || \u0027\u0027,\n    \u0027Email 2 Body\u0027: lead.email2_body || \u0027\u0027,\n    \u0027Email 3 Subject\u0027: lead.email3_subject || \u0027\u0027,\n    \u0027Email 3 Body\u0027: lead.email3_body || \u0027\u0027,\n    \u0027Simulated\u0027: \u0027YES\u0027\n  } };\n});"
+                                                           },
+                                            "id":  "93942d9a-e0db-45b6-a4c6-c30615539cb4",
+                                            "name":  "SAFE MODE (Simulated Send)",
+                                            "position":  [
+                                                             1568,
+                                                             288
+                                                         ],
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "amount":  45
+                                                           },
+                                            "id":  "fc2b3e94-8ee6-4cc0-8893-4aa92667cb28",
+                                            "name":  "Warm-Up Delay (45s)",
+                                            "position":  [
+                                                             1120,
+                                                             480
+                                                         ],
+                                            "type":  "n8n-nodes-base.wait",
+                                            "typeVersion":  1.1,
+                                            "webhookId":  "v75-warmup-delay-001"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "fromEmail":  "={{ $json[\u0027Sender Email\u0027] || $json.senderEmail }}",
+                                                               "toEmail":  "={{ $json[\u0027Email\u0027] || $json.email }}",
+                                                               "subject":  "={{ $json.email1_subject }}",
+                                                               "emailFormat":  "text",
+                                                               "text":  "={{ $json.email1_body + \u0027\\n\\n--\\n\u0027 + ($json[\u0027Sender Name\u0027] || $json.senderName || \u0027\u0027) + \u0027\\n\u0027 + ($json[\u0027Agency Name\u0027] || $json.agencyName || \u0027\u0027) + \u0027\\n\\nP.S. Reply \"remove\" to unsubscribe.\u0027 }}",
+                                                               "options":  {
+                                                                               "replyTo":  "={{ $json[\u0027Sender Email\u0027] || $json.senderEmail }}"
+                                                                           }
+                                                           },
+                                            "id":  "b882a728-19e5-41b4-bb33-d285a6e44365",
+                                            "name":  "Send Email 1 (Intro)",
+                                            "position":  [
+                                                             1344,
+                                                             480
+                                                         ],
+                                            "type":  "n8n-nodes-base.emailSend",
+                                            "typeVersion":  2.1,
+                                            "webhookId":  "f71c2fb8-e71a-42e9-99ef-1ad7ff8e1ac4",
+                                            "credentials":  {
+                                                                "smtp":  {
+                                                                             "id":  "udtIzlJq8iqmL3aZ",
+                                                                             "name":  "SMTP account - kspandian32"
+                                                                         }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "// emailSend does not pass input through. Recover from Warm-Up Delay.\nconst warmupLeads = $(\u0027Warm-Up Delay (45s)\u0027).all();\nreturn $input.all().map((item, idx) =\u003e {\n  const lead = warmupLeads[idx] ? warmupLeads[idx].json : {};\n  const emailSlug = (lead.Email || lead.email || \u0027unknown\u0027).replace(/[^a-zA-Z0-9]/g,\u0027\u0027).toLowerCase().substring(0,15);\n  const threadId = \u0027SMTP-\u0027 + emailSlug + \u0027-\u0027 + Date.now();\n  return { json: {\n    \u0027Thread ID\u0027: threadId,\n    \u0027Status\u0027: \u0027Email 1 Sent\u0027,\n    \u0027Email 1 Sent At\u0027: new Date().toISOString(),\n    \u0027First Name\u0027: lead[\u0027First Name\u0027] || lead.firstName || \u0027\u0027,\n    \u0027Last Name\u0027: lead[\u0027Last Name\u0027] || lead.lastName || \u0027\u0027,\n    \u0027Company Name\u0027: lead[\u0027Company Name\u0027] || lead.companyName || \u0027\u0027,\n    \u0027Email\u0027: lead.Email || lead.email || \u0027\u0027,\n    \u0027Title\u0027: lead.Title || lead.title || \u0027\u0027,\n    \u0027Industry\u0027: lead.Industry || lead.industry || \u0027\u0027,\n    \u0027Agency Name\u0027: lead[\u0027Agency Name\u0027] || lead.agencyName || \u0027\u0027,\n    \u0027Service\u0027: lead.Service || lead.service || \u0027\u0027,\n    \u0027UVP\u0027: lead.UVP || lead.uvp || \u0027\u0027,\n    \u0027Sender Email\u0027: lead[\u0027Sender Email\u0027] || lead.senderEmail || \u0027\u0027,\n    \u0027Sender Name\u0027: lead[\u0027Sender Name\u0027] || lead.senderName || \u0027\u0027,\n    \u0027Lead Score\u0027: lead[\u0027Lead Score\u0027] || lead.leadScore || 0,\n    \u0027Tier\u0027: lead.Tier || lead.leadTier || \u0027STANDARD\u0027,\n    \u0027GPT Model\u0027: lead.gptModel || (lead.tier === \u0027premium\u0027 ? \u0027gpt-4o\u0027 : \u0027gpt-4o-mini\u0027),\n    \u0027Quality Score\u0027: lead[\u0027Quality Score\u0027] || 0,\n    \u0027Quality Notes\u0027: lead[\u0027Quality Notes\u0027] || \u0027\u0027,\n    \u0027Verdict\u0027: lead.Verdict || \u0027SEND\u0027,\n    \u0027Email 1 Subject\u0027: lead.email1_subject || \u0027\u0027,\n    \u0027Email 1 Body\u0027: lead.email1_body || \u0027\u0027,\n    \u0027Email 2 Subject\u0027: lead.email2_subject || \u0027\u0027,\n    \u0027Email 2 Body\u0027: lead.email2_body || \u0027\u0027,\n    \u0027Email 3 Subject\u0027: lead.email3_subject || \u0027\u0027,\n    \u0027Email 3 Body\u0027: lead.email3_body || \u0027\u0027,\n    \u0027Simulated\u0027: \u0027NO\u0027\n  } };\n});"
+                                                           },
+                                            "id":  "c118778b-3315-4cf4-a979-51dd9e199d69",
+                                            "name":  "Capture Thread ID",
+                                            "position":  [
+                                                             1568,
+                                                             480
+                                                         ],
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "operation":  "append",
+                                                               "documentId":  {
+                                                                                  "mode":  "id",
+                                                                                  "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
+                                                                              },
+                                                               "sheetName":  {
+                                                                                 "mode":  "id",
+                                                                                 "value":  "1475293523"
+                                                                             },
+                                                               "columns":  {
+                                                                               "mappingMode":  "autoMapInputData"
+                                                                           },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "a56f0b83-329b-4820-a00a-b7df964f7f9c",
+                                            "name":  "Log to CRM",
+                                            "position":  [
+                                                             1792,
+                                                             384
+                                                         ],
+                                            "type":  "n8n-nodes-base.googleSheets",
+                                            "typeVersion":  4.7,
+                                            "retryOnFail":  true,
+                                            "credentials":  {
+                                                                "googleSheetsOAuth2Api":  {
+                                                                                              "id":  "hiWj9Xv9QRzG92uS",
+                                                                                              "name":  "AI Lead Gen Machine Google Sheets"
+                                                                                          }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "chatId":  "={{$env.TELEGRAM_CHAT_ID}}",
+                                                               "operation":  "sendMessage",
+                                                               "text":  "=âœ… Email 1 Sent\nRecipient: {{ $json[\u0027First Name\u0027] }} {{ $json[\u0027Last Name\u0027] }}\nCompany: {{ $json[\u0027Company Name\u0027] }}\nStatus: {{ $json.Status }}"
+                                                           },
+                                            "id":  "094972f4-c213-4b27-a566-e3624a975966",
+                                            "name":  "Telegram: Email 1 Sent",
+                                            "position":  [
+                                                             2016,
+                                                             384
+                                                         ],
+                                            "type":  "n8n-nodes-base.telegram",
+                                            "typeVersion":  1.2,
+                                            "webhookId":  "7ebda068-961e-42d6-995b-0167bddfe106",
+                                            "credentials":  {
+                                                                "telegramApi":  {
+                                                                                    "id":  "FNjJr1wAENbF6WRc",
+                                                                                    "name":  "AI Lead Gen Machine Telegram account"
+                                                                                }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "id":  "afa12f7e-23de-4298-8554-b1efdf0334cf",
+                                            "name":  "Error Trigger",
+                                            "type":  "n8n-nodes-base.errorTrigger",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -2600,
+                                                             600
+                                                         ],
+                                            "parameters":  {
+
+                                                           }
+                                        },
+                                        {
+                                            "id":  "2e910b43-2404-4091-9ad5-9d0cec781635",
+                                            "name":  "Log-Drain HTTP",
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             -2400,
+                                                             600
+                                                         ],
+                                            "parameters":  {
+                                                               "bodyParameters":  {
+                                                                                      "parameters":  [
+                                                                                                         {
+                                                                                                             "name":  "workflow_name",
+                                                                                                             "value":  "={{ $workflow.name }}"
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "name":  "tool_name",
+                                                                                                             "value":  "={{ $json.execution.error.nodeName ?? \u0027Global\u0027 }}"
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "name":  "level",
+                                                                                                             "value":  "error"
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "name":  "message",
+                                                                                                             "value":  "={{ $json.execution.error.message }}"
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "name":  "metadata",
+                                                                                                             "value":  "={{ $json }}"
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "name":  "session_id",
+                                                                                                             "value":  "={{ $execution.id }}"
+                                                                                                         }
+                                                                                                     ]
+                                                                                  },
+                                                               "method":  "POST",
+                                                               "sendBody":  true,
+                                                               "url":  "https://n8n.pureremedysolutions.com/webhook/log-drain"
+                                                           }
+                                        }
+                                    ],
+                          "connections":  {
+                                              "Launch Campaign Form":  {
+                                                                           "main":  [
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Read Apollo Contacts Sheet",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ]
+                                                                                    ]
+                                                                       },
+                                              "Read Apollo Contacts Sheet":  {
+                                                                                 "main":  [
+                                                                                              [
+                                                                                                  {
+                                                                                                      "node":  "Filter Verified + Merge",
+                                                                                                      "type":  "main",
+                                                                                                      "index":  0
+                                                                                                  }
+                                                                                              ]
+                                                                                          ]
+                                                                             },
+                                              "Filter Verified + Merge":  {
+                                                                              "main":  [
+                                                                                           [
+                                                                                               {
+                                                                                                   "node":  "Lead Scoring",
+                                                                                                   "type":  "main",
+                                                                                                   "index":  0
+                                                                                               }
+                                                                                           ]
+                                                                                       ]
+                                                                          },
+                                              "Lead Scoring":  {
+                                                                   "main":  [
+                                                                                [
+                                                                                    {
+                                                                                        "node":  "Route Tier",
+                                                                                        "type":  "main",
+                                                                                        "index":  0
+                                                                                    }
+                                                                                ]
+                                                                            ]
+                                                               },
+                                              "Route Tier":  {
+                                                                 "main":  [
+                                                                              [
+                                                                                  {
+                                                                                      "node":  "Build Prompt (Premium)",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ],
+                                                                              [
+                                                                                  {
+                                                                                      "node":  "Build Prompt (Standard)",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ]
+                                                                          ]
+                                                             },
+                                              "Build Prompt (Premium)":  {
+                                                                             "main":  [
+                                                                                          [
+                                                                                              {
+                                                                                                  "node":  "GPT Premium",
+                                                                                                  "type":  "main",
+                                                                                                  "index":  0
+                                                                                              }
+                                                                                          ]
+                                                                                      ]
+                                                                         },
+                                              "Build Prompt (Standard)":  {
+                                                                              "main":  [
+                                                                                           [
+                                                                                               {
+                                                                                                   "node":  "GPT Standard",
+                                                                                                   "type":  "main",
+                                                                                                   "index":  0
+                                                                                               }
+                                                                                           ]
+                                                                                       ]
+                                                                          },
+                                              "GPT Premium":  {
+                                                                  "main":  [
+                                                                               [
+                                                                                   {
+                                                                                       "node":  "Parse AI Emails \u0026 Merge",
+                                                                                       "type":  "main",
+                                                                                       "index":  0
+                                                                                   }
+                                                                               ]
+                                                                           ]
+                                                              },
+                                              "GPT Standard":  {
+                                                                   "main":  [
+                                                                                [
+                                                                                    {
+                                                                                        "node":  "Parse AI Emails \u0026 Merge",
+                                                                                        "type":  "main",
+                                                                                        "index":  0
+                                                                                    }
+                                                                                ]
+                                                                            ]
+                                                               },
+                                              "Parse AI Emails \u0026 Merge":  {
+                                                                                   "main":  [
+                                                                                                [
+                                                                                                    {
+                                                                                                        "node":  "AI Quality Gate",
+                                                                                                        "type":  "main",
+                                                                                                        "index":  0
+                                                                                                    }
+                                                                                                ]
+                                                                                            ]
+                                                                               },
+                                              "AI Quality Gate":  {
+                                                                      "main":  [
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "Parse Quality Score",
+                                                                                           "type":  "main",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                                  },
+                                              "Parse Quality Score":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "Quality Gate: SEND or REVIEW?",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      },
+                                              "Quality Gate: SEND or REVIEW?":  {
+                                                                                    "main":  [
+                                                                                                 [
+                                                                                                     {
+                                                                                                         "node":  "Decision Dashboard Builder",
+                                                                                                         "type":  "main",
+                                                                                                         "index":  0
+                                                                                                     }
+                                                                                                 ],
+                                                                                                 [
+                                                                                                     {
+                                                                                                         "node":  "Log to Review Queue",
+                                                                                                         "type":  "main",
+                                                                                                         "index":  0
+                                                                                                     },
+                                                                                                     {
+                                                                                                         "node":  "Telegram: Lead Needs Review",
+                                                                                                         "type":  "main",
+                                                                                                         "index":  0
+                                                                                                     }
+                                                                                                 ]
+                                                                                             ]
+                                                                                },
+                                              "Decision Dashboard Builder":  {
+                                                                                 "main":  [
+                                                                                              [
+                                                                                                  {
+                                                                                                      "node":  "Write Dashboard",
+                                                                                                      "type":  "main",
+                                                                                                      "index":  0
+                                                                                                  }
+                                                                                              ]
+                                                                                          ]
+                                                                             },
+                                              "Write Dashboard":  {
+                                                                      "main":  [
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "Consolidate for Blacklist",
+                                                                                           "type":  "main",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                                  },
+                                              "Consolidate for Blacklist":  {
+                                                                                "main":  [
+                                                                                             [
+                                                                                                 {
+                                                                                                     "node":  "Blacklist Lookup",
+                                                                                                     "type":  "main",
+                                                                                                     "index":  0
+                                                                                                 }
+                                                                                             ]
+                                                                                         ]
+                                                                            },
+                                              "Blacklist Lookup":  {
+                                                                       "main":  [
+                                                                                    [
+                                                                                        {
+                                                                                            "node":  "Blacklist Safety Net",
+                                                                                            "type":  "main",
+                                                                                            "index":  0
+                                                                                        }
+                                                                                    ]
+                                                                                ]
+                                                                   },
+                                              "Blacklist Safety Net":  {
+                                                                           "main":  [
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Blacklist Gate",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ]
+                                                                                    ]
+                                                                       },
+                                              "Blacklist Gate":  {
+                                                                     "main":  [
+                                                                                  [
+                                                                                      {
+                                                                                          "node":  "SAFE MODE Check",
+                                                                                          "type":  "main",
+                                                                                          "index":  0
+                                                                                      }
+                                                                                  ]
+                                                                              ]
+                                                                 },
+                                              "SAFE MODE Check":  {
+                                                                      "main":  [
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "SAFE MODE (Simulated Send)",
+                                                                                           "type":  "main",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ],
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "Warm-Up Delay (45s)",
+                                                                                           "type":  "main",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                                  },
+                                              "SAFE MODE (Simulated Send)":  {
+                                                                                 "main":  [
+                                                                                              [
+                                                                                                  {
+                                                                                                      "node":  "Log to CRM",
+                                                                                                      "type":  "main",
+                                                                                                      "index":  0
+                                                                                                  }
+                                                                                              ]
+                                                                                          ]
+                                                                             },
+                                              "Warm-Up Delay (45s)":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "Send Email 1 (Intro)",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      },
+                                              "Send Email 1 (Intro)":  {
+                                                                           "main":  [
+                                                                                        [
+                                                                                            {
+                                                                                                "node":  "Capture Thread ID",
+                                                                                                "type":  "main",
+                                                                                                "index":  0
+                                                                                            }
+                                                                                        ]
+                                                                                    ]
+                                                                       },
+                                              "Capture Thread ID":  {
+                                                                        "main":  [
+                                                                                     [
+                                                                                         {
+                                                                                             "node":  "Log to CRM",
+                                                                                             "type":  "main",
+                                                                                             "index":  0
+                                                                                         }
+                                                                                     ]
+                                                                                 ]
+                                                                    },
+                                              "Log to CRM":  {
+                                                                 "main":  [
+                                                                              [
+                                                                                  {
+                                                                                      "node":  "Telegram: Email 1 Sent",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ]
+                                                                          ]
+                                                             },
+                                              "Error Trigger":  {
+                                                                    "main":  [
+                                                                                 [
+                                                                                     {
+                                                                                         "node":  "Log-Drain HTTP",
+                                                                                         "type":  "main",
+                                                                                         "index":  0
+                                                                                     }
+                                                                                 ]
+                                                                             ]
+                                                                }
+                                          },
+                          "authors":  "PANDIAN K S",
+                          "name":  null,
+                          "description":  null,
+                          "autosaved":  false,
+                          "workflowPublishHistory":  [
+                                                         {
+                                                             "createdAt":  "2026-04-26T06:18:33.300Z",
+                                                             "id":  1536,
+                                                             "workflowId":  "aOhqZMSBwd9ZCSuT",
+                                                             "versionId":  "f7b217bf-40ce-4e2d-8a5d-c204ceb5ebbd",
+                                                             "event":  "activated",
+                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                                         },
+                                                         {
+                                                             "createdAt":  "2026-04-26T06:18:33.236Z",
+                                                             "id":  1535,
+                                                             "workflowId":  "aOhqZMSBwd9ZCSuT",
+                                                             "versionId":  "f7b217bf-40ce-4e2d-8a5d-c204ceb5ebbd",
+                                                             "event":  "deactivated",
+                                                             "userId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                                         }
+                                                     ]
+                      }
 }
