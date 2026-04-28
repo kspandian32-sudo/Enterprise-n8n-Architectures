@@ -3,16 +3,16 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "// ============================================================\n// ⚙️ ENTERPRISE GLOBAL CONFIGURATION\n// Conform to: https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures\n// ============================================================\n\nreturn [{\n  json: {\n    spreadsheetId: \"1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg\",\n    masterSheetName: \"Master\",\n    calendarSheetName: \"Calendar\",\n    safeMode: false,\n    logDrainUrl: \"https://n8n.pureremedysolutions.com/webhook/log-drain\",\n    smtpFrom: \"Influencer Factory <kspandian32@gmail.com>\",\n    sheetUrl: \"https://docs.google.com/spreadsheets/d/1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg/edit\"\n  }\n}];"
+        "jsCode": "return [{\n  json: {\n    spreadsheetId: \"1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg\",\n    masterSheetName: \"Master\",\n    calendarSheetName: \"Calendar\",\n    safeMode: false,\n    logDrainUrl: \"https://n8n.pureremedysolutions.com/webhook/log-drain\",\n    smtpFrom: \"Influencer Factory <kspandian32@gmail.com>\",\n    sheetUrl: \"https://docs.google.com/spreadsheets/d/1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg/edit\"\n  }\n}];"
       },
       "id": "62b91848-bae5-4dbf-ac00-4f6e6a921a74",
       "name": "⚙️ Global Config",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
       "position": [
         -624,
-        0
-      ]
+        64
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
     },
     {
       "parameters": {
@@ -59,9 +59,33 @@
       "typeVersion": 2.2,
       "position": [
         -848,
-        0
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.safeMode }}",
+              "operator": {
+                "operation": "equals",
+                "type": "boolean"
+              },
+              "rightValue": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "safe-mode-if-gen-001",
+      "name": "🛡️ IF: Safe Mode?",
+      "position": [
+        -400,
+        64
       ],
-      "webhookId": "670c1dd0-7e9d-4f15-9635-0bd6836dde42"
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2
     },
     {
       "parameters": {
@@ -77,18 +101,16 @@
               "content": "={{ \"Create a detailed character profile for: \" + $json[\"Influencer Name\"] + \"\\nNiche: \" + $json.Niche + \"\\n\\nReturn this EXACT JSON structure:\\n{\\n  \\\"personality\\\": \\\"3 descriptive words\\\",\\n  \\\"aesthetic\\\": \\\"Visual style description\\\",\\n  \\\"bio\\\": \\\"Instagram bio with emojis\\\",\\n  \\\"master_prompt\\\": \\\"Master appearance description for image generation\\\",\\n  \\\"caption_style\\\": \\\"Tone of voice description\\\",\\n  \\\"content_pillars\\\": [\\\"List of 3 pillars\\\"],\\n  \\\"target_audience\\\": \\\"Primary demographic\\\",\\n  \\\"hashtags\\\": \\\"#tag1 #tag2 #tag3\\\"\\n}\" }}"
             }
           ]
-        },
-        "options": {},
-        "requestOptions": {}
+        }
       },
       "id": "73785a42-eadb-4990-a48a-c3b845648309",
       "name": "🤖 AI: Profile",
+      "position": [
+        -176,
+        160
+      ],
       "type": "n8n-nodes-base.openAi",
       "typeVersion": 1,
-      "position": [
-        -400,
-        0
-      ],
       "credentials": {
         "openAiApi": {
           "id": "So1Wi5RlSonVFbIN",
@@ -113,17 +135,16 @@
         },
         "options": {
           "maxTokens": 16384
-        },
-        "requestOptions": {}
+        }
       },
       "id": "dd9b0a0b-a61f-4edb-aee2-ae9214c9a3dd",
       "name": "🤖 AI: 30-Day Calendar",
+      "position": [
+        48,
+        64
+      ],
       "type": "n8n-nodes-base.openAi",
       "typeVersion": 1,
-      "position": [
-        -176,
-        0
-      ],
       "credentials": {
         "openAiApi": {
           "id": "So1Wi5RlSonVFbIN",
@@ -137,12 +158,12 @@
       },
       "id": "67458a6c-77ea-40b0-988a-36bacec57e52",
       "name": "🔧 Data: Normalize",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
       "position": [
-        48,
-        0
-      ]
+        272,
+        -32
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
     },
     {
       "parameters": {
@@ -164,17 +185,16 @@
           "schema": [],
           "attemptToConvertTypes": false,
           "convertFieldsToString": false
-        },
-        "options": {}
+        }
       },
       "id": "297b17a1-41fa-4896-96a3-ad1dc1e550c6",
       "name": "💾 Memory: Log Master",
+      "position": [
+        496,
+        -32
+      ],
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [
-        272,
-        0
-      ],
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "hiWj9Xv9QRzG92uS",
@@ -188,12 +208,12 @@
       },
       "id": "48df71df-7d6c-4d13-bda7-52af13aa7aa7",
       "name": "🔧 Data: Expand Calendar",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
       "position": [
-        496,
-        96
-      ]
+        720,
+        64
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
     },
     {
       "parameters": {
@@ -215,17 +235,16 @@
           "schema": [],
           "attemptToConvertTypes": false,
           "convertFieldsToString": false
-        },
-        "options": {}
+        }
       },
       "id": "74fe02cf-11e6-4d73-8ec3-03fea5d3ef0b",
       "name": "💾 Memory: Log Calendar",
+      "position": [
+        944,
+        64
+      ],
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [
-        720,
-        96
-      ],
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "hiWj9Xv9QRzG92uS",
@@ -243,13 +262,12 @@
       },
       "id": "ce585165-ebd7-47b2-8586-45d467f92c10",
       "name": "🚀 Execute: Send Email",
+      "position": [
+        720,
+        -128
+      ],
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [
-        496,
-        -96
-      ],
-      "webhookId": "b020ba07-8d4d-4d6b-929c-edf9ab6133bc",
       "credentials": {
         "smtp": {
           "id": "udtIzlJq8iqmL3aZ",
@@ -268,63 +286,16 @@
             { "name": "level", "value": "info" },
             { "name": "message", "value": "Started" }
           ]
-        },
-        "options": {}
+        }
       },
       "id": "log-start",
       "name": "📝 Log: Start",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
       "position": [
-        -848,
-        208
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            { "name": "workflow_name", "value": "AI Influencer Factory" },
-            { "name": "level", "value": "info" },
-            { "name": "message", "value": "Profile Generated" }
-          ]
-        },
-        "options": {}
-      },
-      "id": "log-profile",
-      "name": "📝 Log: Profile",
+        -624,
+        256
+      ],
       "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        -400,
-        208
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            { "name": "workflow_name", "value": "AI Influencer Factory" },
-            { "name": "level", "value": "info" },
-            { "name": "message", "value": "Calendar Generated" }
-          ]
-        },
-        "options": {}
-      },
-      "id": "log-calendar",
-      "name": "📝 Log: Calendar",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        -176,
-        208
-      ]
+      "typeVersion": 4.4
     },
     {
       "parameters": {
@@ -337,135 +308,45 @@
             { "name": "level", "value": "info" },
             { "name": "message", "value": "Success" }
           ]
-        },
-        "options": {}
+        }
       },
       "id": "log-success",
       "name": "📝 Log: Success",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
       "position": [
-        928,
-        96
-      ]
-    },
-    {
-      "id": "safe-mode-if-gen-001",
-      "name": "🛡️ IF: Safe Mode?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        -400,
-        -128
+        1168,
+        64
       ],
-      "parameters": {
-        "conditions": {
-          "conditions": [
-            {
-              "leftValue": "={{ $json.safeMode }}",
-              "operator": {
-                "operation": "equals",
-                "type": "boolean"
-              },
-              "rightValue": true
-            }
-          ]
-        }
-      }
-    },
-    {
-      "id": "safe-mode-log-gen-001",
-      "name": "📝 Log: Safe Mode (Skip)",
       "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        -176,
-        -128
-      ],
-      "parameters": {
-        "bodyParameters": {
-          "parameters": [
-            { "name": "workflow_name", "value": "AI Influencer Factory" },
-            { "name": "level", "value": "warn" },
-            { "name": "message", "value": "Safe Mode Active: Skipping AI Generation." }
-          ]
-        },
-        "method": "POST",
-        "sendBody": true,
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}"
-      }
+      "typeVersion": 4.4
     }
   ],
   "connections": {
     "🗓️ Trigger: Form": {
-      "main": [
-        [
-          { "node": "⚙️ Global Config", "type": "main", "index": 0 },
-          { "node": "📝 Log: Start", "type": "main", "index": 0 }
-        ]
-      ]
-    },
-    "🤖 AI: Profile": {
-      "main": [
-        [
-          { "node": "🤖 AI: 30-Day Calendar", "type": "main", "index": 0 },
-          { "node": "📝 Log: Profile", "type": "main", "index": 0 }
-        ]
-      ]
-    },
-    "🤖 AI: 30-Day Calendar": {
-      "main": [
-        [
-          { "node": "🔧 Data: Normalize", "type": "main", "index": 0 },
-          { "node": "📝 Log: Calendar", "type": "main", "index": 0 }
-        ]
-      ]
-    },
-    "🔧 Data: Normalize": {
-      "main": [
-        [
-          { "node": "💾 Memory: Log Master", "type": "main", "index": 0 }
-        ]
-      ]
-    },
-    "💾 Memory: Log Master": {
-      "main": [
-        [
-          { "node": "🚀 Execute: Send Email", "type": "main", "index": 0 },
-          { "node": "🔧 Data: Expand Calendar", "type": "main", "index": 0 }
-        ]
-      ]
-    },
-    "🔧 Data: Expand Calendar": {
-      "main": [
-        [
-          { "node": "💾 Memory: Log Calendar", "type": "main", "index": 0 }
-        ]
-      ]
-    },
-    "💾 Memory: Log Calendar": {
-      "main": [
-        [
-          { "node": "📝 Log: Success", "type": "main", "index": 0 }
-        ]
-      ]
+      "main": [ [ { "node": "⚙️ Global Config", "type": "main", "index": 0 }, { "node": "📝 Log: Start", "type": "main", "index": 0 } ] ]
     },
     "⚙️ Global Config": {
-      "main": [
-        [
-          { "node": "🛡️ IF: Safe Mode?", "type": "main", "index": 0 }
-        ]
-      ]
+      "main": [ [ { "node": "🛡️ IF: Safe Mode?", "type": "main", "index": 0 } ] ]
     },
     "🛡️ IF: Safe Mode?": {
-      "main": [
-        [
-          { "node": "📝 Log: Safe Mode (Skip)", "type": "main", "index": 0 }
-        ],
-        [
-          { "node": "🤖 AI: Profile", "type": "main", "index": 0 }
-        ]
-      ]
+      "main": [ [ ], [ { "node": "🤖 AI: Profile", "type": "main", "index": 0 } ] ]
+    },
+    "🤖 AI: Profile": {
+      "main": [ [ { "node": "🤖 AI: 30-Day Calendar", "type": "main", "index": 0 } ] ]
+    },
+    "🤖 AI: 30-Day Calendar": {
+      "main": [ [ { "node": "🔧 Data: Normalize", "type": "main", "index": 0 } ] ]
+    },
+    "🔧 Data: Normalize": {
+      "main": [ [ { "node": "💾 Memory: Log Master", "type": "main", "index": 0 } ] ]
+    },
+    "💾 Memory: Log Master": {
+      "main": [ [ { "node": "🚀 Execute: Send Email", "type": "main", "index": 0 }, { "node": "🔧 Data: Expand Calendar", "type": "main", "index": 0 } ] ]
+    },
+    "🔧 Data: Expand Calendar": {
+      "main": [ [ { "node": "💾 Memory: Log Calendar", "type": "main", "index": 0 } ] ]
+    },
+    "💾 Memory: Log Calendar": {
+      "main": [ [ { "node": "📝 Log: Success", "type": "main", "index": 0 } ] ]
     }
   },
   "settings": {
