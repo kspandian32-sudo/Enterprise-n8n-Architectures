@@ -213,20 +213,30 @@ This repository has been hardened with the **v7.6 Resilient Standard**, focusing
 
 ---
 
-## 🌉 Instagram Bridge (Composio V3.1 Upgrade)
+## 📊 Production Observability & Telegram Restoration
 
-The **AI Influencer Factory** now features a specialized Python-based Bridge to handle modern Instagram publishing via Composio V3.1.
+The stack now features a fully restored and hardened **Observability Layer** to ensure zero silent failures.
+
+### **Key Upgrades:**
+*   **Telegram Alert Restoration:** Fixed the `Log-Drain` workflow to bypass environment variable restrictions by using a dedicated **Telegram Node** with persistent credentials (`lMh5dlTVHK0LmmG6`).
+*   **Unified Error Handling:** The `FEK7PNwR6I3XZygD` sub-workflow now correctly handles both `SUCCESS` and `ERROR` signals, providing formatted real-time alerts to the administrator's Telegram bot.
+*   **Intelligent Log Filtering:** Implemented logic to filter out `debug` noise while ensuring all production-critical events (publishing successes, generation failures) are pushed to the Telegram channel.
+
+---
+
+## 🌉 Instagram Bridge (Composio V3.1 & Resilience Upgrade)
+
+The **AI Influencer Factory** now features a specialized Python-based Bridge to handle modern Instagram publishing via Composio V3.1, with added self-healing logic.
 
 ### **Key Features:**
-*   **Composio V3.1 Migration:** Fully compatible with the latest `/api/v3.1/tools/execute/` endpoints.
-*   **Ideogram URL Resolution:** Automatically converts Ideogram gallery and Progressive Image links into raw direct URLs suitable for Instagram's Graph API.
-*   **Automated Error Filtering:** The workflow now includes hardened `IF` nodes and `Code` validation to prevent "Not Generated" placeholders from triggering API failures.
-*   **Service Port:** Runs on port **5007** (local bridge) to avoid conflicts with standard services.
+*   **Composio V3.1 Migration:** Fully compatible with the latest `/api/v3.1/tools/execute/` endpoints and entity management.
+*   **Resilient URL Resolution:** The n8n resolver now progressively verifies Ideogram CDN paths and strictly drops "Not Generated" placeholders to prevent 500 errors.
+*   **PM2 Management:** The bridge service is now managed by PM2 for automated restarts and high availability on port **5007**.
 
 ### **Usage:**
-Ensure `ig_bridge.py` is running (recommended via PM2):
+Ensure `ig_bridge.py` is running:
 ```bash
-pm2 start "python ig_bridge.py" --name "ig-bridge"
+pm2 start ig_bridge.py --interpreter python --name "ig-bridge"
 ```
 
 *Maintained by [kspandian32-sudo](https://github.com/kspandian32-sudo)*
