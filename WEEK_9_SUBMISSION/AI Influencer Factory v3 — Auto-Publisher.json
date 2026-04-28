@@ -8,11 +8,43 @@
       "id": "1d4954f1-62c6-49c4-8378-6b0b0f443060",
       "name": "⚙️ Global Config",
       "position": [
-        -272,
-        64
+        -1904,
+        352
       ],
       "type": "n8n-nodes-base.code",
       "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "Auto-Publisher"
+            },
+            {
+              "name": "level",
+              "value": "warn"
+            },
+            {
+              "name": "message",
+              "value": "Safe Mode Active: Skipping Publishing."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "safe-mode-log-pub-001",
+      "name": "📝 Log: Safe Mode (Skip)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1456,
+        256
+      ]
     }
   ],
   "connections": {},
