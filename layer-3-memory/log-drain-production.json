@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-28T07:44:49.417Z",
+  "updatedAt": "2026-04-28T07:50:44.058Z",
   "createdAt": "2026-04-25T19:14:19.192Z",
   "id": "FEK7PNwR6I3XZygD",
   "name": "Log-Drain — Centralized Sub-workflow",
@@ -49,15 +49,16 @@
       ],
       "parameters": {
         "conditions": {
+          "combinator": "and",
           "conditions": [
             {
+              "id": "cond-1777360836465-9b4kubpyi",
               "leftValue": "={{ $json.level }}",
               "operator": {
                 "operation": "notEquals",
                 "type": "string"
               },
-              "rightValue": "debug",
-              "id": "condition-1777360836465-9b4kubpyi"
+              "rightValue": "debug"
             }
           ],
           "options": {
@@ -74,12 +75,14 @@
       "id": "node-telegram",
       "name": "Telegram Alert",
       "type": "n8n-nodes-base.telegram",
-      "typeVersion": 4.4,
+      "typeVersion": 1.2,
       "position": [
         960,
         160
       ],
       "parameters": {
+        "additionalFields": {},
+        "chatId": "7392899748",
         "text": "={{ $json.level === 'error' ? '🚨 *ERROR*' : ($json.level === 'warn' ? '⚠️ *WARNING*' : '✅ *SUCCESS*') }} in `{{ $json.workflow_name }}`\n*Tool:* `{{ $json.tool_name ?? 'n/a' }}`\n*Message:* {{ $json.message }}\n*Time:* {{ $json.created_at }}\n*Session:* `{{ $json.session_id ?? 'n/a' }}`"
       },
       "maxTries": 3,
@@ -285,9 +288,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "40671aab-6acc-4833-8344-f2c71b568608",
-  "activeVersionId": "40671aab-6acc-4833-8344-f2c71b568608",
-  "versionCounter": 24,
+  "versionId": "33384a62-b7c0-4d01-9fc8-838db3d13211",
+  "activeVersionId": "33384a62-b7c0-4d01-9fc8-838db3d13211",
+  "versionCounter": 28,
   "triggerCount": 1,
   "shared": [
     {
@@ -310,9 +313,9 @@
   ],
   "tags": [],
   "activeVersion": {
-    "updatedAt": "2026-04-28T07:44:49.418Z",
-    "createdAt": "2026-04-28T07:44:49.418Z",
-    "versionId": "40671aab-6acc-4833-8344-f2c71b568608",
+    "updatedAt": "2026-04-28T07:50:44.059Z",
+    "createdAt": "2026-04-28T07:50:44.059Z",
+    "versionId": "33384a62-b7c0-4d01-9fc8-838db3d13211",
     "workflowId": "FEK7PNwR6I3XZygD",
     "nodes": [
       {
@@ -357,15 +360,16 @@
         ],
         "parameters": {
           "conditions": {
+            "combinator": "and",
             "conditions": [
               {
+                "id": "cond-1777360836465-9b4kubpyi",
                 "leftValue": "={{ $json.level }}",
                 "operator": {
                   "operation": "notEquals",
                   "type": "string"
                 },
-                "rightValue": "debug",
-                "id": "condition-1777360836465-9b4kubpyi"
+                "rightValue": "debug"
               }
             ],
             "options": {
@@ -382,12 +386,14 @@
         "id": "node-telegram",
         "name": "Telegram Alert",
         "type": "n8n-nodes-base.telegram",
-        "typeVersion": 4.4,
+        "typeVersion": 1.2,
         "position": [
           960,
           160
         ],
         "parameters": {
+          "additionalFields": {},
+          "chatId": "7392899748",
           "text": "={{ $json.level === 'error' ? '🚨 *ERROR*' : ($json.level === 'warn' ? '⚠️ *WARNING*' : '✅ *SUCCESS*') }} in `{{ $json.workflow_name }}`\n*Tool:* `{{ $json.tool_name ?? 'n/a' }}`\n*Message:* {{ $json.message }}\n*Time:* {{ $json.created_at }}\n*Session:* `{{ $json.session_id ?? 'n/a' }}`"
         },
         "maxTries": 3,
@@ -589,6 +595,23 @@
     "name": null,
     "description": null,
     "autosaved": false,
-    "workflowPublishHistory": []
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-04-28T07:50:44.146Z",
+        "id": 1714,
+        "workflowId": "FEK7PNwR6I3XZygD",
+        "versionId": "33384a62-b7c0-4d01-9fc8-838db3d13211",
+        "event": "activated",
+        "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+      },
+      {
+        "createdAt": "2026-04-28T07:50:44.115Z",
+        "id": 1713,
+        "workflowId": "FEK7PNwR6I3XZygD",
+        "versionId": "33384a62-b7c0-4d01-9fc8-838db3d13211",
+        "event": "deactivated",
+        "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+      }
+    ]
   }
 }
