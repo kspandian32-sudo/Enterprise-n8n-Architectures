@@ -211,4 +211,23 @@ This repository has been hardened with the **v7.6 Resilient Standard**, focusing
 3.  **Type-Strict Logic:** Critical `IF` nodes and `Code` nodes have been refactored for strict type validation to prevent silent routing failures.
 4.  **Google Sheets Resilience:** CRM update nodes now use explicit range definitions and `onError: continueRegularOutput` to ensure that tracking failures do not crash the primary automation logic.
 
+---
+
+## 🌉 Instagram Bridge (Composio V3.1 Upgrade)
+
+The **AI Influencer Factory** now features a specialized Python-based Bridge to handle modern Instagram publishing via Composio V3.1.
+
+### **Key Features:**
+*   **Composio V3.1 Migration:** Fully compatible with the latest `/api/v3.1/tools/execute/` endpoints.
+*   **Ideogram URL Resolution:** Automatically converts Ideogram gallery and Progressive Image links into raw direct URLs suitable for Instagram's Graph API.
+*   **Automated Error Filtering:** The workflow now includes hardened `IF` nodes and `Code` validation to prevent "Not Generated" placeholders from triggering API failures.
+*   **Service Port:** Runs on port **5007** (local bridge) to avoid conflicts with standard services.
+
+### **Usage:**
+Ensure `ig_bridge.py` is running (recommended via PM2):
+```bash
+pm2 start "python ig_bridge.py" --name "ig-bridge"
+```
+
 *Maintained by [kspandian32-sudo](https://github.com/kspandian32-sudo)*
+
