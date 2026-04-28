@@ -91,7 +91,7 @@ graph TD
 *   **[AI Proposal Autopilot](./layer-4-execution/AI-Proposal-Invoice-Autopilot/)** — *Full Sales Lifecycle*
     *   End-to-end automation from lead intake to Google Slides generation and invoicing.
 *   **[AI Influencer Factory](./layer-4-execution/AI-Influencer-Factory/)** — *v3 Enterprise Edition*
-    *   Autonomous persona generation and 30-day scheduled publishing with multi-modal AI (Ideogram/OpenAI), "Safe Mode" hardening, and **Manual Image Overwrite** support.
+    *   Autonomous persona generation and 30-day scheduled publishing with multi-modal AI (Ideogram/OpenAI), **Synchronized Safe Mode guardrails**, and **Manual Image Overwrite** support.
 
 ### 📂 [Layer 5: Extensions](./layer-5-extensions/)
 *   **[Gemini PDF Node](./layer-5-extensions/n8n-nodes-gemini-pdf-analyzer/)** — *Custom n8n Extension*
@@ -127,7 +127,7 @@ This portfolio implements a **Global SAFE_MODE Toggle** across 4 major automatio
 - **Invoice Vision Auditor**: Gates file movements / external API writes.
 - **Signal Pipeline**: Gates email alerting / intent notifications.
 - **Auto-Blogger**: Gates WordPress publishing API.
-- **AI Influencer Factory**: Gates Ideogram image generation and Instagram publishing.
+- **AI Influencer Factory**: Gates Ideogram image generation and Instagram publishing (Synchronized across Gen & Pub workflows).
 
 **Architecture:** Destructive actions are programmatically gated by environment-based IF branches (`SAFE_MODE=true`). This ensures that developers can run end-to-end tests without triggering real-world side effects. Designed for the n8n Community Edition by leveraging system environment variables instead of Enterprise-only UI features.
 
@@ -233,11 +233,16 @@ The **AI Influencer Factory** now features a specialized Python-based Bridge to 
 *   **Resilient URL Resolution:** The n8n resolver now progressively verifies Ideogram CDN paths and strictly drops "Not Generated" placeholders to prevent 500 errors.
 *   **PM2 Management:** The bridge service is now managed by PM2 for automated restarts and high availability on port **5007**.
 
-### **Usage:**
-Ensure `ig_bridge.py` is running:
-```bash
-pm2 start ig_bridge.py --interpreter python --name "ig-bridge"
-```
+---
+
+## 🛡️ Production Synchronization (April 28th Upgrade)
+
+The **AI Influencer Factory** stack has been fully synchronized for Production Stability.
+
+### **Safe Mode Guardrails:**
+*   **Main Generation:** Now features an `🛡️ IF: Safe Mode?` branch that bypasses expensive OpenAI calls during testing.
+*   **Auto-Publisher:** Now features an identical `🛡️ IF: Safe Mode?` branch that bypasses the Instagram Bridge and Spreadsheet "Mark as Posted" steps.
+*   **Unified Config:** Both workflows now share a standardized `⚙️ Global Config` node with the `safeMode` boolean flag.
 
 *Maintained by [kspandian32-sudo](https://github.com/kspandian32-sudo)*
 
