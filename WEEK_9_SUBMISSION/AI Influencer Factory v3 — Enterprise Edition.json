@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-04-28T08:01:43.290Z",
-  "createdAt": "2026-04-28T08:01:43.290Z",
-  "versionId": "463df08d-c6bb-4d2d-bd0a-c9e8f3481071",
+  "updatedAt": "2026-04-28T08:49:07.284Z",
+  "createdAt": "2026-04-28T08:49:07.284Z",
+  "versionId": "877fcfda-d885-45e8-91a8-ae053878ddf9",
   "workflowId": "wK18IwIA4ERn8xh9",
   "nodes": [
     {
@@ -258,6 +258,26 @@
     },
     {
       "parameters": {
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "info"
+            },
+            {
+              "name": "message",
+              "value": "Workflow started."
+            }
+          ]
+        },
+        "contentType": "json",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "keypair",
         "url": "https://n8n.pureremedysolutions.com/webhook/log-drain"
       },
       "id": "log-start",
@@ -271,6 +291,26 @@
     },
     {
       "parameters": {
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "info"
+            },
+            {
+              "name": "message",
+              "value": "Character profile generated."
+            }
+          ]
+        },
+        "contentType": "json",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "keypair",
         "url": "https://n8n.pureremedysolutions.com/webhook/log-drain"
       },
       "id": "log-profile",
@@ -284,6 +324,26 @@
     },
     {
       "parameters": {
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "info"
+            },
+            {
+              "name": "message",
+              "value": "30-day calendar generated."
+            }
+          ]
+        },
+        "contentType": "json",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "keypair",
         "url": "https://n8n.pureremedysolutions.com/webhook/log-drain"
       },
       "id": "log-calendar",
@@ -297,6 +357,26 @@
     },
     {
       "parameters": {
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "success"
+            },
+            {
+              "name": "message",
+              "value": "Workflow completed successfully. Email sent."
+            }
+          ]
+        },
+        "contentType": "json",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "keypair",
         "url": "https://n8n.pureremedysolutions.com/webhook/log-drain"
       },
       "id": "log-success",
@@ -508,18 +588,18 @@
   "autosaved": false,
   "workflowPublishHistory": [
     {
-      "createdAt": "2026-04-28T08:01:43.382Z",
-      "id": 1722,
+      "createdAt": "2026-04-28T08:49:07.721Z",
+      "id": 1724,
       "workflowId": "wK18IwIA4ERn8xh9",
-      "versionId": "463df08d-c6bb-4d2d-bd0a-c9e8f3481071",
+      "versionId": "877fcfda-d885-45e8-91a8-ae053878ddf9",
       "event": "activated",
       "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
     },
     {
-      "createdAt": "2026-04-28T08:01:43.348Z",
-      "id": 1721,
+      "createdAt": "2026-04-28T08:49:07.595Z",
+      "id": 1723,
       "workflowId": "wK18IwIA4ERn8xh9",
-      "versionId": "463df08d-c6bb-4d2d-bd0a-c9e8f3481071",
+      "versionId": "877fcfda-d885-45e8-91a8-ae053878ddf9",
       "event": "deactivated",
       "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
     }
