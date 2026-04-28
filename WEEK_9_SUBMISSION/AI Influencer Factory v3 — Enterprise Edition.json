@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    spreadsheetId: \"1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg\",\n    masterSheetName: \"Master\",\n    calendarSheetName: \"Calendar\",\n    safeMode: false,\n    logDrainUrl: \"https://n8n.pureremedysolutions.com/webhook/log-drain\",\n    smtpFrom: \"Influencer Factory <kspandian32@gmail.com>\",\n    sheetUrl: \"https://docs.google.com/spreadsheets/d/1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg/edit\"\n  }\n}];"
+        "jsCode": "return [{ json: { spreadsheetId: \"1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg\", masterSheetName: \"Master\", calendarSheetName: \"Calendar\", safeMode: false, logDrainUrl: \"https://n8n.pureremedysolutions.com/webhook/log-drain\", smtpFrom: \"Influencer Factory <kspandian32@gmail.com>\", sheetUrl: \"https://docs.google.com/spreadsheets/d/1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg/edit\" } }];"
       },
       "id": "62b91848-bae5-4dbf-ac00-4f6e6a921a74",
       "name": "⚙️ Global Config",
@@ -98,7 +98,7 @@
               "content": "You are an expert AI influencer strategist. Create detailed virtual influencer character sheets. Return ONLY raw valid JSON. DO NOT use markdown blocks like ```json, just return the raw object starting with {."
             },
             {
-              "content": "={{ \"Create a detailed character profile for: \" + $json[\"Influencer Name\"] + \"\\nNiche: \" + $json.Niche + \"\\n\\nReturn this EXACT JSON structure:\\n{\\n  \\\"personality\\\": \\\"3 descriptive words\\\",\\n  \\\"aesthetic\\\": \\\"Visual style description\\\",\\n  \\\"bio\\\": \\\"Instagram bio with emojis\\\",\\n  \\\"master_prompt\\\": \\\"Master appearance description for image generation\\\",\\n  \\\"caption_style\\\": \\\"Tone of voice description\\\",\\n  \\\"content_pillars\\\": [\\\"List of 3 pillars\\\"],\\n  \\\"target_audience\\\": \\\"Primary demographic\\\",\\n  \\\"hashtags\\\": \\\"#tag1 #tag2 #tag3\\\"\\n}\" }}"
+              "content": "={{ \"Create a detailed character profile for: \" + $json[\"Influencer Name\"] + \"\\nNiche: \" + $json.Niche + \"\\n\\nReturn this EXACT JSON structure:\\n{\\n  \\\"personality\\\": \\\"3 descriptive words\\\",\\n  \\\"aesthetic\\\": \\\"Visual style description\\\",\\n  \\\"bio\\\": \\\"Instagram bio with emojis\\\",\\n  \\\"master_prompt\\\": \\\"Master appearance description for image generation\\\",\\n  \\\"caption_style\\\", \\\"Tone of voice description\\\",\\n  \\\"content_pillars\\\": [\\\"List of 3 pillars\\\"],\\n  \\\"target_audience\\\": \\\"Primary demographic\\\",\\n  \\\"hashtags\\\": \\\"#tag1 #tag2 #tag3\\\"\\n}\" }}"
             }
           ]
         }
@@ -256,7 +256,7 @@
       "parameters": {
         "fromEmail": "={{ $(\"⚙️ Global Config\").first().json.smtpFrom }}",
         "toEmail": "={{ $(\"🗓️ Trigger: Form\").first().json[\"Your Email\"] }}",
-        "subject": "=🤖 AI Influencer Package: {{ $(\"🗓️ Trigger: Form\").first().json[\"Influencer Name\"] }}",
+        "subject": "=🤖 AI Influencer Factory: {{ $(\"🗓️ Trigger: Form\").first().json[\"Influencer Name\"] }}",
         "html": "=<h1>🤖 AI Influencer Package Ready</h1><p>Hello,</p><p>Your AI Influencer character sheet and 30-day content calendar for <b>{{ $(\"🗓️ Trigger: Form\").first().json[\"Influencer Name\"] }}</b> have been generated and logged to the Master Spreadsheet.</p><p>Best regards,<br>AI Influencer Factory</p>",
         "options": {}
       },
