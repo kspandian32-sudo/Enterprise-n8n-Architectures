@@ -1,0 +1,589 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// ⚙️ ENTERPRISE GLOBAL CONFIGURATION\n// Conform to: https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures\n// ============================================================\n\nreturn [{\n  json: {\n    spreadsheetId: \"1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg\",\n    masterSheetName: \"Master\",\n    calendarSheetName: \"Calendar\",\n    safeMode: false,\n    logDrainUrl: \"https://n8n.pureremedysolutions.com/webhook/log-drain\",\n    smtpFrom: \"Influencer Factory <kspandian32@gmail.com>\",\n    sheetUrl: \"https://docs.google.com/spreadsheets/d/1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg/edit\"\n  }\n}];"
+      },
+      "id": "62b91848-bae5-4dbf-ac00-4f6e6a921a74",
+      "name": "⚙️ Global Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -624,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "🤖 AI Influencer Factory (Plan B)",
+        "formDescription": "Enter details. AI will generate character sheets & 30-day calendar.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Influencer Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Instagram Handle",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Niche",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Fitness & Wellness"
+                  },
+                  {
+                    "option": "Fashion & Lifestyle"
+                  },
+                  {
+                    "option": "Travel & Adventure"
+                  },
+                  {
+                    "option": "AI & Tech"
+                  },
+                  {
+                    "option": "Business & Finance"
+                  },
+                  {
+                    "option": "Food & Cooking"
+                  },
+                  {
+                    "option": "Beauty & Skincare"
+                  },
+                  {
+                    "option": "Motivation & Mindset"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Your Email",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2eed2e48-7466-4c03-84f1-6fb9660ffeb4",
+      "name": "🗓️ Trigger: Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -848,
+        0
+      ],
+      "webhookId": "670c1dd0-7e9d-4f15-9635-0bd6836dde42"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o-mini",
+        "prompt": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "You are an expert AI influencer strategist. Create detailed virtual influencer character sheets. Return ONLY raw valid JSON. DO NOT use markdown blocks like ```json, just return the raw object starting with {."
+            },
+            {
+              "content": "={{ \"Create a detailed character profile for: \" + $json[\"Influencer Name\"] + \"\\nNiche: \" + $json.Niche + \"\\n\\nReturn this EXACT JSON structure:\\n{\\n  \\\"personality\\\": \\\"3 descriptive words\\\",\\n  \\\"aesthetic\\\": \\\"Visual style description\\\",\\n  \\\"bio\\\": \\\"Instagram bio with emojis\\\",\\n  \\\"master_prompt\\\": \\\"Master appearance description for image generation\\\",\\n  \\\"caption_style\\\": \\\"Tone of voice description\\\",\\n  \\\"content_pillars\\\": [\\\"List of 3 pillars\\\"],\\n  \\\"target_audience\\\": \\\"Primary demographic\\\",\\n  \\\"hashtags\\\": \\\"#tag1 #tag2 #tag3\\\"\\n}\" }}"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "id": "73785a42-eadb-4990-a48a-c3b845648309",
+      "name": "🤖 AI: Profile",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "So1Wi5RlSonVFbIN",
+          "name": "OpenAI fresh-key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o-mini",
+        "prompt": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "You are an Instagram content strategist. Create detailed content calendars with ready-to-use Ideogram AI image prompts. Return ONLY a raw JSON array. DO NOT use markdown blocks like ```json, just return the raw array starting with [."
+            },
+            {
+              "content": "={{ \"Create a 30-day Instagram calendar for \" + $(\"🗓️ Trigger: Form\").first().json[\"Influencer Name\"] + \".\\n\\nCharacter Profile: \" + $(\"🤖 AI: Profile\").first().json.message.content + \"\\n\\nReturn a JSON ARRAY of 30 items. Each item:\\n{\\n  \\\"day\\\": 1,\\n  \\\"type\\\": \\\"Feed Post or Carousel or Reel or Story\\\",\\n  \\\"photo_description\\\": \\\"What the image shows\\\",\\n  \\\"ideogram_prompt\\\": \\\"FULL Ideogram prompt for this specific scene.\\\",\\n  \\\"caption\\\": \\\"2-3 line Instagram caption\\\",\\n  \\\"hashtags\\\": \\\"15 hashtags as string\\\",\\n  \\\"posting_time\\\": \\\"Time in IST\\\"\\n}\" }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 16384
+        },
+        "requestOptions": {}
+      },
+      "id": "dd9b0a0b-a61f-4edb-aee2-ae9214c9a3dd",
+      "name": "🤖 AI: 30-Day Calendar",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "So1Wi5RlSonVFbIN",
+          "name": "OpenAI fresh-key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let aiNode = $(\"🤖 AI: Profile\").first().json;\nlet content = aiNode.message?.content || aiNode.text;\nlet charAi;\nif (typeof content === 'object') {\n  charAi = content;\n} else if (typeof content === 'string') {\n  try {\n    charAi = JSON.parse(content.replace(/```json/gi, '').replace(/```/g, '').trim());\n  } catch(e) {\n    charAi = {};\n  }\n} else {\n  charAi = aiNode; \n}\n\nconst form = $(\"🗓️ Trigger: Form\").first().json;\n\nreturn [{\n  json: {\n    Name: form[\"Influencer Name\"],\n    Handle: form[\"Instagram Handle\"],\n    Niche: form[\"Niche\"],\n    Gender: \"Generated\",\n    Age: \"24\",\n    Location: \"India\",\n    Personality: charAi.personality || \"\",\n    Aesthetic: charAi.aesthetic || \"\",\n    Bio: charAi.bio || \"\",\n    \"Hashtag Bank\": charAi.hashtags || \"\",\n    Timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "67458a6c-77ea-40b0-988a-36bacec57e52",
+      "name": "🔧 Data: Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $(\"⚙️ Global Config\").first().json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $(\"⚙️ Global Config\").first().json.masterSheetName }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "297b17a1-41fa-4896-96a3-ad1dc1e550c6",
+      "name": "💾 Memory: Log Master",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        272,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "AI Lead Gen Machine Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let aiNode = $(\"🤖 AI: 30-Day Calendar\").first().json;\nlet content = aiNode.message?.content || aiNode.text;\nlet calAi;\n\nif (typeof content === 'object') {\n  calAi = content;\n} else if (typeof content === 'string') {\n  let clean = content.replace(/```json/gi, '').replace(/```/g, '').trim();\n  if (clean.startsWith(\"[\") && !clean.endsWith(\"]\")) {\n    clean = clean.replace(/,\\s*$/, '') + \"}]\"; \n  }\n  try {\n    calAi = JSON.parse(clean);\n  } catch(e) {\n    calAi = [];\n  }\n} else {\n  calAi = aiNode;\n}\n\nconst form = $(\"🗓️ Trigger: Form\").first().json;\nconst influencer = form[\"Influencer Name\"] + \" (\" + form[\"Instagram Handle\"] + \")\";\n\nif (!Array.isArray(calAi)) return [];\n\nreturn calAi.map(day => ({ json: {\n  Influencer: influencer,\n  Day: day.day || \"\",\n  Type: day.type || \"\",\n  \"Photo Description\": day.photo_description || \"\",\n  \"Ideogram Prompt\": day.ideogram_prompt || \"\",\n  Caption: day.caption || \"\",\n  Hashtags: day.hashtags || \"\",\n  \"Posting Time\": day.posting_time || \"\",\n  \"Image Status\": \"Not Generated\",\n  \"Video Status\": \"Not Generated\",\n  Posted: \"No\"\n} }));"
+      },
+      "id": "48df71df-7d6c-4d13-bda7-52af13aa7aa7",
+      "name": "🔧 Data: Expand Calendar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $(\"⚙️ Global Config\").first().json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $(\"⚙️ Global Config\").first().json.calendarSheetName }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "74fe02cf-11e6-4d73-8ec3-03fea5d3ef0b",
+      "name": "💾 Memory: Log Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        720,
+        96
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "AI Lead Gen Machine Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $(\"⚙️ Global Config\").first().json.smtpFrom }}",
+        "toEmail": "={{ $(\"🗓️ Trigger: Form\").first().json[\"Your Email\"] }}",
+        "subject": "=🤖 AI Influencer Package: {{ $(\"🗓️ Trigger: Form\").first().json[\"Influencer Name\"] }}",
+        "html": "=<h1>🤖 AI Influencer Package Ready</h1><p>Hello,</p><p>Your AI Influencer character sheet and 30-day content calendar for <b>{{ $(\"🗓️ Trigger: Form\").first().json[\"Influencer Name\"] }}</b> have been generated and logged to the Master Spreadsheet.</p><p>Best regards,<br>AI Influencer Factory</p>",
+        "options": {}
+      },
+      "id": "ce585165-ebd7-47b2-8586-45d467f92c10",
+      "name": "🚀 Execute: Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        496,
+        -96
+      ],
+      "webhookId": "b020ba07-8d4d-4d6b-929c-edf9ab6133bc",
+      "credentials": {
+        "smtp": {
+          "id": "udtIzlJq8iqmL3aZ",
+          "name": "SMTP account - kspandian32"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "info"
+            },
+            {
+              "name": "message",
+              "value": "Started"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "log-start",
+      "name": "📝 Log: Start",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -848,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "info"
+            },
+            {
+              "name": "message",
+              "value": "Profile Generated"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "log-profile",
+      "name": "📝 Log: Profile",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -400,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "info"
+            },
+            {
+              "name": "message",
+              "value": "Calendar Generated"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "log-calendar",
+      "name": "📝 Log: Calendar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -176,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "info"
+            },
+            {
+              "name": "message",
+              "value": "Success"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "log-success",
+      "name": "📝 Log: Success",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        928,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "id": "check-safe-mode",
+              "leftValue": "={{ $json.safeMode }}",
+              "operator": {
+                "operation": "true",
+                "type": "boolean"
+              },
+              "singleValue": true
+            }
+          ]
+        }
+      },
+      "id": "safe-mode-if-gen-001",
+      "name": "🛡️ IF: Safe Mode?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "warn"
+            },
+            {
+              "name": "message",
+              "value": "Safe Mode Active: Skipping AI Generation."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "safe-mode-log-gen-001",
+      "name": "📝 Log: Safe Mode (Skip)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -176,
+        -128
+      ]
+    }
+  ],
+  "connections": {
+    "🗓️ Trigger: Form": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Global Config",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📝 Log: Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Global Config": {
+      "main": [
+        [
+          {
+            "node": "🛡️ IF: Safe Mode?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 AI: Profile": {
+      "main": [
+        [
+          {
+            "node": "🤖 AI: 30-Day Calendar",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📝 Log: Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 AI: 30-Day Calendar": {
+      "main": [
+        [
+          {
+            "node": "🔧 Data: Normalize",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📝 Log: Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔧 Data: Normalize": {
+      "main": [
+        [
+          {
+            "node": "💾 Memory: Log Master",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💾 Memory: Log Master": {
+      "main": [
+        [
+          {
+            "node": "🚀 Execute: Send Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🔧 Data: Expand Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔧 Data: Expand Calendar": {
+      "main": [
+        [
+          {
+            "node": "💾 Memory: Log Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💾 Memory: Log Calendar": {
+      "main": [
+        [
+          {
+            "node": "📝 Log: Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🛡️ IF: Safe Mode?": {
+      "main": [
+        [
+          {
+            "node": "📝 Log: Safe Mode (Skip)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "🤖 AI: Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
