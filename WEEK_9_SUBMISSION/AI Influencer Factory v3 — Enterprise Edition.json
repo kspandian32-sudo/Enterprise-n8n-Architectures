@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-04-28T07:53:24.402Z",
-  "createdAt": "2026-04-28T07:53:24.402Z",
-  "versionId": "d5dfe2d8-86a3-499d-bfef-f21aef7ac0e1",
+  "updatedAt": "2026-04-28T08:01:43.290Z",
+  "createdAt": "2026-04-28T08:01:43.290Z",
+  "versionId": "463df08d-c6bb-4d2d-bd0a-c9e8f3481071",
   "workflowId": "wK18IwIA4ERn8xh9",
   "nodes": [
     {
@@ -258,27 +258,7 @@
     },
     {
       "parameters": {
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "workflow_name",
-              "value": "AI Influencer Factory"
-            },
-            {
-              "name": "level",
-              "value": "info"
-            },
-            {
-              "name": "message",
-              "value": "Workflow started."
-            }
-          ]
-        },
-        "contentType": "json",
-        "method": "POST",
-        "sendBody": true,
-        "specifyBody": "keypair",
-        "url": "={{ $(\\\"⚙️ Global Config\\\").first().json.logDrainUrl }}"
+        "url": "https://n8n.pureremedysolutions.com/webhook/log-drain"
       },
       "id": "log-start",
       "name": "📝 Log: Start",
@@ -291,27 +271,7 @@
     },
     {
       "parameters": {
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "workflow_name",
-              "value": "AI Influencer Factory"
-            },
-            {
-              "name": "level",
-              "value": "info"
-            },
-            {
-              "name": "message",
-              "value": "Character profile generated."
-            }
-          ]
-        },
-        "contentType": "json",
-        "method": "POST",
-        "sendBody": true,
-        "specifyBody": "keypair",
-        "url": "={{ $(\\\"⚙️ Global Config\\\").first().json.logDrainUrl }}"
+        "url": "https://n8n.pureremedysolutions.com/webhook/log-drain"
       },
       "id": "log-profile",
       "name": "📝 Log: Profile",
@@ -324,27 +284,7 @@
     },
     {
       "parameters": {
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "workflow_name",
-              "value": "AI Influencer Factory"
-            },
-            {
-              "name": "level",
-              "value": "info"
-            },
-            {
-              "name": "message",
-              "value": "30-day calendar generated."
-            }
-          ]
-        },
-        "contentType": "json",
-        "method": "POST",
-        "sendBody": true,
-        "specifyBody": "keypair",
-        "url": "={{ $(\\\"⚙️ Global Config\\\").first().json.logDrainUrl }}"
+        "url": "https://n8n.pureremedysolutions.com/webhook/log-drain"
       },
       "id": "log-calendar",
       "name": "📝 Log: Calendar",
@@ -357,27 +297,7 @@
     },
     {
       "parameters": {
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "workflow_name",
-              "value": "AI Influencer Factory"
-            },
-            {
-              "name": "level",
-              "value": "success"
-            },
-            {
-              "name": "message",
-              "value": "Workflow completed successfully. Email sent."
-            }
-          ]
-        },
-        "contentType": "json",
-        "method": "POST",
-        "sendBody": true,
-        "specifyBody": "keypair",
-        "url": "={{ $(\\\"⚙️ Global Config\\\").first().json.logDrainUrl }}"
+        "url": "https://n8n.pureremedysolutions.com/webhook/log-drain"
       },
       "id": "log-success",
       "name": "📝 Log: Success",
@@ -391,18 +311,25 @@
     {
       "parameters": {
         "conditions": {
+          "combinator": "and",
           "conditions": [
             {
+              "id": "cond-1777363400000-safe",
               "leftValue": "={{ $json.safeMode }}",
               "operator": {
-                "operation": "equals",
+                "operation": "true",
+                "singleValue": true,
                 "type": "boolean"
-              },
-              "rightValue": true
+              }
             }
-          ]
-        },
-        "options": {}
+          ],
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "none",
+            "version": 2
+          }
+        }
       },
       "id": "safe-mode-if-gen-001",
       "name": "🛡️ IF: Safe Mode?",
@@ -431,10 +358,11 @@
             }
           ]
         },
+        "contentType": "json",
         "method": "POST",
-        "options": {},
         "sendBody": true,
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}"
+        "specifyBody": "keypair",
+        "url": "https://n8n.pureremedysolutions.com/webhook/log-drain"
       },
       "id": "safe-mode-log-gen-001",
       "name": "📝 Log: Safe Mode (Skip)",
@@ -580,18 +508,18 @@
   "autosaved": false,
   "workflowPublishHistory": [
     {
-      "createdAt": "2026-04-28T07:53:24.557Z",
-      "id": 1716,
+      "createdAt": "2026-04-28T08:01:43.382Z",
+      "id": 1722,
       "workflowId": "wK18IwIA4ERn8xh9",
-      "versionId": "d5dfe2d8-86a3-499d-bfef-f21aef7ac0e1",
+      "versionId": "463df08d-c6bb-4d2d-bd0a-c9e8f3481071",
       "event": "activated",
       "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
     },
     {
-      "createdAt": "2026-04-28T07:53:24.516Z",
-      "id": 1715,
+      "createdAt": "2026-04-28T08:01:43.348Z",
+      "id": 1721,
       "workflowId": "wK18IwIA4ERn8xh9",
-      "versionId": "d5dfe2d8-86a3-499d-bfef-f21aef7ac0e1",
+      "versionId": "463df08d-c6bb-4d2d-bd0a-c9e8f3481071",
       "event": "deactivated",
       "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
     }
