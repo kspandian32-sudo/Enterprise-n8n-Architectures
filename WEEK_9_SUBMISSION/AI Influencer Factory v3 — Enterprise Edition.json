@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-04-28T07:39:27.240Z",
-  "createdAt": "2026-04-28T07:39:27.240Z",
-  "versionId": "2e732c28-862c-4412-a3fa-d09f37c3d8a6",
+  "updatedAt": "2026-04-28T07:53:24.402Z",
+  "createdAt": "2026-04-28T07:53:24.402Z",
+  "versionId": "d5dfe2d8-86a3-499d-bfef-f21aef7ac0e1",
   "workflowId": "wK18IwIA4ERn8xh9",
   "nodes": [
     {
@@ -258,7 +258,27 @@
     },
     {
       "parameters": {
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}"
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "info"
+            },
+            {
+              "name": "message",
+              "value": "Workflow started."
+            }
+          ]
+        },
+        "contentType": "json",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "keypair",
+        "url": "={{ $(\\\"⚙️ Global Config\\\").first().json.logDrainUrl }}"
       },
       "id": "log-start",
       "name": "📝 Log: Start",
@@ -271,7 +291,27 @@
     },
     {
       "parameters": {
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}"
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "info"
+            },
+            {
+              "name": "message",
+              "value": "Character profile generated."
+            }
+          ]
+        },
+        "contentType": "json",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "keypair",
+        "url": "={{ $(\\\"⚙️ Global Config\\\").first().json.logDrainUrl }}"
       },
       "id": "log-profile",
       "name": "📝 Log: Profile",
@@ -284,7 +324,27 @@
     },
     {
       "parameters": {
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}"
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "info"
+            },
+            {
+              "name": "message",
+              "value": "30-day calendar generated."
+            }
+          ]
+        },
+        "contentType": "json",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "keypair",
+        "url": "={{ $(\\\"⚙️ Global Config\\\").first().json.logDrainUrl }}"
       },
       "id": "log-calendar",
       "name": "📝 Log: Calendar",
@@ -297,7 +357,27 @@
     },
     {
       "parameters": {
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}"
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "AI Influencer Factory"
+            },
+            {
+              "name": "level",
+              "value": "success"
+            },
+            {
+              "name": "message",
+              "value": "Workflow completed successfully. Email sent."
+            }
+          ]
+        },
+        "contentType": "json",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "keypair",
+        "url": "={{ $(\\\"⚙️ Global Config\\\").first().json.logDrainUrl }}"
       },
       "id": "log-success",
       "name": "📝 Log: Success",
@@ -500,18 +580,18 @@
   "autosaved": false,
   "workflowPublishHistory": [
     {
-      "createdAt": "2026-04-28T07:39:27.342Z",
-      "id": 1708,
+      "createdAt": "2026-04-28T07:53:24.557Z",
+      "id": 1716,
       "workflowId": "wK18IwIA4ERn8xh9",
-      "versionId": "2e732c28-862c-4412-a3fa-d09f37c3d8a6",
+      "versionId": "d5dfe2d8-86a3-499d-bfef-f21aef7ac0e1",
       "event": "activated",
       "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
     },
     {
-      "createdAt": "2026-04-28T07:39:27.303Z",
-      "id": 1707,
+      "createdAt": "2026-04-28T07:53:24.516Z",
+      "id": 1715,
       "workflowId": "wK18IwIA4ERn8xh9",
-      "versionId": "2e732c28-862c-4412-a3fa-d09f37c3d8a6",
+      "versionId": "d5dfe2d8-86a3-499d-bfef-f21aef7ac0e1",
       "event": "deactivated",
       "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
     }
