@@ -27,7 +27,7 @@
             {
               "id": "b0e58b5e-1652-48c5-8b94-3a9691d4b65a",
               "name": "fact",
-              "value": "{{ $node[\"HTTP Request\"].json[\"text\"] }}",
+              "value": "={{ $node[\"HTTP Request\"].json[\"text\"] }}",
               "type": "string"
             }
           ]
