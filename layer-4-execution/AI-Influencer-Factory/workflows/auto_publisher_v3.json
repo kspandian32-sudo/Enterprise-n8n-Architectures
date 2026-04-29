@@ -1,4 +1,5 @@
 {
+  "name": "🤖 AI Influencer Factory v3 — Auto-Publisher",
   "nodes": [
     {
       "parameters": {
@@ -11,27 +12,118 @@
           ]
         }
       },
-      "id": "c5ae322b-cb69-470e-a647-3096c3082768",
+      "id": "af9dada9-5904-41f3-9dbc-c8e6cb73f9f6",
       "name": "🗓️ Trigger: Schedule",
       "position": [
-        -2128,
-        544
+        80,
+        656
       ],
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3
     },
     {
+      "parameters": {},
+      "id": "6e21599e-0e29-446f-9baf-9dee5d2bd011",
+      "name": "Manual Force Publish",
+      "position": [
+        80,
+        464
+      ],
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1
+    },
+    {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    spreadsheetId: \"1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg\",\n    calendarSheetName: \"Calendar\",\n    igUserId: \"27135504529380775\",\n    safeMode: false,\n    logDrainUrl: \"https://n8n.pureremedysolutions.com/webhook/log-drain\"\n  }\n}];"
+        "path": "trigger-999",
+        "options": {}
       },
-      "id": "1d4954f1-62c6-49c4-8378-6b0b0f443060",
+      "id": "978a3318-4207-4f3f-a664-0b96e8d81a67",
+      "name": "Trigger Hook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        272
+      ],
+      "webhookId": "fb6994c4-0eb5-4886-8f76-05f0b33ee644"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { spreadsheetId: \"1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg\", calendarSheetName: \"Calendar\", igUserId: \"27135504529380775\", safeMode: false, logDrainUrl: \"https://n8n.pureremedysolutions.com/webhook/log-drain\" } }];"
+      },
+      "id": "4c77abe9-0985-49b4-8ee2-fe43c9bee162",
       "name": "⚙️ Global Config",
       "position": [
-        -1904,
-        352
+        304,
+        464
       ],
       "type": "n8n-nodes-base.code",
       "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond-safe-pub",
+              "leftValue": "={{ $json.safeMode }}",
+              "operator": {
+                "operation": "true",
+                "singleValue": true,
+                "type": "boolean"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "9264cbf4-7996-4699-8ca1-ab8d31473259",
+      "name": "🛡️ IF: Safe Mode?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        528,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "Auto-Publisher"
+            },
+            {
+              "name": "level",
+              "value": "warn"
+            },
+            {
+              "name": "message",
+              "value": "Safe Mode Active: Skipping Publishing."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b334b2c-26be-4f9b-b08b-61b29ab59097",
+      "name": "📝 Log: Safe Mode (Skip)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        752,
+        368
+      ]
     },
     {
       "parameters": {
@@ -55,11 +147,11 @@
         },
         "options": {}
       },
-      "id": "8f6c8cf4-d0b9-43dd-acdd-4998f40aa05b",
+      "id": "f6d06034-6ce8-4122-8e96-91d83fb90f82",
       "name": "💾 Memory: Read Calendar",
       "position": [
-        -1680,
-        352
+        752,
+        560
       ],
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
@@ -73,8 +165,10 @@
     {
       "parameters": {
         "conditions": {
+          "combinator": "and",
           "conditions": [
             {
+              "id": "cond-has-image",
               "leftValue": "={{ $json['Image Status'] }}",
               "operator": {
                 "operation": "startsWith",
@@ -82,28 +176,33 @@
               },
               "rightValue": "http"
             }
-          ]
+          ],
+          "options": {
+            "caseSensitive": false,
+            "typeValidation": "none",
+            "version": 2
+          }
         },
         "options": {}
       },
-      "id": "6e0c56c8-ab14-4abe-8dc0-5869ac3e0b17",
+      "id": "83cab40a-10d1-4641-bbbb-214ca1038f27",
       "name": "🛡️ IF: Has Image?",
       "position": [
-        -1456,
-        352
+        976,
+        560
       ],
       "type": "n8n-nodes-base.if",
       "typeVersion": 2
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const ideogramUrl = (item.json['Image Status'] || '').trim();\n  let resolvedUrl = null;\n  let resolveMethod = 'failed';\n\n  // SKIP if already clearly invalid\n  if (ideogramUrl === 'Not Generated' || ideogramUrl === '') {\n    continue;\n  }\n\n  // Helper: verify a URL actually serves an image\n  async function verifyImageUrl(url) {\n    try {\n      const r = await fetch(url, { method: 'HEAD', redirect: 'follow' });\n      const ct = r.headers.get('content-type') || '';\n      return r.ok && ct.startsWith('image/');\n    } catch(e) { return false; }\n  }\n\n  // Strategy 1: Try multiple Ideogram CDN path patterns and VERIFY each\n  const galleryMatch = ideogramUrl.match(/ideogram\\.ai\\/g\\/([A-Za-z0-9_-]+)\\\\/(\\\\d+)/);\n  if (galleryMatch) {\n    const [, hash, idx] = galleryMatch;\n    const candidates = [\n      `https://ideogram.ai/assets/progressive-image/balanced/response/${hash}/${idx}`,\n      `https://ideogram.ai/assets/image/lossless/response/${hash}/${idx}`,\n      `https://ideogram.ai/assets/image/balanced/response/${hash}/${idx}`,\n    ];\n    for (const candidate of candidates) {\n      if (await verifyImageUrl(candidate)) {\n        resolvedUrl = candidate;\n        resolveMethod = 'cdn-construct-verified';\n        break;\n      }\n    }\n  }\n\n  // Strategy 2: og:image scraping\n  if (!resolvedUrl && ideogramUrl.toLowerCase().startsWith('http')) {\n    try {\n      const response = await fetch(ideogramUrl, {\n        headers: {\n          'User-Agent': 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)',\n          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'\n        },\n        redirect: 'follow'\n      });\n      const html = await response.text();\n      const match =\n        html.match(/property=[\\\"']og:image[\\\"'][^>]*content=[\\\"']([^\\\"']+)[\\\"']/i) ||\n        html.match(/content=[\\\"']([^\\\"']+)[\\\"'][^>]*property=[\\\"']og:image[\\\"']/i) ||\n        html.match(/\\\"url\\\":\\\"(https:\\\\/\\\\/[^\\\\"']+\\\\.(?:jpg|jpeg|png|webp)[^\\\\"'] *)\\\"/i);\n      if (match && match[1] && match[1] !== ideogramUrl) {\n        resolvedUrl = match[1];\n        resolveMethod = 'og-image-scrape';\n      }\n    } catch (e) {}\n  }\n\n  // Strategy 3: Absolute fallback (only if valid URL)\n  if (!resolvedUrl && ideogramUrl.toLowerCase().startsWith('http')) {\n    resolvedUrl = ideogramUrl;\n    resolveMethod = 'fallback-original';\n  }\n\n  // Only proceed if we have a valid resolved image URL starting with http\n  if (resolvedUrl && resolvedUrl.toLowerCase().startsWith('http')) {\n    const caption = item.json['Caption'] || '';\n    const hashtags = item.json['Hashtags'] || '';\n    const fullCaption = hashtags.trim() ? `${caption}\\n\\n${hashtags}` : caption;\n\n    results.push({\n      json: {\n        ...item.json,\n        resolvedImageUrl: resolvedUrl,\n        fullCaption,\n        _resolveMethod: resolveMethod\n      }\n    });\n  }\n}\n\nreturn results;"
+        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const ideogramUrl = (item.json['Image Status'] || '').trim();\n  let resolvedUrl = null;\n  let resolveMethod = 'failed';\n\n  if (ideogramUrl === 'Not Generated' || ideogramUrl === '') {\n    continue;\n  }\n\n  // Helper: verify URL actually serves an image\n  async function verifyImageUrl(url) {\n    try {\n      const r = await fetch(url, { method: 'HEAD', redirect: 'follow' });\n      const ct = r.headers.get('content-type') || '';\n      return r.ok && ct.startsWith('image/');\n    } catch(e) { return false; }\n  }\n\n  // Strategy 1: Ideogram gallery URL → CDN direct URL\n  const galleryMatch = ideogramUrl.match(/ideogram\\.ai\\/g\\/([A-Za-z0-9_-]+)\\/(\\d+)/);\n  if (galleryMatch) {\n    const [, hash, idx] = galleryMatch;\n    const candidates = [\n      `https://ideogram.ai/assets/progressive-image/balanced/response/${hash}/${idx}`,\n      `https://ideogram.ai/assets/image/lossless/response/${hash}/${idx}`,\n      `https://ideogram.ai/assets/image/balanced/response/${hash}/${idx}`,\n    ];\n    for (const candidate of candidates) {\n      if (await verifyImageUrl(candidate)) {\n        resolvedUrl = candidate;\n        resolveMethod = 'cdn-construct-verified';\n        break;\n      }\n    }\n  }\n\n  // Strategy 2: og:image scraping\n  if (!resolvedUrl && ideogramUrl.toLowerCase().startsWith('http')) {\n    try {\n      const response = await fetch(ideogramUrl, {\n        headers: {\n          'User-Agent': 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)',\n          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'\n        },\n        redirect: 'follow'\n      });\n      const html = await response.text();\n      const match =\n        html.match(/property=[\"']og:image[\"'][^>]*content=[\"']([^\"']+)[\"']/i) ||\n        html.match(/content=[\"']([^\"']+)[\"'][^>]*property=[\"']og:image[\"']/i) ||\n        html.match(/\"url\":\"(https:\\/\\/[^\"]+\\.(?:jpg|jpeg|png|webp)[^\"]*)\"/i);\n      if (match && match[1] && match[1] !== ideogramUrl) {\n        resolvedUrl = match[1];\n        resolveMethod = 'og-image-scrape';\n      }\n    } catch (e) {}\n  }\n\n  // Strategy 3: Absolute fallback\n  if (!resolvedUrl && ideogramUrl.toLowerCase().startsWith('http')) {\n    resolvedUrl = ideogramUrl;\n    resolveMethod = 'fallback-original';\n  }\n\n  if (resolvedUrl && resolvedUrl.toLowerCase().startsWith('http')) {\n    const caption = item.json['Caption'] || '';\n    const hashtags = item.json['Hashtags'] || '';\n    const fullCaption = hashtags.trim() ? `${caption}\\n\\n${hashtags}` : caption;\n\n    results.push({\n      json: {\n        ...item.json,\n        resolvedImageUrl: resolvedUrl,\n        fullCaption,\n        _resolveMethod: resolveMethod\n      }\n    });\n  }\n}\n\nreturn results;"
       },
-      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "id": "27b84ddf-4cad-4974-ab94-9c74f7fbcdbc",
       "name": "🔧 Resolve Image URLs",
       "position": [
-        -1232,
-        352
+        1200,
+        560
       ],
       "type": "n8n-nodes-base.code",
       "typeVersion": 2
@@ -125,7 +224,7 @@
             },
             {
               "name": "ig_user_id",
-              "value": "={{ $('⚙️ Global Config').first().json.igUserId }}"
+              "value": "={{ $(\"⚙️ Global Config\").first().json.igUserId }}"
             },
             {
               "name": "resolve_method",
@@ -137,11 +236,11 @@
           "timeout": 120000
         }
       },
-      "id": "e358cf43-3cec-4cfc-815b-76bd5698dba3",
+      "id": "3a4dd73f-dca3-4df5-8033-7e87c75db0cd",
       "name": "🚀 Instagram: Publish via Bridge",
       "position": [
-        -1008,
-        352
+        1424,
+        560
       ],
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4
@@ -169,23 +268,22 @@
           "schema": [
             {
               "canBeUsedToMatch": true,
+              "defaultMatch": true,
+              "display": true,
+              "displayName": "row_number",
+              "id": "row_number",
+              "readOnly": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": false,
               "defaultMatch": false,
               "display": true,
               "displayName": "Posted",
               "id": "Posted",
               "required": false,
               "type": "string"
-            },
-            {
-              "canBeUsedToMatch": true,
-              "defaultMatch": false,
-              "display": true,
-              "displayName": "row_number",
-              "id": "row_number",
-              "readOnly": true,
-              "removed": true,
-              "required": false,
-              "type": "number"
             }
           ],
           "value": {
@@ -195,11 +293,11 @@
         },
         "options": {}
       },
-      "id": "4ab13e77-f7b3-4674-8218-cc43acb1a016",
+      "id": "eed9ebbf-d0ec-4684-8de0-1c40d97fa740",
       "name": "💾 Memory: Mark Posted",
       "position": [
-        -784,
-        256
+        1648,
+        560
       ],
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
@@ -222,119 +320,25 @@
               "value": "Auto-Publisher"
             },
             {
+              "name": "level",
+              "value": "success"
+            },
+            {
               "name": "message",
-              "value": "Done"
+              "value": "Post published and marked as posted in Calendar sheet"
             }
           ]
         },
         "options": {}
       },
-      "id": "1858e7d1-fabc-41f4-9464-7e7ee3c2cb53",
+      "id": "346e9c56-fba9-43fb-901e-8a44911433b5",
       "name": "📝 Log: Success",
       "position": [
-        -560,
-        256
+        1872,
+        560
       ],
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "workflow_name",
-              "value": "Auto-Publisher"
-            },
-            {
-              "name": "status",
-              "value": "ERROR"
-            },
-            {
-              "name": "message",
-              "value": "Instagram publish failed"
-            },
-            {
-              "name": "image_url",
-              "value": "={{ $json.resolvedImageUrl }}"
-            },
-            {
-              "name": "resolve_method",
-              "value": "={{ $json._resolveMethod }}"
-            },
-            {
-              "name": "caption_preview",
-              "value": "={{ ($json.fullCaption || '').slice(0, 120) }}"
-            },
-            {
-              "name": "error",
-              "value": "={{ $json.error?.message || 'Bridge returned non-200' }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "err-handler-001",
-      "name": "📛 Log: Publish Failed",
-      "position": [
-        -784,
-        448
-      ],
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4
-    },
-    {
-      "parameters": {},
-      "id": "c4fcf6ef-4cd7-43ac-8b48-7bae9c219056",
-      "name": "Manual Force Publish",
-      "position": [
-        -2128,
-        352
-      ],
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1
-    },
-    {
-      "parameters": {
-        "path": "trigger-999",
-        "options": {}
-      },
-      "id": "9fd59b86-c897-4a1a-8234-82858755fe1a",
-      "name": "Trigger Hook",
-      "position": [
-        -2128,
-        160
-      ],
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1.1,
-      "webhookId": "fb6994c4-0eb5-4886-8f76-05f0b33ee644"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "conditions": [
-            {
-              "leftValue": "={{ $json.safeMode }}",
-              "operator": {
-                "operation": "true",
-                "type": "boolean"
-              },
-              "singleValue": true
-            }
-          ]
-        }
-      },
-      "id": "safe-mode-if-pub-001",
-      "name": "🛡️ IF: Safe Mode?",
-      "position": [
-        -1776,
-        352
-      ],
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2
     },
     {
       "parameters": {
@@ -349,27 +353,64 @@
             },
             {
               "name": "level",
-              "value": "warn"
+              "value": "error"
             },
             {
               "name": "message",
-              "value": "Safe Mode Active: Skipping Auto-Publishing cycle."
+              "value": "Instagram publish failed"
+            },
+            {
+              "name": "image_url",
+              "value": "={{ $json.resolvedImageUrl || '' }}"
+            },
+            {
+              "name": "resolve_method",
+              "value": "={{ $json._resolveMethod || '' }}"
+            },
+            {
+              "name": "caption_preview",
+              "value": "={{ ($json.fullCaption || '').slice(0, 120) }}"
+            },
+            {
+              "name": "error",
+              "value": "={{ $json.message || $json.error || 'Bridge returned non-200' }}"
             }
           ]
         },
         "options": {}
       },
-      "id": "safe-mode-log-pub-001",
-      "name": "📝 Log: Safe Mode (Skip)",
+      "id": "1d22f4e3-2957-4e72-92e6-b1b992fb642d",
+      "name": "📛 Log: Publish Failed",
       "position": [
-        -1552,
-        544
+        80,
+        880
       ],
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4
     }
   ],
+  "pinData": {
+    "Manual Force Publish": [
+      {
+        "json": {},
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
   "connections": {
+    "🗓️ Trigger: Schedule": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Global Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Manual Force Publish": {
       "main": [
         [
@@ -381,7 +422,7 @@
         ]
       ]
     },
-    "🗓️ Trigger: Schedule": {
+    "Trigger Hook": {
       "main": [
         [
           {
@@ -403,11 +444,18 @@
         ]
       ]
     },
-    "💾 Memory: Mark Posted": {
+    "🛡️ IF: Safe Mode?": {
       "main": [
         [
           {
-            "node": "📝 Log: Success",
+            "node": "📝 Log: Safe Mode (Skip)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "💾 Memory: Read Calendar",
             "type": "main",
             "index": 0
           }
@@ -419,6 +467,17 @@
         [
           {
             "node": "🛡️ IF: Has Image?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🛡️ IF: Has Image?": {
+      "main": [
+        [
+          {
+            "node": "🔧 Resolve Image URLs",
             "type": "main",
             "index": 0
           }
@@ -444,55 +503,33 @@
             "type": "main",
             "index": 0
           }
-        ],
-        [
-          {
-            "node": "📛 Log: Publish Failed",
-            "type": "main",
-            "index": 0
-          }
         ]
       ]
     },
-    "🛡️ IF: Has Image?": {
+    "💾 Memory: Mark Posted": {
       "main": [
         [
           {
-            "node": "🔧 Resolve Image URLs",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Trigger Hook": {
-      "main": [
-        [
-          {
-            "node": "⚙️ Global Config",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "🛡️ IF: Safe Mode?": {
-      "main": [
-        [
-          {
-            "node": "📝 Log: Safe Mode (Skip)",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "💾 Memory: Read Calendar",
+            "node": "📝 Log: Success",
             "type": "main",
             "index": 0
           }
         ]
       ]
     }
-  }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "72b3cb53-39b3-4f98-969c-d120587a0ec1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ed2a568837751c5a1f9702fd6c1922630ad5492c39a030f09d6e222deb3330e8"
+  },
+  "id": "hauIuGCfrHYPbHcg",
+  "tags": []
 }

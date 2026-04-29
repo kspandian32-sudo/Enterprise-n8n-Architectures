@@ -1,16 +1,17 @@
 {
+  "name": "🤖 AI Influencer Factory v3 — Enterprise Edition (Plan B)",
   "nodes": [
     {
       "parameters": {
-        "jsCode": "// ============================================================\n// ⚙️ ENTERPRISE GLOBAL CONFIGURATION\n// Conform to: https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures\n// ============================================================\n\nreturn [{\n  json: {\n    spreadsheetId: \"1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg\",\n    masterSheetName: \"Master\",\n    calendarSheetName: \"Calendar\",\n    safeMode: false,\n    logDrainUrl: \"https://n8n.pureremedysolutions.com/webhook/log-drain\",\n    smtpFrom: \"Influencer Factory <kspandian32@gmail.com>\",\n    sheetUrl: \"https://docs.google.com/spreadsheets/d/1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg/edit\"\n  }\n}];"
+        "jsCode": "return [{ json: { spreadsheetId: \"1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg\", masterSheetName: \"Master\", calendarSheetName: \"Calendar\", safeMode: false, logDrainUrl: \"https://n8n.pureremedysolutions.com/webhook/log-drain\", smtpFrom: \"Influencer Factory <kspandian32@gmail.com>\", sheetUrl: \"https://docs.google.com/spreadsheets/d/1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg/edit\" } }];"
       },
-      "id": "62b91848-bae5-4dbf-ac00-4f6e6a921a74",
+      "id": "e18d597a-f027-4073-ba88-430e0c6d9fbb",
       "name": "⚙️ Global Config",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -624,
-        0
+        -1072,
+        80
       ]
     },
     {
@@ -68,15 +69,15 @@
         },
         "options": {}
       },
-      "id": "2eed2e48-7466-4c03-84f1-6fb9660ffeb4",
+      "id": "08a9d93a-e3a4-46ae-9a67-3d8dc675cda0",
       "name": "🗓️ Trigger: Form",
       "type": "n8n-nodes-base.formTrigger",
       "typeVersion": 2.2,
       "position": [
-        -848,
-        0
+        -1296,
+        176
       ],
-      "webhookId": "670c1dd0-7e9d-4f15-9635-0bd6836dde42"
+      "webhookId": "8966fb6a-7404-44ba-86a8-0d7c74788257"
     },
     {
       "parameters": {
@@ -89,20 +90,20 @@
               "content": "You are an expert AI influencer strategist. Create detailed virtual influencer character sheets. Return ONLY raw valid JSON. DO NOT use markdown blocks like ```json, just return the raw object starting with {."
             },
             {
-              "content": "={{ \"Create a detailed character profile for: \" + $json[\"Influencer Name\"] + \"\\nNiche: \" + $json.Niche + \"\\n\\nReturn this EXACT JSON structure:\\n{\\n  \\\"personality\\\": \\\"3 descriptive words\\\",\\n  \\\"aesthetic\\\": \\\"Visual style description\\\",\\n  \\\"bio\\\": \\\"Instagram bio with emojis\\\",\\n  \\\"master_prompt\\\": \\\"Master appearance description for image generation\\\",\\n  \\\"caption_style\\\": \\\"Tone of voice description\\\",\\n  \\\"content_pillars\\\": [\\\"List of 3 pillars\\\"],\\n  \\\"target_audience\\\": \\\"Primary demographic\\\",\\n  \\\"hashtags\\\": \\\"#tag1 #tag2 #tag3\\\"\\n}\" }}"
+              "content": "={{ \"Create a detailed character profile for: \" + $(\"🗓️ Trigger: Form\").first().json[\"Influencer Name\"] + \"\\nNiche: \" + $(\"🗓️ Trigger: Form\").first().json[\"Niche\"] + \"\\n\\nReturn this EXACT JSON structure:\\n{\\n  \\\"personality\\\": \\\"3 descriptive words\\\",\\n  \\\"aesthetic\\\": \\\"Visual style description\\\",\\n  \\\"bio\\\": \\\"Instagram bio with emojis\\\",\\n  \\\"master_prompt\\\": \\\"Master appearance description for image generation\\\",\\n  \\\"caption_style\\\": \\\"Tone of voice description\\\",\\n  \\\"content_pillars\\\": [\\\"List of 3 pillars\\\"],\\n  \\\"target_audience\\\": \\\"Primary demographic\\\",\\n  \\\"hashtags\\\": \\\"#tag1 #tag2 #tag3\\\"\\n}\" }}"
             }
           ]
         },
         "options": {},
         "requestOptions": {}
       },
-      "id": "73785a42-eadb-4990-a48a-c3b845648309",
+      "id": "50bcbba1-0190-4306-b07d-93fa983c66e6",
       "name": "🤖 AI: Profile",
       "type": "n8n-nodes-base.openAi",
       "typeVersion": 1,
       "position": [
-        -400,
-        0
+        -624,
+        176
       ],
       "credentials": {
         "openAiApi": {
@@ -131,13 +132,13 @@
         },
         "requestOptions": {}
       },
-      "id": "dd9b0a0b-a61f-4edb-aee2-ae9214c9a3dd",
+      "id": "faa9904e-f07b-4e51-93de-73c8bf147f50",
       "name": "🤖 AI: 30-Day Calendar",
       "type": "n8n-nodes-base.openAi",
       "typeVersion": 1,
       "position": [
-        -176,
-        0
+        -400,
+        80
       ],
       "credentials": {
         "openAiApi": {
@@ -150,13 +151,13 @@
       "parameters": {
         "jsCode": "let aiNode = $(\"🤖 AI: Profile\").first().json;\nlet content = aiNode.message?.content || aiNode.text;\nlet charAi;\nif (typeof content === 'object') {\n  charAi = content;\n} else if (typeof content === 'string') {\n  try {\n    charAi = JSON.parse(content.replace(/```json/gi, '').replace(/```/g, '').trim());\n  } catch(e) {\n    charAi = {};\n  }\n} else {\n  charAi = aiNode; \n}\n\nconst form = $(\"🗓️ Trigger: Form\").first().json;\n\nreturn [{\n  json: {\n    Name: form[\"Influencer Name\"],\n    Handle: form[\"Instagram Handle\"],\n    Niche: form[\"Niche\"],\n    Gender: \"Generated\",\n    Age: \"24\",\n    Location: \"India\",\n    Personality: charAi.personality || \"\",\n    Aesthetic: charAi.aesthetic || \"\",\n    Bio: charAi.bio || \"\",\n    \"Hashtag Bank\": charAi.hashtags || \"\",\n    Timestamp: new Date().toISOString()\n  }\n}];"
       },
-      "id": "67458a6c-77ea-40b0-988a-36bacec57e52",
+      "id": "434e0c62-7015-4363-aec9-3159813acef7",
       "name": "🔧 Data: Normalize",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        48,
-        0
+        -176,
+        -16
       ]
     },
     {
@@ -164,31 +165,30 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "={{ $(\"⚙️ Global Config\").first().json.spreadsheetId }}",
-          "mode": "id"
+          "mode": "id",
+          "value": "={{ $(\"⚙️ Global Config\").first().json.spreadsheetId }}"
         },
         "sheetName": {
           "__rl": true,
-          "value": "={{ $(\"⚙️ Global Config\").first().json.masterSheetName }}",
-          "mode": "name"
+          "mode": "name",
+          "value": "={{ $(\"⚙️ Global Config\").first().json.masterSheetName }}"
         },
         "columns": {
           "mappingMode": "autoMapInputData",
-          "value": {},
           "matchingColumns": [],
           "schema": [],
           "attemptToConvertTypes": false,
-          "convertFieldsToString": false
+          "convertFieldsToString": true
         },
         "options": {}
       },
-      "id": "297b17a1-41fa-4896-96a3-ad1dc1e550c6",
+      "id": "091557a7-bf8f-400f-aeff-ce969223f96d",
       "name": "💾 Memory: Log Master",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        272,
-        0
+        48,
+        -16
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -199,15 +199,15 @@
     },
     {
       "parameters": {
-        "jsCode": "let aiNode = $(\"🤖 AI: 30-Day Calendar\").first().json;\nlet content = aiNode.message?.content || aiNode.text;\nlet calAi;\n\nif (typeof content === 'object') {\n  calAi = content;\n} else if (typeof content === 'string') {\n  let clean = content.replace(/```json/gi, '').replace(/```/g, '').trim();\n  if (clean.startsWith(\"[\") && !clean.endsWith(\"]\")) {\n    clean = clean.replace(/,\\s*$/, '') + \"}]\"; \n  }\n  try {\n    calAi = JSON.parse(clean);\n  } catch(e) {\n    calAi = [];\n  }\n} else {\n  calAi = aiNode;\n}\n\nconst form = $(\"🗓️ Trigger: Form\").first().json;\nconst influencer = form[\"Influencer Name\"] + \" (\" + form[\"Instagram Handle\"] + \")\";\n\nif (!Array.isArray(calAi)) return [];\n\nreturn calAi.map(day => ({ json: {\n  Influencer: influencer,\n  Day: day.day || \"\",\n  Type: day.type || \"\",\n  \"Photo Description\": day.photo_description || \"\",\n  \"Ideogram Prompt\": day.ideogram_prompt || \"\",\n  Caption: day.caption || \"\",\n  Hashtags: day.hashtags || \"\",\n  \"Posting Time\": day.posting_time || \"\",\n  \"Image Status\": \"Not Generated\",\n  \"Video Status\": \"Not Generated\",\n  Posted: \"No\"\n} }));"
+        "jsCode": "let aiNode = $(\"🤖 AI: 30-Day Calendar\").first().json;\nlet content = aiNode.message?.content || aiNode.text;\nlet calAi;\n\nif (typeof content === 'object') {\n  calAi = content;\n} else if (typeof content === 'string') {\n  let clean = content.replace(/```json/gi, '').replace(/```/g, '').trim();\n  // Robust fix for truncated JSON array\n  if (clean.startsWith('[') && !clean.endsWith(']')) {\n    const stripped = clean.replace(/,\\s*$/, '');\n    let fixed = false;\n    try { JSON.parse(stripped + ']'); clean = stripped + ']'; fixed = true; } catch(e) {}\n    if (!fixed) {\n      try { JSON.parse(stripped + '}]'); clean = stripped + '}]'; fixed = true; } catch(e) {}\n    }\n    if (!fixed) { clean = '[]'; }\n  }\n  try {\n    calAi = JSON.parse(clean);\n  } catch(e) {\n    calAi = [];\n  }\n} else {\n  calAi = aiNode;\n}\n\nconst form = $(\"🗓️ Trigger: Form\").first().json;\nconst influencer = form[\"Influencer Name\"] + \" (\" + form[\"Instagram Handle\"] + \")\";\n\nif (!Array.isArray(calAi)) return [];\n\nreturn calAi.map(day => ({ json: {\n  Influencer: influencer,\n  Day: day.day || \"\",\n  Type: day.type || \"\",\n  \"Photo Description\": day.photo_description || \"\",\n  \"Ideogram Prompt\": day.ideogram_prompt || \"\",\n  Caption: day.caption || \"\",\n  Hashtags: day.hashtags || \"\",\n  \"Posting Time\": day.posting_time || \"\",\n  \"Image Status\": \"Not Generated\",\n  \"Video Status\": \"Not Generated\",\n  Posted: \"No\"\n} }));"
       },
-      "id": "48df71df-7d6c-4d13-bda7-52af13aa7aa7",
+      "id": "1d62dfd2-8347-4d13-9b3e-dd4e9898e9af",
       "name": "🔧 Data: Expand Calendar",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        496,
-        96
+        272,
+        80
       ]
     },
     {
@@ -215,31 +215,30 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "={{ $(\"⚙️ Global Config\").first().json.spreadsheetId }}",
-          "mode": "id"
+          "mode": "id",
+          "value": "={{ $(\"⚙️ Global Config\").first().json.spreadsheetId }}"
         },
         "sheetName": {
           "__rl": true,
-          "value": "={{ $(\"⚙️ Global Config\").first().json.calendarSheetName }}",
-          "mode": "name"
+          "mode": "name",
+          "value": "={{ $(\"⚙️ Global Config\").first().json.calendarSheetName }}"
         },
         "columns": {
           "mappingMode": "autoMapInputData",
-          "value": {},
           "matchingColumns": [],
           "schema": [],
           "attemptToConvertTypes": false,
-          "convertFieldsToString": false
+          "convertFieldsToString": true
         },
         "options": {}
       },
-      "id": "74fe02cf-11e6-4d73-8ec3-03fea5d3ef0b",
+      "id": "0630a030-c6fa-43c7-8d77-fbce9ed5a893",
       "name": "💾 Memory: Log Calendar",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        720,
-        96
+        496,
+        80
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -256,15 +255,15 @@
         "html": "=<h1>🤖 AI Influencer Package Ready</h1><p>Hello,</p><p>Your AI Influencer character sheet and 30-day content calendar for <b>{{ $(\"🗓️ Trigger: Form\").first().json[\"Influencer Name\"] }}</b> have been generated and logged to the Master Spreadsheet.</p><p>Best regards,<br>AI Influencer Factory</p>",
         "options": {}
       },
-      "id": "ce585165-ebd7-47b2-8586-45d467f92c10",
+      "id": "34236b45-9cf6-4100-9030-cc7eb14ac4e0",
       "name": "🚀 Execute: Send Email",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        496,
-        -96
+        272,
+        -112
       ],
-      "webhookId": "b020ba07-8d4d-4d6b-929c-edf9ab6133bc",
+      "webhookId": "5a269c53-d96f-4f53-bad5-5c5b003c9cda",
       "credentials": {
         "smtp": {
           "id": "udtIzlJq8iqmL3aZ",
@@ -275,7 +274,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "url": "https://n8n.pureremedysolutions.com/webhook/log-drain",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -289,25 +288,25 @@
             },
             {
               "name": "message",
-              "value": "Started"
+              "value": "Workflow triggered — new influencer setup started"
             }
           ]
         },
         "options": {}
       },
-      "id": "log-start",
+      "id": "eadfbc9a-76f2-4722-b7ef-5b7fdbf274ab",
       "name": "📝 Log: Start",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -848,
-        208
+        -1072,
+        272
       ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "url": "https://n8n.pureremedysolutions.com/webhook/log-drain",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -321,25 +320,25 @@
             },
             {
               "name": "message",
-              "value": "Profile Generated"
+              "value": "AI character profile generated successfully"
             }
           ]
         },
         "options": {}
       },
-      "id": "log-profile",
+      "id": "a399604c-c569-4797-93d5-df60325795fc",
       "name": "📝 Log: Profile",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
         -400,
-        208
+        272
       ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "url": "https://n8n.pureremedysolutions.com/webhook/log-drain",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -353,25 +352,25 @@
             },
             {
               "name": "message",
-              "value": "Calendar Generated"
+              "value": "30-day calendar generated successfully"
             }
           ]
         },
         "options": {}
       },
-      "id": "log-calendar",
+      "id": "5cda1db5-952c-4507-923e-9cdc61bcf974",
       "name": "📝 Log: Calendar",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
         -176,
-        208
+        176
       ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "url": "https://n8n.pureremedysolutions.com/webhook/log-drain",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -381,54 +380,62 @@
             },
             {
               "name": "level",
-              "value": "info"
+              "value": "success"
             },
             {
               "name": "message",
-              "value": "Success"
+              "value": "Influencer setup complete — profile + calendar logged to Sheets"
             }
           ]
         },
         "options": {}
       },
-      "id": "log-success",
+      "id": "9f379517-d712-485d-81e3-6dbd215184aa",
       "name": "📝 Log: Success",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        928,
-        96
+        720,
+        80
       ]
     },
     {
       "parameters": {
         "conditions": {
+          "combinator": "and",
           "conditions": [
             {
-              "id": "check-safe-mode",
+              "id": "cond-1777363400000-safe",
               "leftValue": "={{ $json.safeMode }}",
               "operator": {
                 "operation": "true",
+                "singleValue": true,
                 "type": "boolean"
-              },
-              "singleValue": true
+              }
             }
-          ]
-        }
+          ],
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "none",
+            "version": 2
+          }
+        },
+        "options": {}
       },
-      "id": "safe-mode-if-gen-001",
+      "id": "1fa20bc8-995d-41d5-b906-b208784e3a14",
       "name": "🛡️ IF: Safe Mode?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -400,
-        -128
+        -848,
+        80
       ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $(\"⚙️ Global Config\").first().json.logDrainUrl }}",
+        "url": "https://n8n.pureremedysolutions.com/webhook/log-drain",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -448,16 +455,17 @@
         },
         "options": {}
       },
-      "id": "safe-mode-log-gen-001",
+      "id": "93a36638-0bae-42f1-bca4-cb8fd4e46b5f",
       "name": "📝 Log: Safe Mode (Skip)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -176,
-        -128
+        -624,
+        -16
       ]
     }
   ],
+  "pinData": {},
   "connections": {
     "🗓️ Trigger: Form": {
       "main": [
@@ -480,6 +488,24 @@
         [
           {
             "node": "🛡️ IF: Safe Mode?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🛡️ IF: Safe Mode?": {
+      "main": [
+        [
+          {
+            "node": "📝 Log: Safe Mode (Skip)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "🤖 AI: Profile",
             "type": "main",
             "index": 0
           }
@@ -566,24 +592,20 @@
           }
         ]
       ]
-    },
-    "🛡️ IF: Safe Mode?": {
-      "main": [
-        [
-          {
-            "node": "📝 Log: Safe Mode (Skip)",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "🤖 AI: Profile",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
-  }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "Gada0T8rzuzLSEte"
+  },
+  "versionId": "a3c657f3-3fb8-4930-a45e-4fe00c3f9363",
+  "meta": {
+    "instanceId": "ed2a568837751c5a1f9702fd6c1922630ad5492c39a030f09d6e222deb3330e8"
+  },
+  "id": "wK18IwIA4ERn8xh9",
+  "tags": []
 }

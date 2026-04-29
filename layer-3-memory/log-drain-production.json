@@ -1,52 +1,38 @@
 {
-  "updatedAt": "2026-04-28T07:50:44.058Z",
-  "createdAt": "2026-04-25T19:14:19.192Z",
-  "id": "FEK7PNwR6I3XZygD",
   "name": "Log-Drain — Centralized Sub-workflow",
-  "description": null,
-  "active": true,
-  "isArchived": false,
   "nodes": [
     {
-      "id": "node-webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "log-drain",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "874cb754-32a3-4452-b7ec-b2ea164cd99a",
       "name": "Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        240,
-        300
+        544,
+        352
       ],
-      "parameters": {
-        "path": "log-drain",
-        "httpMethod": "POST",
-        "responseMode": "responseNode",
-        "options": {}
-      },
       "webhookId": "54b4aff7-ebfe-462b-8f98-10dfb2ff05e6",
       "onError": "continueRegularOutput"
     },
     {
-      "id": "node-normalize",
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.body ?? $input.first().json;\n\n// 1. Level Detection\nlet level = raw.level;\nif (!level) {\n  if (raw.status === 'ERROR' || raw.error) level = 'error';\n  else if (raw.message === 'Done' || raw.status === 'SUCCESS' || raw.status === 'success') level = 'success';\n  else level = 'info';\n}\n\n// 2. Formatting\nconst validLevels = ['debug', 'info', 'warn', 'error', 'success'];\nconst finalLevel = validLevels.includes(level) ? level : 'info';\n\nconst entry = {\n  workflow_name: String(raw.workflow_name ?? 'unknown').slice(0, 100),\n  tool_name:     raw.tool_name ? String(raw.tool_name).slice(0, 100) : null,\n  level:         finalLevel,\n  message:       String(raw.message ?? '').slice(0, 2000),\n  metadata:      (raw.metadata && typeof raw.metadata === 'object') ? raw.metadata : { ...raw },\n  session_id:    raw.session_id ? String(raw.session_id).slice(0, 100) : null,\n  created_at:    raw.ts ?? new Date().toISOString(),\n};\n\nreturn [{ json: entry }];"
+      },
+      "id": "c814c347-6c9c-4e5a-ad89-11bed2935e0d",
       "name": "Normalize Entry",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        480,
-        300
-      ],
-      "parameters": {
-        "jsCode": "const raw = $input.first().json.body ?? $input.first().json;\n\n// 1. Level Detection\nlet level = raw.level;\nif (!level) {\n  if (raw.status === 'ERROR' || raw.error) level = 'error';\n  else if (raw.message === 'Done' || raw.status === 'SUCCESS' || raw.status === 'success') level = 'success';\n  else level = 'info';\n}\n\n// 2. Formatting\nconst validLevels = ['debug', 'info', 'warn', 'error', 'success'];\nconst finalLevel = validLevels.includes(level) ? level : 'info';\n\nconst entry = {\n  workflow_name: String(raw.workflow_name ?? 'unknown').slice(0, 100),\n  tool_name:     raw.tool_name ? String(raw.tool_name).slice(0, 100) : null,\n  level:         finalLevel,\n  message:       String(raw.message ?? '').slice(0, 2000),\n  metadata:      (raw.metadata && typeof raw.metadata === 'object') ? raw.metadata : { ...raw },\n  session_id:    raw.session_id ? String(raw.session_id).slice(0, 100) : null,\n  created_at:    raw.ts ?? new Date().toISOString(),\n};\n\nreturn [{ json: entry }];"
-      }
+        784,
+        352
+      ]
     },
     {
-      "id": "node-if",
-      "name": "Is Error Level",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        720,
-        300
-      ],
       "parameters": {
         "conditions": {
           "combinator": "and",
@@ -67,58 +53,59 @@
             "caseSensitive": false,
             "typeValidation": "none"
           }
-        }
+        },
+        "options": {}
       },
+      "id": "6aed7496-eded-4266-8f7a-d3ae219ef21c",
+      "name": "Is Non-Debug?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        352
+      ],
       "onError": "continueErrorOutput"
     },
     {
-      "id": "node-telegram",
+      "parameters": {
+        "chatId": "7392899748",
+        "text": "={{ $json.level === 'error' ? '🚨 *ERROR*' : ($json.level === 'warn' ? '⚠️ *WARNING*' : ($json.level === 'success' ? '✅ *SUCCESS*' : 'ℹ️ *INFO*')) }} in `{{ $json.workflow_name }}`\n*Tool:* `{{ $json.tool_name ?? 'n/a' }}`\n*Message:* {{ $json.message }}\n*Time:* {{ $json.created_at }}\n*Session:* `{{ $json.session_id ?? 'n/a' }}`",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "55abf308-aa05-4b5d-a072-d8ad2999d4e6",
       "name": "Telegram Alert",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        960,
-        160
+        1264,
+        208
       ],
-      "parameters": {
-        "additionalFields": {},
-        "chatId": "7392899748",
-        "text": "={{ $json.level === 'error' ? '🚨 *ERROR*' : ($json.level === 'warn' ? '⚠️ *WARNING*' : '✅ *SUCCESS*') }} in `{{ $json.workflow_name }}`\n*Tool:* `{{ $json.tool_name ?? 'n/a' }}`\n*Message:* {{ $json.message }}\n*Time:* {{ $json.created_at }}\n*Session:* `{{ $json.session_id ?? 'n/a' }}`"
-      },
       "maxTries": 3,
-      "onError": "continueRegularOutput",
       "retryOnFail": true,
       "waitBetweenTries": 2000,
+      "webhookId": "8c09eb9c-35cf-4689-8f95-ffade3fea0e5",
       "credentials": {
         "telegramApi": {
           "id": "lMh5dlTVHK0LmmG6",
           "name": "Telegram Account Memory Vault"
         }
       },
-      "webhookId": "1b0e19a6-8709-48d2-b388-e8077fb1a4c0"
+      "onError": "continueRegularOutput"
     },
     {
-      "id": "node-merge",
+      "parameters": {},
+      "id": "9857329f-23f0-4a8f-a3fa-b3295804d090",
       "name": "Merge Branches",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        1200,
-        300
-      ],
-      "parameters": {
-        "mode": "append"
-      }
+        1504,
+        352
+      ]
     },
     {
-      "id": "node-supabase",
-      "name": "Supabase Insert",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        1440,
-        300
-      ],
       "parameters": {
         "method": "POST",
         "url": "={{$env.SUPABASE_URL}}/rest/v1/execution_logs",
@@ -131,7 +118,7 @@
             },
             {
               "name": "Authorization",
-              "value": "=Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}"
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
             },
             {
               "name": "Content-Type",
@@ -144,39 +131,9 @@
           ]
         },
         "sendBody": true,
-        "contentType": "json",
-        "body": {
-          "values": [
-            {
-              "name": "workflow_name",
-              "value": "={{ $json.workflow_name }}"
-            },
-            {
-              "name": "tool_name",
-              "value": "={{ $json.tool_name }}"
-            },
-            {
-              "name": "level",
-              "value": "={{ $json.level }}"
-            },
-            {
-              "name": "message",
-              "value": "={{ $json.message }}"
-            },
-            {
-              "name": "metadata",
-              "value": "={{ JSON.stringify($json.metadata) }}"
-            },
-            {
-              "name": "session_id",
-              "value": "={{ $json.session_id }}"
-            },
-            {
-              "name": "created_at",
-              "value": "={{ $json.created_at }}"
-            }
-          ]
-        },
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ workflow_name: $json.workflow_name, tool_name: $json.tool_name, level: $json.level, message: $json.message, metadata: JSON.stringify($json.metadata), session_id: $json.session_id, created_at: $json.created_at }) }}",
         "options": {
           "response": {
             "response": {
@@ -185,26 +142,36 @@
           }
         }
       },
+      "id": "216be209-57a2-42aa-b206-fc4672656caf",
+      "name": "Supabase Insert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1744,
+        352
+      ],
       "maxTries": 3,
-      "onError": "continueRegularOutput",
       "retryOnFail": true,
-      "waitBetweenTries": 5000
+      "waitBetweenTries": 5000,
+      "onError": "continueRegularOutput"
     },
     {
-      "id": "node-respond",
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"ok\": true }",
+        "options": {}
+      },
+      "id": "2925582e-b935-465a-9337-08712cf5b030",
       "name": "Respond OK",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1680,
-        300
-      ],
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "={ \"ok\": true }"
-      }
+        1984,
+        352
+      ]
     }
   ],
+  "pinData": {},
   "connections": {
     "Webhook Trigger": {
       "main": [
@@ -221,14 +188,14 @@
       "main": [
         [
           {
-            "node": "Is Error Level",
+            "node": "Is Non-Debug?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Is Error Level": {
+    "Is Non-Debug?": {
       "main": [
         [
           {
@@ -280,338 +247,17 @@
       ]
     }
   },
+  "active": true,
   "settings": {
     "executionOrder": "v1",
+    "binaryMode": "separate",
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "staticData": null,
-  "meta": null,
-  "pinData": null,
-  "versionId": "33384a62-b7c0-4d01-9fc8-838db3d13211",
-  "activeVersionId": "33384a62-b7c0-4d01-9fc8-838db3d13211",
-  "versionCounter": 28,
-  "triggerCount": 1,
-  "shared": [
-    {
-      "updatedAt": "2026-04-25T19:14:19.231Z",
-      "createdAt": "2026-04-25T19:14:19.231Z",
-      "role": "workflow:owner",
-      "workflowId": "FEK7PNwR6I3XZygD",
-      "projectId": "4z38v6JO6ntgY8gF",
-      "project": {
-        "updatedAt": "2026-01-13T19:13:51.671Z",
-        "createdAt": "2026-01-13T19:11:25.659Z",
-        "id": "4z38v6JO6ntgY8gF",
-        "name": "PANDIAN K S <kspandia@gmail.com>",
-        "type": "personal",
-        "icon": null,
-        "description": null,
-        "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
-      }
-    }
-  ],
-  "tags": [],
-  "activeVersion": {
-    "updatedAt": "2026-04-28T07:50:44.059Z",
-    "createdAt": "2026-04-28T07:50:44.059Z",
-    "versionId": "33384a62-b7c0-4d01-9fc8-838db3d13211",
-    "workflowId": "FEK7PNwR6I3XZygD",
-    "nodes": [
-      {
-        "id": "node-webhook",
-        "name": "Webhook Trigger",
-        "type": "n8n-nodes-base.webhook",
-        "typeVersion": 2.1,
-        "position": [
-          240,
-          300
-        ],
-        "parameters": {
-          "path": "log-drain",
-          "httpMethod": "POST",
-          "responseMode": "responseNode",
-          "options": {}
-        },
-        "webhookId": "54b4aff7-ebfe-462b-8f98-10dfb2ff05e6",
-        "onError": "continueRegularOutput"
-      },
-      {
-        "id": "node-normalize",
-        "name": "Normalize Entry",
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          480,
-          300
-        ],
-        "parameters": {
-          "jsCode": "const raw = $input.first().json.body ?? $input.first().json;\n\n// 1. Level Detection\nlet level = raw.level;\nif (!level) {\n  if (raw.status === 'ERROR' || raw.error) level = 'error';\n  else if (raw.message === 'Done' || raw.status === 'SUCCESS' || raw.status === 'success') level = 'success';\n  else level = 'info';\n}\n\n// 2. Formatting\nconst validLevels = ['debug', 'info', 'warn', 'error', 'success'];\nconst finalLevel = validLevels.includes(level) ? level : 'info';\n\nconst entry = {\n  workflow_name: String(raw.workflow_name ?? 'unknown').slice(0, 100),\n  tool_name:     raw.tool_name ? String(raw.tool_name).slice(0, 100) : null,\n  level:         finalLevel,\n  message:       String(raw.message ?? '').slice(0, 2000),\n  metadata:      (raw.metadata && typeof raw.metadata === 'object') ? raw.metadata : { ...raw },\n  session_id:    raw.session_id ? String(raw.session_id).slice(0, 100) : null,\n  created_at:    raw.ts ?? new Date().toISOString(),\n};\n\nreturn [{ json: entry }];"
-        }
-      },
-      {
-        "id": "node-if",
-        "name": "Is Error Level",
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 2.3,
-        "position": [
-          720,
-          300
-        ],
-        "parameters": {
-          "conditions": {
-            "combinator": "and",
-            "conditions": [
-              {
-                "id": "cond-1777360836465-9b4kubpyi",
-                "leftValue": "={{ $json.level }}",
-                "operator": {
-                  "operation": "notEquals",
-                  "type": "string"
-                },
-                "rightValue": "debug"
-              }
-            ],
-            "options": {
-              "version": 2,
-              "leftValue": "",
-              "caseSensitive": false,
-              "typeValidation": "none"
-            }
-          }
-        },
-        "onError": "continueErrorOutput"
-      },
-      {
-        "id": "node-telegram",
-        "name": "Telegram Alert",
-        "type": "n8n-nodes-base.telegram",
-        "typeVersion": 1.2,
-        "position": [
-          960,
-          160
-        ],
-        "parameters": {
-          "additionalFields": {},
-          "chatId": "7392899748",
-          "text": "={{ $json.level === 'error' ? '🚨 *ERROR*' : ($json.level === 'warn' ? '⚠️ *WARNING*' : '✅ *SUCCESS*') }} in `{{ $json.workflow_name }}`\n*Tool:* `{{ $json.tool_name ?? 'n/a' }}`\n*Message:* {{ $json.message }}\n*Time:* {{ $json.created_at }}\n*Session:* `{{ $json.session_id ?? 'n/a' }}`"
-        },
-        "maxTries": 3,
-        "onError": "continueRegularOutput",
-        "retryOnFail": true,
-        "waitBetweenTries": 2000,
-        "credentials": {
-          "telegramApi": {
-            "id": "lMh5dlTVHK0LmmG6",
-            "name": "Telegram Account Memory Vault"
-          }
-        },
-        "webhookId": "1b0e19a6-8709-48d2-b388-e8077fb1a4c0"
-      },
-      {
-        "id": "node-merge",
-        "name": "Merge Branches",
-        "type": "n8n-nodes-base.merge",
-        "typeVersion": 3.2,
-        "position": [
-          1200,
-          300
-        ],
-        "parameters": {
-          "mode": "append"
-        }
-      },
-      {
-        "id": "node-supabase",
-        "name": "Supabase Insert",
-        "type": "n8n-nodes-base.httpRequest",
-        "typeVersion": 4.4,
-        "position": [
-          1440,
-          300
-        ],
-        "parameters": {
-          "method": "POST",
-          "url": "={{$env.SUPABASE_URL}}/rest/v1/execution_logs",
-          "sendHeaders": true,
-          "headerParameters": {
-            "parameters": [
-              {
-                "name": "apikey",
-                "value": "={{$env.SUPABASE_SERVICE_ROLE_KEY}}"
-              },
-              {
-                "name": "Authorization",
-                "value": "=Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}"
-              },
-              {
-                "name": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "name": "Prefer",
-                "value": "return=minimal"
-              }
-            ]
-          },
-          "sendBody": true,
-          "contentType": "json",
-          "body": {
-            "values": [
-              {
-                "name": "workflow_name",
-                "value": "={{ $json.workflow_name }}"
-              },
-              {
-                "name": "tool_name",
-                "value": "={{ $json.tool_name }}"
-              },
-              {
-                "name": "level",
-                "value": "={{ $json.level }}"
-              },
-              {
-                "name": "message",
-                "value": "={{ $json.message }}"
-              },
-              {
-                "name": "metadata",
-                "value": "={{ JSON.stringify($json.metadata) }}"
-              },
-              {
-                "name": "session_id",
-                "value": "={{ $json.session_id }}"
-              },
-              {
-                "name": "created_at",
-                "value": "={{ $json.created_at }}"
-              }
-            ]
-          },
-          "options": {
-            "response": {
-              "response": {
-                "neverError": true
-              }
-            }
-          }
-        },
-        "maxTries": 3,
-        "onError": "continueRegularOutput",
-        "retryOnFail": true,
-        "waitBetweenTries": 5000
-      },
-      {
-        "id": "node-respond",
-        "name": "Respond OK",
-        "type": "n8n-nodes-base.respondToWebhook",
-        "typeVersion": 1.5,
-        "position": [
-          1680,
-          300
-        ],
-        "parameters": {
-          "respondWith": "json",
-          "responseBody": "={ \"ok\": true }"
-        }
-      }
-    ],
-    "connections": {
-      "Webhook Trigger": {
-        "main": [
-          [
-            {
-              "node": "Normalize Entry",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Normalize Entry": {
-        "main": [
-          [
-            {
-              "node": "Is Error Level",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Is Error Level": {
-        "main": [
-          [
-            {
-              "node": "Telegram Alert",
-              "type": "main",
-              "index": 0
-            }
-          ],
-          [
-            {
-              "node": "Merge Branches",
-              "type": "main",
-              "index": 1
-            }
-          ]
-        ]
-      },
-      "Telegram Alert": {
-        "main": [
-          [
-            {
-              "node": "Merge Branches",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Merge Branches": {
-        "main": [
-          [
-            {
-              "node": "Supabase Insert",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Supabase Insert": {
-        "main": [
-          [
-            {
-              "node": "Respond OK",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      }
-    },
-    "authors": "PANDIAN K S",
-    "name": null,
-    "description": null,
-    "autosaved": false,
-    "workflowPublishHistory": [
-      {
-        "createdAt": "2026-04-28T07:50:44.146Z",
-        "id": 1714,
-        "workflowId": "FEK7PNwR6I3XZygD",
-        "versionId": "33384a62-b7c0-4d01-9fc8-838db3d13211",
-        "event": "activated",
-        "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
-      },
-      {
-        "createdAt": "2026-04-28T07:50:44.115Z",
-        "id": 1713,
-        "workflowId": "FEK7PNwR6I3XZygD",
-        "versionId": "33384a62-b7c0-4d01-9fc8-838db3d13211",
-        "event": "deactivated",
-        "userId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
-      }
-    ]
-  }
+  "versionId": "0473b9bc-abae-472c-8121-5ce5f43718e8",
+  "meta": {
+    "instanceId": "ed2a568837751c5a1f9702fd6c1922630ad5492c39a030f09d6e222deb3330e8"
+  },
+  "id": "FEK7PNwR6I3XZygD",
+  "tags": []
 }

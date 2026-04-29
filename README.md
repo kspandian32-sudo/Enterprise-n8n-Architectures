@@ -94,6 +94,9 @@ graph TD
     *   Autonomous persona generation and 30-day scheduled publishing with multi-modal AI (Ideogram/OpenAI), **Synchronized Safe Mode guardrails**, and **Manual Image Overwrite** support.
 
 ### 📂 [Layer 5: Extensions](./layer-5-extensions/)
+*   **[Autonomous Agent Operations](./layer-5-extensions/autonomous-agent-ops/)** — *Agentic n8n Ops*
+    *   **Self-Building Infrastructure:** Demonstration of AI agents (Antigravity) autonomously building, configuring, and managing production workflows on local and cloud n8n instances.
+    *   **Video Post-Production Suite:** FFmpeg-based agent utility for high-performance content processing (Silence removal, Speed-up, Instagram 9:16).
 *   **[Gemini PDF Node](./layer-5-extensions/n8n-nodes-gemini-pdf-analyzer/)** — *Custom n8n Extension*
     *   Native TypeScript community node for multimodal PDF analysis, published on npm.
 
@@ -244,5 +247,14 @@ The **AI Influencer Factory** stack has been fully synchronized for Production S
 *   **Auto-Publisher:** Now features an identical `🛡️ IF: Safe Mode?` branch that bypasses the Instagram Bridge and Spreadsheet "Mark as Posted" steps.
 *   **Unified Config:** Both workflows now share a standardized `⚙️ Global Config` node with the `safeMode` boolean flag.
 
-*Maintained by [kspandian32-sudo](https://github.com/kspandian32-sudo)*
+---
 
+## 📽️ Demonstration & Walkthroughs
+
+The following demonstrations showcase the **AI Influencer Factory** in full production mode:
+
+*   **[Instagram Auto-Publish Walkthrough](../../WEEK_9_SUBMISSION/Videos/Instagram_AutoPublish_Edited.mp4)** — *End-to-end flow from Sheet update to Instagram Live.*
+*   **[Production Instagram Feed](../../WEEK_9_SUBMISSION/Videos/Instagram_AutoPublish_Instagram.mp4)** — *Visual proof of the autonomous engine successfully managing the live influencer profile.*
+
+
+*Maintained by [kspandian32-sudo](https://github.com/kspandian32-sudo)*
