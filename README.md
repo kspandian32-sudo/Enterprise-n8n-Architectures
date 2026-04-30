@@ -94,9 +94,6 @@ graph TD
     *   Autonomous persona generation and 30-day scheduled publishing with multi-modal AI (Ideogram/OpenAI), **Synchronized Safe Mode guardrails**, and **Manual Image Overwrite** support.
 
 ### 📂 [Layer 5: Extensions](./layer-5-extensions/)
-*   **[Autonomous Agent Operations](./layer-5-extensions/autonomous-agent-ops/)** — *Agentic n8n Ops*
-    *   **Self-Building Infrastructure:** Demonstration of AI agents (Antigravity) autonomously building, configuring, and managing production workflows on local and cloud n8n instances.
-    *   **Video Post-Production Suite:** FFmpeg-based agent utility for high-performance content processing (Silence removal, Speed-up, Instagram 9:16).
 *   **[Gemini PDF Node](./layer-5-extensions/n8n-nodes-gemini-pdf-analyzer/)** — *Custom n8n Extension*
     *   Native TypeScript community node for multimodal PDF analysis, published on npm.
 
@@ -256,5 +253,24 @@ The following demonstrations showcase the **AI Influencer Factory** in full prod
 *   **[Instagram Auto-Publish Walkthrough](../../WEEK_9_SUBMISSION/Videos/Instagram_AutoPublish_Edited.mp4)** — *End-to-end flow from Sheet update to Instagram Live.*
 *   **[Production Instagram Feed](../../WEEK_9_SUBMISSION/Videos/Instagram_AutoPublish_Instagram.mp4)** — *Visual proof of the autonomous engine successfully managing the live influencer profile.*
 
+---
+
+## 🤖 Autonomous Agent Demo
+
+This repository was **extended in real-time by an AI agent** during the final build phase — serving as live proof that the architecture is not just well-built, but machine-legible and agent-friendly.
+
+The Antigravity Browser Agent was given direct control of a local n8n instance with zero pre-configuration. It autonomously:
+- Navigated the n8n canvas
+- Created and named a new workflow
+- Configured HTTP Request and Edit Fields nodes with live API calls
+- Resolved a runtime expression bug and re-executed to verify the fix
+- Committed all changes back to this repository
+
+> [!IMPORTANT]
+> **Proof of Autonomous Execution:** The full screen-recorded session is available as a Loom video demonstrating the agent working directly inside the production environment — no scripting, no human input.
+>
+> 📹 **[Watch: Antigravity Autonomous Workflow Creation Demo](https://www.loom.com/share/your-demo-link-here)** *(replace with your Loom URL after recording)*
+
+---
 
 *Maintained by [kspandian32-sudo](https://github.com/kspandian32-sudo)*

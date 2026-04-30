@@ -49,7 +49,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return [{ json: { spreadsheetId: \"1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg\", calendarSheetName: \"Calendar\", igUserId: \"27135504529380775\", safeMode: false, logDrainUrl: \"https://n8n.pureremedysolutions.com/webhook/log-drain\" } }];"
+        "jsCode": "return [{ json: { spreadsheetId: \"YOUR_SPREADSHEET_ID\", calendarSheetName: \"Calendar\", igUserId: \"YOUR_IG_USER_ID\", safeMode: true, logDrainUrl: \"YOUR_LOG_DRAIN_WEBHOOK_URL\" } }];"
       },
       "id": "4c77abe9-0985-49b4-8ee2-fe43c9bee162",
       "name": "⚙️ Global Config",
@@ -157,8 +157,8 @@
       "typeVersion": 4.5,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "hiWj9Xv9QRzG92uS",
-          "name": "AI Lead Gen Machine Google Sheets"
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Your Google Sheets OAuth2 Credential"
         }
       }
     },
@@ -303,8 +303,8 @@
       "typeVersion": 4.5,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "hiWj9Xv9QRzG92uS",
-          "name": "AI Lead Gen Machine Google Sheets"
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Your Google Sheets OAuth2 Credential"
         }
       }
     },

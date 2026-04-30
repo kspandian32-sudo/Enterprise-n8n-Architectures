@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "return [{ json: { spreadsheetId: \"1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg\", masterSheetName: \"Master\", calendarSheetName: \"Calendar\", safeMode: false, logDrainUrl: \"https://n8n.pureremedysolutions.com/webhook/log-drain\", smtpFrom: \"Influencer Factory <kspandian32@gmail.com>\", sheetUrl: \"https://docs.google.com/spreadsheets/d/1Txyuj08oqwGtsyBZ9Llorb0oygPBWDz3RisGomy1Evg/edit\" } }];"
+        "jsCode": "return [{ json: { spreadsheetId: \"YOUR_SPREADSHEET_ID\", masterSheetName: \"Master\", calendarSheetName: \"Calendar\", safeMode: true, logDrainUrl: \"YOUR_LOG_DRAIN_WEBHOOK_URL\", smtpFrom: \"Your Name <your@email.com>\", sheetUrl: \"YOUR_SPREADSHEET_URL\" } }];"
       },
       "id": "e18d597a-f027-4073-ba88-430e0c6d9fbb",
       "name": "⚙️ Global Config",
@@ -107,8 +107,8 @@
       ],
       "credentials": {
         "openAiApi": {
-          "id": "So1Wi5RlSonVFbIN",
-          "name": "OpenAI fresh-key"
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "Your OpenAI API Credential"
         }
       }
     },
@@ -142,8 +142,8 @@
       ],
       "credentials": {
         "openAiApi": {
-          "id": "So1Wi5RlSonVFbIN",
-          "name": "OpenAI fresh-key"
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "Your OpenAI API Credential"
         }
       }
     },
@@ -192,8 +192,8 @@
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "hiWj9Xv9QRzG92uS",
-          "name": "AI Lead Gen Machine Google Sheets"
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Your Google Sheets OAuth2 Credential"
         }
       }
     },
@@ -242,8 +242,8 @@
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "hiWj9Xv9QRzG92uS",
-          "name": "AI Lead Gen Machine Google Sheets"
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Your Google Sheets OAuth2 Credential"
         }
       }
     },
@@ -266,8 +266,8 @@
       "webhookId": "5a269c53-d96f-4f53-bad5-5c5b003c9cda",
       "credentials": {
         "smtp": {
-          "id": "udtIzlJq8iqmL3aZ",
-          "name": "SMTP account - kspandian32"
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Your SMTP Credential"
         }
       }
     },

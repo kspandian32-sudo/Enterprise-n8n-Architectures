@@ -45,8 +45,7 @@ The system includes a built-in "Safe Mode" switch within the `⚙️ Global Conf
 ## 📁 Repository Structure
 
 *   `workflows/ai_influencer_engine.json`: The core strategy and asset generation engine (v3 Enterprise Edition - Plan B).
-*   `workflows/auto_publisher_v3.json`: The cron-triggered Instagram scheduler (v3 Resilient).
-*   `workflows/auto_publisher.json`: Legacy Instagram scheduler.
+*   `workflows/auto_publisher_v3.json`: The cron-triggered Instagram scheduler (v3 Resilient — Production Standard).
 
 ## 🛠️ Setup Instructions
 
