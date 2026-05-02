@@ -77,6 +77,19 @@ const PROJECTS = [
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-1-perception/Signal-Pipeline'
   },
   {
+    id: 'intake-pipeline',
+    title: 'Native Intake Pipeline',
+    layer: 'L1 Perception',
+    videoUrl: 'https://www.instagram.com/reel/DWS6dUyEcgA/',
+    bullets: [
+      '10-Field Normalization: Native form data parsed and typed for n8n consumption.',
+      'Zero-CORS Architecture: Secure webhook routing directly to Supabase and Telegram.',
+      'Lead Prioritization: Automatic scoring based on company size and revenue signals.'
+    ],
+    roi: 'Zero-Friction Ingestion',
+    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-1-perception/AI-Lead-Gen-Machine'
+  },
+  {
     id: 'mcp-sheets',
     title: 'Claude MCP Orchestrator',
     layer: 'L2 Core',
@@ -84,10 +97,23 @@ const PROJECTS = [
     bullets: [
       '14-tool Node.js MCP server: Real-time Google Sheets read/write.',
       'Autonomous Task Management: Adds tasks and updates statuses via natural language.',
-      'Automated Standup Reports: Generates daily summaries with zero manual input.'
+      'Zod Hardening: Implements Claude-recommended validation patterns for reliability.'
     ],
-    roi: 'Replaces Manual Data Entry',
+    roi: 'Agentic Reasoning Bridge',
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-2-core/Claude-MCP-Task-Orchestrator'
+  },
+  {
+    id: 'memory',
+    title: 'Permanent AI Brain',
+    layer: 'L3 Memory',
+    videoUrl: 'https://www.instagram.com/reel/DXKkyT8EdD8/',
+    bullets: [
+      'Supabase Vector DB: Permanent memory vault for brand pricing & suppliers.',
+      'Full ACID Compliance: Relational state management migrated from Google Sheets.',
+      'Proactive Retrieval: Context pre-fetching via Flowise Tool Agent.'
+    ],
+    roi: 'Zero Cognitive Overhead',
+    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-3-memory'
   },
   {
     id: 'auditor',
@@ -104,16 +130,42 @@ const PROJECTS = [
   },
   {
     id: 'proposal',
-    title: 'Proposal Autopilot',
+    title: 'AI Proposal Autopilot',
     layer: 'L4 Execution',
     videoUrl: 'https://www.instagram.com/reel/DW05GrBkf7-/',
     bullets: [
-      'Full Stack CRM: Auto-generates branded PDF proposals and GST invoices.',
+      'Full Sales Lifecycle: Auto-generates branded PDF proposals and GST invoices.',
       '30-Second Delivery: Form submit to client inbox (Slides + Gmail + CRM).',
       '₹29,500 Savings: Replaces PandaDoc, HubSpot, and Zapier fees.'
     ],
     roi: '₹1.50 per Proposal',
-    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/Proposal-Autopilot'
+    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/AI-Proposal-Invoice-Autopilot'
+  },
+  {
+    id: 'outreach',
+    title: 'Enterprise AI Sales Rep',
+    layer: 'L4 Execution',
+    videoUrl: 'https://www.instagram.com/reel/DXY7-u2kUEo/',
+    bullets: [
+      'Human-in-the-Loop: Slack-integrated approval gates for AI outreach.',
+      '5-Bucket Intent: GPT classifies replies into Hot Lead vs Unsubscribe.',
+      'Safe Mode: Config-level toggle for Simulation vs Live production.'
+    ],
+    roi: '40x Lead Throughput',
+    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/Enterprise-AI-Sales-Rep'
+  },
+  {
+    id: 'researcher',
+    title: 'Autonomous Research Engine',
+    layer: 'L4 Execution',
+    videoUrl: 'https://www.instagram.com/reel/DXfOYEOkd34/',
+    bullets: [
+      'Deep Web RAG: YouTube transcripts and live scrapes via Apify.',
+      'Quality Kill-Switch: Auto-refuses work scoring below 35/50 quality.',
+      'Telegram Logs: Instant failure alerts with exact reasoning.'
+    ],
+    roi: '2,500-Word Cited Docs',
+    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/Autonomous-Research-Engine'
   },
   {
     id: 'alchemist',
@@ -121,91 +173,78 @@ const PROJECTS = [
     layer: 'L4 Execution',
     videoUrl: 'https://www.instagram.com/reel/DXATR87kebf/',
     bullets: [
-      'Voice-to-Viral: 37-node suite transforms voice notes to LinkedIn/Twitter threads.',
+      'Voice-to-Viral: Transforms voice notes to LinkedIn/Twitter threads.',
       '2-Stage Pipeline: GPT-4o visual briefs → DALL-E 3 branded renders.',
-      'Self-Hosted whisper: Zero-cost transcription via Colab T4 GPU + ngrok.'
+      'Self-Hosted Whisper: Zero-cost transcription via Colab T4 GPU.'
     ],
-    roi: '0 Minutes Spent Writing',
+    roi: '40x Faster Production',
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/Content-Alchemist'
   },
   {
-    id: 'legal',
-    title: 'Local Legal Intelligence',
-    layer: 'L4 Execution',
-    videoUrl: 'https://www.instagram.com/reel/DXFHiaRkS6B/',
-    bullets: [
-      '100% Offline: 6 specialized Ollama agents (NDAs, Employment, IP).',
-      'Deepseek-r1:8b: Chain-of-thought reasoning for defensible legal verdicts.',
-      'Zero Data Leaks: Local PDF processing with AnythingLLM workspaces.'
-    ],
-    roi: '₹20k–₹1L Savings/Run',
-    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/Local-Legal-AI'
-  },
-  {
-    id: 'memory',
-    title: 'Permanent AI Brain',
-    layer: 'L3 Memory',
-    videoUrl: 'https://www.instagram.com/reel/DXKkyT8EdD8/',
-    bullets: [
-      'Supabase Vector DB: Permanent memory vault for brand pricing & suppliers.',
-      'Importance Scoring: Only 6+/10 memories stored to prevent noise.',
-      'Proactive Retrieval: Context pre-fetching via Flowise Tool Agent.'
-    ],
-    roi: 'Zero Cognitive Overhead',
-    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-3-memory'
-  },
-  {
-    id: 'outreach',
-    title: '3-Workflow Outreach',
-    layer: 'L4 Execution',
-    videoUrl: 'https://www.instagram.com/reel/DXY7-u2kUEo/',
-    bullets: [
-      'Apollo Lead Scoring: Automated contact auditing and blacklist checking.',
-      '5-Bucket Intent: GPT classifies replies into Hot Lead vs Unsubscribe.',
-      'Safe Mode: Config-level toggle for Simulation vs Live production.'
-    ],
-    roi: '40x Lead Throughput',
-    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/Outreach-Engine'
-  },
-  {
-    id: 'researcher',
-    title: 'Autonomous Researcher',
-    layer: 'L4 Execution',
-    videoUrl: 'https://www.instagram.com/reel/DXfOYEOkd34/',
-    bullets: [
-      '23-Node Engine: Pulls YouTube transcripts and live web scrapes via Apify.',
-      'Quality Kill-Switch: Auto-refuses work scoring below 35/50 on quality criteria.',
-      'Telegram Logs: Instant failure alerts with exact reasoning for human review.'
-    ],
-    roi: '2,500-Word Cited Docs',
-    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/Research-Engine'
-  },
-  {
     id: 'factory',
-    title: 'Virtual Influencer Factory',
+    title: 'AI Influencer Factory',
     layer: 'L4 Execution',
     videoUrl: 'https://www.instagram.com/reel/DXt9_2HEX7B/',
     bullets: [
-      'End-to-End Autonomy: Persona Gen → Ideogram API → Instagram Graph API.',
-      'Defensive Parsing: Custom regex strips markdown to ensure 100% JSON uptime.',
-      'Hybrid Overrides: Detects manual image URLs to skip AI generation selectively.'
+      'v3 Enterprise: Persona Gen → Ideogram API → Instagram Graph API.',
+      'Safe Mode Guardrails: Prevents accidental production spends during tests.',
+      'Manual Overwrites: Detects custom image URLs to skip AI generation.'
     ],
-    roi: '₹1,00,000/mo Agency Savings',
+    roi: '₹1,00,000/mo Savings',
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/AI-Influencer-Factory'
   },
   {
+    id: 'seo-suite',
+    title: 'Auto-Blogger SEO Suite',
+    layer: 'L4 Execution',
+    videoUrl: 'https://www.instagram.com/reel/DXATR87kebf/',
+    bullets: [
+      'WordPress Integration: Automated SEO content pipeline with direct publishing.',
+      'Dual Audit Logging: Captures article generation and publishing events separately.',
+      'Dynamic Optimization: AI-powered metadata and alt-text generation.'
+    ],
+    roi: '90x Production Speed',
+    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/Auto-Blogger-SEO-Suite'
+  },
+  {
+    id: 'whatsapp-bot',
+    title: 'WhatsApp AI Bot Series',
+    layer: 'L4 Execution',
+    videoUrl: 'https://www.instagram.com/reel/DXfOYEOkd34/',
+    bullets: [
+      'Industry Specialized: Production-ready bots for Hotels and Restaurants.',
+      'Webhook Boilerplates: Reusable infrastructure for rapid bot deployment.',
+      'Conversational Memory: Stateful interactions using Layer 3 persistence.'
+    ],
+    roi: 'Instant Client Response',
+    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/WhatsApp-AI-Bot-Series'
+  },
+  {
+    id: 'ugc-system',
+    title: 'UGC Content System',
+    layer: 'L4 Execution',
+    videoUrl: 'https://www.instagram.com/reel/DXt9_2HEX7B/',
+    bullets: [
+      'Multi-Lane Architecture: Video production with Nano, Veo, and Sora lanes.',
+      'Dynamic Switching: AI autonomously selects the best model for the scene.',
+      'Automated Stitching: Post-production logic for unified video output.'
+    ],
+    roi: 'Zero-Manual Editing',
+    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/UGC-Content-System'
+  },
+  {
     id: 'npm-node',
-    title: 'n8n-nodes-gemini-pdf-analyzer',
+    title: 'n8n Gemini PDF Analyzer',
     layer: 'L5 Extensions',
     isPackage: true,
     url: 'https://www.npmjs.com/package/n8n-nodes-gemini-pdf-analyzer',
     bullets: [
       'Community Node: Published to npm for global n8n ecosystem use.',
       'Gemini 1.5 Pro: Direct PDF auditing and vision-to-json extraction.',
-      'Enterprise Schema: Built-in validation for industrial invoice/legal parsing.'
+      'Enterprise Schema: Built-in validation for industrial parsing.'
     ],
     roi: 'Official npm Package',
-    github: 'https://github.com/kspandian32-sudo/n8n-nodes-gemini-pdf-analyzer'
+    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-5-extensions/n8n-nodes-gemini-pdf-analyzer'
   }
 ]
 
