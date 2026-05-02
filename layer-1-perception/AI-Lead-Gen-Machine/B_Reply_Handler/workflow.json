@@ -1,4 +1,4 @@
-﻿{
+{
     "updatedAt":  "2026-04-26T06:18:34.201Z",
     "createdAt":  "2026-04-20T06:42:35.827Z",
     "id":  "RooLB8UBX9x9TOz1",
@@ -377,7 +377,6 @@
                                                                     }
                                       }
                   },
-                  {
                       "parameters":  {
                                          "operation":  "update",
                                          "documentId":  {
@@ -388,6 +387,10 @@
                                                            "mode":  "id",
                                                            "value":  "1475293523"
                                                        },
+                                         "range": "A:Z",
+                                         "dataMode": "autoMapInputData",
+                                         "columnToMatchOn": "Email",
+                                         "valueToMatchOn": "={{ $json.Email }}",
                                          "options":  {
 
                                                      }
@@ -539,6 +542,10 @@
                                                            "mode":  "id",
                                                            "value":  "1475293523"
                                                        },
+                                         "range": "A:Z",
+                                         "dataMode": "autoMapInputData",
+                                         "columnToMatchOn": "Email",
+                                         "valueToMatchOn": "={{ $json.Email }}",
                                          "options":  {
 
                                                      }
@@ -776,6 +783,10 @@
                                                            "mode":  "id",
                                                            "value":  "1475293523"
                                                        },
+                                         "range": "A:Z",
+                                         "dataMode": "autoMapInputData",
+                                         "columnToMatchOn": "Email",
+                                         "valueToMatchOn": "={{ $json.Email }}",
                                          "options":  {
 
                                                      }
@@ -942,7 +953,7 @@
                                                                                    },
                                                                                    {
                                                                                        "name":  "tool_name",
-                                                                                       "value":  "={{ $json.execution.error.nodeName ?? \u0027Global\u0027 }}"
+                                                                                       "value":  "={{ $json.execution && $json.execution.error ? $json.execution.error.nodeName : 'Global' }}"
                                                                                    },
                                                                                    {
                                                                                        "name":  "level",
@@ -950,7 +961,7 @@
                                                                                    },
                                                                                    {
                                                                                        "name":  "message",
-                                                                                       "value":  "={{ $json.execution.error.message }}"
+                                                                                       "value":  "={{ $json.execution && $json.execution.error ? $json.execution.error.message : 'Unknown error' }}"
                                                                                    },
                                                                                    {
                                                                                        "name":  "metadata",
@@ -1397,6 +1408,7 @@
                                         },
                                         {
                                             "parameters":  {
+                                                               "operation":  "update",
                                                                "documentId":  {
                                                                                   "mode":  "id",
                                                                                   "value":  "1KEGnIhb68tK1tLGL3rZ-MA7kso1KFdAFa8fmQ13nhKo"
@@ -1405,6 +1417,10 @@
                                                                                  "mode":  "id",
                                                                                  "value":  "1475293523"
                                                                              },
+                                                               "range": "A:Z",
+                                                               "dataMode": "autoMapInputData",
+                                                               "columnToMatchOn": "Email",
+                                                               "valueToMatchOn": "={{ $json.Email }}",
                                                                "options":  {
 
                                                                            }
@@ -2311,7 +2327,7 @@
                                                                                                          },
                                                                                                          {
                                                                                                              "name":  "tool_name",
-                                                                                                             "value":  "={{ $json.execution.error.nodeName ?? \u0027Global\u0027 }}"
+                                                                                                             "value":  "={{ $json.execution && $json.execution.error ? $json.execution.error.nodeName : \u0027Global\u0027 }}"
                                                                                                          },
                                                                                                          {
                                                                                                              "name":  "level",
@@ -2319,7 +2335,7 @@
                                                                                                          },
                                                                                                          {
                                                                                                              "name":  "message",
-                                                                                                             "value":  "={{ $json.execution.error.message }}"
+                                                                                                             "value":  "={{ $json.execution && $json.execution.error ? $json.execution.error.message : \u0027Unknown error\u0027 }}"
                                                                                                          },
                                                                                                          {
                                                                                                              "name":  "metadata",
