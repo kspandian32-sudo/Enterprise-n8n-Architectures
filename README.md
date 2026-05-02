@@ -14,6 +14,26 @@ We operate a 5-stage automated outreach and sales engine, hardened for productio
 3.  **WF-C — Breakup**: The final automated touchpoint. Routes "Interested" leads to the dashboard and closes cold threads.
 4.  **Autopilot — Proposals**: End-to-end proposal and invoice generation using Google Slides and PDF automation.
 5.  **Log-Drain — Centralized**: The safety net. A sub-workflow that captures errors from all other engines and logs them to Supabase + Telegram.
+6.  **Layer-1: Lead Intake**: Connects the landing page form to Supabase and Telegram. Supports 10 normalized fields.
+
+---
+
+## 🌐 Pandian AI Landing Page (`/landing-page`)
+
+The public-facing frontend for lead generation, optimized for conversion and high-integrity data capture.
+
+- **URL**: [https://pandian-ai.com](https://pandian-ai.com)
+- **Tech Stack**: Vite, React, Tailwind CSS, Framer Motion.
+- **Lead Intake**: Custom 10-field form (FullName, Email, Company, Industry, ProjectType, Budget, Timeline, Phone, Goal, TechStack).
+- **Integration**: Asynchronous POST to n8n `layer-1-perception` webhook.
+
+### Building the Landing Page
+```bash
+cd landing-page
+npm install
+npm run build
+```
+The output will be in `landing-page/dist/`, which is ready for deployment to Hostinger or any static host.
 
 ---
 
