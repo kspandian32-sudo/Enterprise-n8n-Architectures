@@ -20,7 +20,7 @@ The 10-field intake form triggers a cascaded AI pipeline (GPT-4o-mini). It gener
 The build integrates the **Ideogram API** directly. A `SplitInBatches` node processes 30 image generations autonomously and writes live URLs back to Google Sheets. This replaces the manual "copy-paste-download" workflow that typically consumes 5-8 hours of an intern's time monthly.
 
 **Tool 3 replaced: Buffer / Later / Hootsuite (₹2,000–₹10,000/month)**
-The **Instagram Auto-Publisher** workflow transforms Google Sheets into a headless CMS. It polls for due posts, uploads images to CDN (ImgBB), and publishes via the Instagram Graph API. This eliminates the need for any third-party scheduling subscription.
+The **Instagram Auto-Publisher** workflow transforms Google Sheets into a headless CMS. It polls for due posts, uploads images to CDN (tmpfiles.org), and publishes via the Instagram Graph API. This eliminates the need for any third-party scheduling subscription.
 
 ---
 

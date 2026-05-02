@@ -1,0 +1,19 @@
+# robots.txt — pandian-ai.com
+# Hosted on Hostinger hPanel / Apache
+
+User-agent: *
+Allow: /
+
+# Block asset internals crawlers don't need
+Disallow: /assets/
+
+# Explicit allow for the OG image (some bots need this)
+Allow: /og-image.png
+Allow: /og-image.svg
+Allow: /favicon.svg
+
+# Crawl-delay for well-behaved bots (Hostinger shared hosting)
+Crawl-delay: 10
+
+# Sitemap location
+Sitemap: https://pandian-ai.com/sitemap.xml
