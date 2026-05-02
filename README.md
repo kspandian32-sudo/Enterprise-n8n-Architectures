@@ -3,8 +3,11 @@
 [![npm version](https://badge.fury.io/js/n8n-nodes-gemini-pdf-analyzer.svg)](https://www.npmjs.com/package/n8n-nodes-gemini-pdf-analyzer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Audit Scorecard](https://img.shields.io/badge/Audit_Score-9%2F10-brightgreen)](./docs/AUDIT_EVOLUTION.md)
+[![Live Portal](https://img.shields.io/badge/Live_Portal-pandian--ai.com-7F77DD)](https://pandian-ai.com)
 
 A curated collection of **14 production-grade** n8n workflows and autonomous AI agents, structured into an enterprise-grade layered architecture.
+
+🌐 **Live at [pandian-ai.com](https://pandian-ai.com)** — The production portal featuring a native glassmorphism intake form that feeds directly into the n8n Perception Layer.
 
 > [!NOTE]
 > **Post-Audit Evolution:** Following 4 technical audits by senior AI architects, this repository was refactored for **L4 Autonomy**. Key upgrades include: **[Postgres Persistence](./docs/MIGRATION.md)**, **[Decision Traces](./docs/AGENT_DECISION_TRACE.json)**, and **[Enterprise Scalability Strategy](./docs/SCALABILITY_STRATEGY.md)**.
@@ -16,7 +19,8 @@ A curated collection of **14 production-grade** n8n workflows and autonomous AI 
 ```mermaid
 graph TD
     subgraph "Layer 1: Perception (Ingestion)"
-        A[Signal Pipeline] --> B[AI Lead Gen]
+        A0["pandian-ai.com Native Form"] --> A[Signal Pipeline]
+        A --> B[AI Lead Gen]
     end
     subgraph "Layer 2: Core Intelligence (Agentic Loop)"
         C[Planner Agent] --> D[Executor Agent]
@@ -33,6 +37,7 @@ graph TD
         J[AI Influencer Factory]
     end
     
+    A0 -- "Webhook POST" --> F
     B --> C
     D <--> F
     D --> G
@@ -46,6 +51,8 @@ graph TD
 ## 🚀 The Layered Stack
 
 ### 📂 [Layer 1: Perception](./layer-1-perception/)
+*   **[pandian-ai.com Native Intake](https://pandian-ai.com)** — *Production Lead Portal*
+    *   Custom React/Vite glassmorphism form with 10 structured fields, posting directly to the n8n webhook. Supabase persistence + Telegram alerting.
 *   **[Signal Pipeline](./layer-1-perception/Signal-Pipeline/)** — *Scanner + Error-Alert Sub-Workflow*
     *   Autonomous job/market signal ingestion with AI-powered intent analysis and tech stack detection.
 *   **[AI Lead Gen Machine](./layer-1-perception/AI-Lead-Gen-Machine/)** — *v7.6 Resilient Upgrade (SMTP)*
@@ -243,6 +250,30 @@ The **AI Influencer Factory** stack has been fully synchronized for Production S
 *   **Main Generation:** Now features an `🛡️ IF: Safe Mode?` branch that bypasses expensive OpenAI calls during testing.
 *   **Auto-Publisher:** Now features an identical `🛡️ IF: Safe Mode?` branch that bypasses the Instagram Bridge and Spreadsheet "Mark as Posted" steps.
 *   **Unified Config:** Both workflows now share a standardized `⚙️ Global Config` node with the `safeMode` boolean flag.
+
+---
+
+## 🌐 Live Portal: pandian-ai.com
+
+The production-grade consulting portal at **[pandian-ai.com](https://pandian-ai.com)** serves as the public face of this architecture.
+
+### **Technical Stack:**
+| Component | Technology | Purpose |
+|:---|:---|:---|
+| Frontend | React + Vite | Glassmorphism UI with Outfit typography |
+| Hosting | Hostinger | Static site deployment |
+| Intake Form | Native 10-field form | Direct webhook POST to n8n |
+| Backend Pipeline | n8n Webhook | Layer 1 Perception — lead routing |
+| Database | Supabase (PostgreSQL) | `leads` table with RLS policies |
+| Alerts | Telegram Bot API | Real-time lead notifications |
+
+### **Architecture Flow:**
+```
+User → pandian-ai.com form → n8n Webhook → Supabase INSERT → Telegram Alert
+```
+
+> [!NOTE]
+> The portal was built to eliminate third-party form dependencies (Tally.so). The native form gives full payload control, zero CORS risk, and exact brand consistency.
 
 ---
 
