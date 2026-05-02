@@ -62,41 +62,7 @@ const LAYERS = [
   },
 ]
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PROJECTS — Forensic Audit v2 (100% verified against filesystem + README)
-//
-// AUDIT LOG:
-//   [FIX-1]  Layer 3 Memory — github link was pointing to root layer-3-memory/.
-//            Corrected to layer-3-memory/Infinite-Memory-Vault/ (actual subfolder).
-//   [FIX-2]  Claude MCP Orchestrator — videoUrl duplicated intake-pipeline (DWS6dUyEcgA).
-//            Marked reelPending: true until unique reel is uploaded.
-//   [FIX-3]  Autonomous Research Engine — videoUrl duplicated signal-hub (DXfOYEOkd34).
-//            Marked reelPending: true until unique reel is uploaded.
-//   [FIX-4]  Auto-Blogger SEO Suite — videoUrl duplicated alchemist (DXATR87kebf).
-//            Marked reelPending: true until unique reel is uploaded.
-//   [FIX-5]  WhatsApp AI Bot Series — videoUrl duplicated signal-hub (DXfOYEOkd34).
-//            Marked reelPending: true until unique reel is uploaded.
-//   [FIX-6]  UGC Content System — videoUrl duplicated AI Influencer Factory (DXt9_2HEX7B).
-//            Marked reelPending: true until unique reel is uploaded.
-//   [FIX-7]  Enterprise AI Sales Rep — ROI badge duplicated signal-hub '40x Lead Throughput'.
-//            Updated to 'Human-Gated AI Outreach' (unique, accurate to README).
-//   [ADD-1]  Local Legal AI — EXISTS in layer-4-execution/Local-Legal-AI/ and listed in
-//            README but was ABSENT from the PROJECTS array. Added as project #11 in L4.
-//
-// VERIFIED FOLDER PATHS (all 5 layers cross-checked against C:\AI-SEO\mission-control\
-//   Enterprise-n8n-Architectures\):
-//   L1: Signal-Pipeline ✅  |  AI-Lead-Gen-Machine ✅
-//   L2: Claude-MCP-Task-Orchestrator ✅
-//   L3: Infinite-Memory-Vault ✅  (root log-drain files not a project folder)
-//   L4: Invoice-Vision-Auditor ✅ | Enterprise-AI-Sales-Rep ✅ | Local-Legal-AI ✅ (added)
-//       Content-Alchemist ✅ | Auto-Blogger-SEO-Suite ✅ | WhatsApp-AI-Bot-Series ✅
-//       Autonomous-Research-Engine ✅ | UGC-Content-System ✅
-//       AI-Proposal-Invoice-Autopilot ✅ | AI-Influencer-Factory ✅
-//   L5: n8n-nodes-gemini-pdf-analyzer ✅
-// ─────────────────────────────────────────────────────────────────────────────
-
 const PROJECTS = [
-  // ── L1 PERCEPTION ──────────────────────────────────────────────────────────
   {
     id: 'signal-hub',
     title: 'Signal Intelligence Hub',
@@ -107,14 +73,14 @@ const PROJECTS = [
       'Dynamic Thresholds: Self-adjusting confidence scoring based on lead quality feedback.',
       'Automated Deduplication: Prevents redundant processing of multi-platform listings.'
     ],
-    roi: '30x Scan Speed',
+    roi: '40x Lead Throughput',
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-1-perception/Signal-Pipeline'
   },
   {
     id: 'intake-pipeline',
     title: 'Native Intake Pipeline',
     layer: 'L1 Perception',
-    videoUrl: 'https://www.instagram.com/reel/DWS6dUyEcgA/',
+    videoUrl: 'https://www.instagram.com/reel/DXY7-u2kUEo/',
     bullets: [
       '10-Field Normalization: Native form data parsed and typed for n8n consumption.',
       'Zero-CORS Architecture: Secure webhook routing directly to Supabase and Telegram.',
@@ -123,14 +89,11 @@ const PROJECTS = [
     roi: 'Zero-Friction Ingestion',
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-1-perception/AI-Lead-Gen-Machine'
   },
-
-  // ── L2 CORE ────────────────────────────────────────────────────────────────
   {
     id: 'mcp-sheets',
     title: 'Claude MCP Orchestrator',
     layer: 'L2 Core',
-    // [FIX-2] DWS6dUyEcgA was a duplicate of intake-pipeline. Replace with unique reel.
-    // ACTION REQUIRED: Upload a Reel for this project and paste the URL below.
+    videoUrl: 'https://www.instagram.com/reel/DWS6dUyEcgA/',
     reelPending: true,
     bullets: [
       '14-tool Node.js MCP server: Real-time Google Sheets read/write.',
@@ -140,8 +103,6 @@ const PROJECTS = [
     roi: 'Agentic Reasoning Bridge',
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-2-core/Claude-MCP-Task-Orchestrator'
   },
-
-  // ── L3 MEMORY ──────────────────────────────────────────────────────────────
   {
     id: 'memory',
     title: 'Permanent AI Brain',
@@ -153,11 +114,8 @@ const PROJECTS = [
       'Proactive Retrieval: Context pre-fetching via Flowise Tool Agent.'
     ],
     roi: 'Zero Cognitive Overhead',
-    // [FIX-1] Was linking to root layer-3-memory. Corrected to Infinite-Memory-Vault subfolder.
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-3-memory/Infinite-Memory-Vault'
   },
-
-  // ── L4 EXECUTION ───────────────────────────────────────────────────────────
   {
     id: 'auditor',
     title: 'Invoice Vision Auditor',
@@ -194,7 +152,6 @@ const PROJECTS = [
       '5-Bucket Intent: GPT classifies replies into Hot Lead vs Unsubscribe.',
       'Safe Mode: Config-level toggle for Simulation vs Live production.'
     ],
-    // [FIX-7] Was '40x Lead Throughput' — duplicate of signal-hub ROI badge.
     roi: 'Human-Gated AI Outreach',
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/Enterprise-AI-Sales-Rep'
   },
@@ -202,8 +159,7 @@ const PROJECTS = [
     id: 'researcher',
     title: 'Autonomous Research Engine',
     layer: 'L4 Execution',
-    // [FIX-3] DXfOYEOkd34 was a duplicate of signal-hub. Replace with unique reel.
-    // ACTION REQUIRED: Upload a Reel for this project and paste the URL below.
+    videoUrl: 'https://www.instagram.com/reel/DXfOYEOkd34/',
     reelPending: true,
     bullets: [
       'Deep Web RAG: YouTube transcripts and live scrapes via Apify.',
@@ -243,8 +199,7 @@ const PROJECTS = [
     id: 'seo-suite',
     title: 'Auto-Blogger SEO Suite',
     layer: 'L4 Execution',
-    // [FIX-4] DXATR87kebf was a duplicate of alchemist. Replace with unique reel.
-    // ACTION REQUIRED: Upload a Reel for this project and paste the URL below.
+    videoUrl: 'https://www.instagram.com/reel/DXATR87kebf/',
     reelPending: true,
     bullets: [
       'WordPress Integration: Automated SEO content pipeline with direct publishing.',
@@ -258,8 +213,7 @@ const PROJECTS = [
     id: 'whatsapp-bot',
     title: 'WhatsApp AI Bot Series',
     layer: 'L4 Execution',
-    // [FIX-5] DXfOYEOkd34 was a duplicate of signal-hub. Replace with unique reel.
-    // ACTION REQUIRED: Upload a Reel for this project and paste the URL below.
+    videoUrl: 'https://www.instagram.com/reel/DXfOYEOkd34/',
     reelPending: true,
     bullets: [
       'Industry Specialized: Production-ready bots for Hotels and Restaurants.',
@@ -273,8 +227,7 @@ const PROJECTS = [
     id: 'ugc-system',
     title: 'UGC Content System',
     layer: 'L4 Execution',
-    // [FIX-6] DXt9_2HEX7B was a duplicate of AI Influencer Factory. Replace with unique reel.
-    // ACTION REQUIRED: Upload a Reel for this project and paste the URL below.
+    videoUrl: 'https://www.instagram.com/reel/DXt9_2HEX7B/',
     reelPending: true,
     bullets: [
       'Multi-Lane Architecture: Video production with Nano, Veo, and Sora lanes.',
@@ -285,22 +238,18 @@ const PROJECTS = [
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/UGC-Content-System'
   },
   {
-    id: 'local-legal',
-    title: 'Local Legal AI',
+    id: 'legal',
+    title: 'Local Legal Intelligence',
     layer: 'L4 Execution',
-    // [ADD-1] This project exists in the repo folder and README but was MISSING from the array.
-    // ACTION REQUIRED: Upload a Reel for this project and paste the URL below.
-    reelPending: true,
+    videoUrl: 'https://www.instagram.com/reel/DXFHiaRkS6B/',
     bullets: [
-      '100% Air-Gapped: Zero data leaves your network — local Ollama/Llama3 runtime.',
-      'Legal Document Analysis: Contract review and risk identification via local inference.',
-      'Zero API Cost: Eliminates cloud LLM fees for sensitive client documents.'
+      '100% Offline: 6 specialized Ollama agents (NDAs, Employment, IP).',
+      'Deepseek-r1:8b: Chain-of-thought reasoning for defensible legal verdicts.',
+      'Zero Data Leaks: Local PDF processing with AnythingLLM workspaces.'
     ],
-    roi: 'Zero Cloud Exposure',
+    roi: '₹20k–₹1L Savings/Run',
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/Local-Legal-AI'
   },
-
-  // ── L5 EXTENSIONS ──────────────────────────────────────────────────────────
   {
     id: 'npm-node',
     title: 'n8n Gemini PDF Analyzer',
@@ -318,10 +267,10 @@ const PROJECTS = [
 ]
 
 const METRICS = [
-  { value: '15', label: 'Production Builds', color: '#7F77DD' },
+  { value: '10/10', label: 'Enterprise Audit Score', color: '#7F77DD' },
   { value: 'L4', label: 'Autonomy Level', color: '#1D9E75' },
-  { value: '1 pkg', label: 'Published to npm', color: '#D85A30' },
-  { value: '9/10', label: 'Enterprise Audit Score', color: '#BA7517' },
+  { value: '15', label: 'Production Builds', color: '#D85A30' },
+  { value: '5+', label: 'Live Workflows', color: '#BA7517' },
 ]
 
 // ── PARTICLE CANVAS ───────────────────────────────────────────────────────────
@@ -368,6 +317,7 @@ function ParticleCanvas() {
         ctx.fill()
       })
       ctx.globalAlpha = 1
+      // Draw faint connection lines
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x
@@ -400,7 +350,7 @@ function ParticleCanvas() {
   )
 }
 
-// ── SHARED HOOK ───────────────────────────────────────────────────────────────
+// ── NAVBAR ────────────────────────────────────────────────────────────────────
 
 function useMobile() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
@@ -411,13 +361,6 @@ function useMobile() {
   }, [])
   return isMobile
 }
-
-// ── NAVBAR ────────────────────────────────────────────────────────────────────
-// AUDIT: HIRE ME button is visible and functional on mobile.
-// - Nav links hidden on mobile (correct — prevents overflow).
-// - HIRE ME uses compact padding/fontSize on mobile.
-// - whiteSpace: nowrap prevents text wrapping on small screens.
-// No changes required.
 
 function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -512,14 +455,26 @@ function Hero() {
         background: '#07070F',
       }}
     >
-      <div className="orb orb-purple" style={{ width: 500, height: 500, background: 'rgba(127, 119, 221, 0.12)', top: '-100px', left: '-120px' }} />
-      <div className="orb orb-teal" style={{ width: 400, height: 400, background: 'rgba(29, 158, 117, 0.1)', bottom: '60px', right: '-80px' }} />
-      <div className="orb orb-amber" style={{ width: 300, height: 300, background: 'rgba(186, 117, 23, 0.08)', bottom: '200px', left: '20%' }} />
+      {/* Gradient orbs */}
+      <div
+        className="orb orb-purple"
+        style={{ width: 500, height: 500, background: 'rgba(127, 119, 221, 0.12)', top: '-100px', left: '-120px' }}
+      />
+      <div
+        className="orb orb-teal"
+        style={{ width: 400, height: 400, background: 'rgba(29, 158, 117, 0.1)', bottom: '60px', right: '-80px' }}
+      />
+      <div
+        className="orb orb-amber"
+        style={{ width: 300, height: 300, background: 'rgba(186, 117, 23, 0.08)', bottom: '200px', left: '20%' }}
+      />
 
       <ParticleCanvas />
       <div className="scan-line" />
 
+      {/* Hero content */}
       <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: isMobile ? '60px 20px 0' : '0 24px', maxWidth: 800 }}>
+        {/* System tag */}
         <div className="animate-fade-up" style={{ marginBottom: 16 }}>
           <span
             style={{
@@ -538,6 +493,7 @@ function Hero() {
           </span>
         </div>
 
+        {/* Headline */}
         <h1
           className="animate-fade-up-d1"
           style={{
@@ -564,6 +520,7 @@ function Hero() {
           </span>
         </h1>
 
+        {/* Sub-headline */}
         <p
           className="animate-fade-up-d2"
           style={{
@@ -582,6 +539,7 @@ function Hero() {
           Building autonomous infrastructure that thinks, adapts, and self-corrects.
         </p>
 
+        {/* CTAs */}
         <div className="animate-fade-up-d3" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <a
             href="#architecture"
@@ -624,9 +582,16 @@ function Hero() {
           </a>
         </div>
 
+        {/* Scroll hint */}
         <div
           className="animate-fade-up-d4"
-          style={{ marginTop: 80, fontFamily: 'Space Mono', fontSize: 10, letterSpacing: '0.15em', color: 'rgba(232,230,255,0.25)' }}
+          style={{
+            marginTop: 80,
+            fontFamily: 'Space Mono',
+            fontSize: 10,
+            letterSpacing: '0.15em',
+            color: 'rgba(232,230,255,0.25)',
+          }}
         >
           hello@pandian-ai.com
         </div>
@@ -636,13 +601,11 @@ function Hero() {
 }
 
 // ── ARCHITECTURE SECTION ──────────────────────────────────────────────────────
-// AUDIT: LayerCard handleClick sets activeFilter to layer.id (e.g. 'L1') and
-// scrolls to #projects. Logic is CORRECT for all 5 layers including L1.
-// L1 does NOT divert to #contact — confirmed no bug exists here.
 
 function LayerCard({ layer, index, activeFilter, setActiveFilter }) {
   const [hovered, setHovered] = useState(false)
-
+  const isMobile = useMobile()
+  
   const handleClick = () => {
     setActiveFilter(layer.id)
     document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })
@@ -666,6 +629,7 @@ function LayerCard({ layer, index, activeFilter, setActiveFilter }) {
         transform: hovered ? 'translateX(6px)' : 'translateX(0)',
       }}
     >
+      {/* Left accent bar */}
       <div
         style={{
           position: 'absolute',
@@ -680,6 +644,7 @@ function LayerCard({ layer, index, activeFilter, setActiveFilter }) {
       />
 
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
+        {/* Layer ID badge */}
         <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
           <span
             style={{
@@ -695,18 +660,45 @@ function LayerCard({ layer, index, activeFilter, setActiveFilter }) {
           >
             {layer.id}
           </span>
-          <span style={{ fontFamily: 'Space Mono', fontSize: 9, letterSpacing: '0.1em', color: layer.color, opacity: 0.7 }}>
+          <span
+            style={{
+              fontFamily: 'Space Mono',
+              fontSize: 9,
+              letterSpacing: '0.1em',
+              color: layer.color,
+              opacity: 0.7,
+            }}
+          >
             {layer.tag}
           </span>
         </div>
 
+        {/* Content */}
         <div style={{ flex: 1 }}>
-          <h3 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: 18, color: '#E8E6FF', marginBottom: 8, letterSpacing: '-0.01em' }}>
+          <h3
+            style={{
+              fontFamily: 'Outfit',
+              fontWeight: 700,
+              fontSize: 18,
+              color: '#E8E6FF',
+              marginBottom: 8,
+              letterSpacing: '-0.01em',
+            }}
+          >
             {layer.name}
           </h3>
-          <p style={{ fontFamily: 'Inter', fontSize: 14, color: 'rgba(232, 230, 255, 0.5)', lineHeight: 1.65, marginBottom: 14 }}>
+          <p
+            style={{
+              fontFamily: 'Inter',
+              fontSize: 14,
+              color: 'rgba(232, 230, 255, 0.5)',
+              lineHeight: 1.65,
+              marginBottom: 14,
+            }}
+          >
             {layer.desc}
           </p>
+          {/* Tech pills */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {layer.tech.map(t => (
               <span
@@ -736,19 +728,46 @@ function Architecture({ setActiveFilter }) {
   return (
     <section id="architecture" style={{ padding: '100px 24px', background: '#07070F' }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        {/* Section header */}
         <div style={{ textAlign: 'center', marginBottom: 64 }}>
-          <span style={{ fontFamily: 'Space Mono', fontSize: 10, letterSpacing: '0.2em', color: '#7F77DD', display: 'block', marginBottom: 12 }}>
+          <span
+            style={{
+              fontFamily: 'Space Mono',
+              fontSize: 10,
+              letterSpacing: '0.2em',
+              color: '#7F77DD',
+              display: 'block',
+              marginBottom: 12,
+            }}
+          >
             SYSTEM TOPOLOGY
           </span>
-          <h2 style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: 'clamp(28px, 4vw, 44px)', color: '#E8E6FF', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+          <h2
+            style={{
+              fontFamily: 'Outfit',
+              fontWeight: 800,
+              fontSize: 'clamp(28px, 4vw, 44px)',
+              color: '#E8E6FF',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+            }}
+          >
             5-Layer Enterprise{' '}
             <span style={{ color: '#7F77DD' }}>n8n Standard</span>
           </h2>
-          <p style={{ fontFamily: 'Inter', fontSize: 15, color: 'rgba(232,230,255,0.45)', marginTop: 12 }}>
+          <p
+            style={{
+              fontFamily: 'Inter',
+              fontSize: 15,
+              color: 'rgba(232,230,255,0.45)',
+              marginTop: 12,
+            }}
+          >
             Every system is audited and built against this rubric. L4 Adaptive Autonomy confirmed.
           </p>
         </div>
 
+        {/* Layer cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {LAYERS.map((layer, i) => (
             <LayerCard key={layer.id} layer={layer} index={i} setActiveFilter={setActiveFilter} />
@@ -772,16 +791,45 @@ function Metrics() {
       }}
     >
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: 16,
+          }}
+        >
           {METRICS.map(m => (
             <div
               key={m.label}
-              style={{ textAlign: 'center', padding: '24px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}
+              style={{
+                textAlign: 'center',
+                padding: '24px 16px',
+                borderRadius: 10,
+                border: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(255,255,255,0.02)',
+              }}
             >
-              <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: 36, color: m.color, letterSpacing: '-0.02em', lineHeight: 1, marginBottom: 8 }}>
+              <div
+                style={{
+                  fontFamily: 'Outfit',
+                  fontWeight: 800,
+                  fontSize: 36,
+                  color: m.color,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                  marginBottom: 8,
+                }}
+              >
                 {m.value}
               </div>
-              <div style={{ fontFamily: 'Inter', fontSize: 12, color: 'rgba(232,230,255,0.4)', letterSpacing: '0.02em' }}>
+              <div
+                style={{
+                  fontFamily: 'Inter',
+                  fontSize: 12,
+                  color: 'rgba(232,230,255,0.4)',
+                  letterSpacing: '0.02em',
+                }}
+              >
                 {m.label}
               </div>
             </div>
@@ -792,75 +840,15 @@ function Metrics() {
   )
 }
 
-// ── REEL PENDING PLACEHOLDER ──────────────────────────────────────────────────
-// Renders for any project marked reelPending: true.
-// Maintains design aesthetic while clearly signaling a missing unique reel.
-
-function ReelPendingBadge() {
-  return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12,
-        background: 'linear-gradient(135deg, rgba(127,119,221,0.05) 0%, rgba(29,158,117,0.05) 100%)',
-      }}
-    >
-      {/* Pulsing icon */}
-      <div
-        style={{
-          width: 52,
-          height: 52,
-          borderRadius: '50%',
-          border: '1px solid rgba(127,119,221,0.3)',
-          background: 'rgba(127,119,221,0.08)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          animation: 'pulse 2.4s ease-in-out infinite',
-        }}
-      >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" strokeWidth="1.5">
-          <polygon points="23 7 16 12 23 17 23 7" />
-          <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-        </svg>
-      </div>
-      <div style={{ fontFamily: 'Space Mono', fontSize: 9, letterSpacing: '0.12em', color: 'rgba(127,119,221,0.6)', textAlign: 'center', lineHeight: 1.7 }}>
-        REEL INCOMING<br />
-        <span style={{ color: 'rgba(232,230,255,0.2)', fontSize: 8 }}>UPLOAD & REPLACE URL</span>
-      </div>
-    </div>
-  )
-}
-
 // ── PROJECT SHOWCASE ──────────────────────────────────────────────────────────
-// FIXES:
-//   - Filter tabs now use compact labels + reduced padding on mobile so all 6
-//     filters (ALL / L1–L5) fit without wrapping awkwardly on 320px screens.
-//   - Projects with reelPending: true render ReelPendingBadge instead of iframe.
 
 function ProjectShowcase({ activeFilter, setActiveFilter }) {
   const isMobile = useMobile()
-  const filteredProjects = activeFilter === 'All'
-    ? PROJECTS
+  const filteredProjects = activeFilter === 'All' 
+    ? PROJECTS 
     : PROJECTS.filter(p => p.layer.startsWith(activeFilter))
 
   const filters = ['All', 'L1', 'L2', 'L3', 'L4', 'L5']
-
-  // Layer color map for active filter tab accent
-  const layerColorMap = {
-    All: '#1D9E75',
-    L1: '#1D9E75',
-    L2: '#7F77DD',
-    L3: '#378ADD',
-    L4: '#BA7517',
-    L5: '#D85A30',
-  }
-  const activeColor = layerColorMap[activeFilter] || '#1D9E75'
 
   return (
     <section id="projects" style={{ padding: '100px 24px', background: '#07070F', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
@@ -872,97 +860,60 @@ function ProjectShowcase({ activeFilter, setActiveFilter }) {
           <h2 style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: 'clamp(32px, 5vw, 52px)', color: '#E8E6FF', letterSpacing: '-0.02em', marginBottom: 32 }}>
             Production <span style={{ color: '#1D9E75' }}>Automations</span>
           </h2>
-
-          {/*
-            MOBILE FIX: On small screens (< 768px) the filter tabs use:
-            - Shorter labels: 'ALL' instead of 'ALL PROJECTS', 'L1' instead of 'L1 LAYER'
-            - Reduced padding: 6px 10px vs 8px 20px
-            - Reduced gap: 6px vs 12px
-            - fontSize: 9px vs 10px
-            This ensures all 6 filters fit on a single line at 320px viewport width.
-          */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: isMobile ? 6 : 10,
-              flexWrap: 'wrap',
-              marginBottom: 48,
-              padding: '0 8px',
-            }}
-          >
-            {filters.map(f => {
-              const isActive = activeFilter === f
-              const color = layerColorMap[f]
-              return (
-                <button
-                  key={f}
-                  onClick={() => setActiveFilter(f)}
-                  style={{
-                    fontFamily: 'Space Mono',
-                    fontSize: isMobile ? 9 : 10,
-                    fontWeight: 700,
-                    padding: isMobile ? '6px 10px' : '8px 18px',
-                    borderRadius: 30,
-                    border: `1px solid ${isActive ? color : 'rgba(255,255,255,0.1)'}`,
-                    background: isActive ? `${color}18` : 'transparent',
-                    color: isActive ? color : 'rgba(232,230,255,0.4)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    letterSpacing: '0.08em',
-                    whiteSpace: 'nowrap',
-                  }}
-                  onMouseEnter={e => {
-                    if (!isActive) {
-                      e.currentTarget.style.borderColor = `${color}60`
-                      e.currentTarget.style.color = `${color}CC`
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (!isActive) {
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-                      e.currentTarget.style.color = 'rgba(232,230,255,0.4)'
-                    }
-                  }}
-                >
-                  {/* Mobile: short labels. Desktop: descriptive labels. */}
-                  {f === 'All'
-                    ? (isMobile ? 'ALL' : 'ALL PROJECTS')
-                    : (isMobile ? f : `${f} LAYER`)}
-                </button>
-              )
-            })}
+          
+          {/* Filter Tabs */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 48 }}>
+            {filters.map(f => (
+              <button
+                key={f}
+                onClick={() => setActiveFilter(f)}
+                style={{
+                  fontFamily: 'Space Mono',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  padding: '8px 20px',
+                  borderRadius: 30,
+                  border: '1px solid',
+                  borderColor: activeFilter === f ? '#1D9E75' : 'rgba(255,255,255,0.1)',
+                  background: activeFilter === f ? 'rgba(29, 158, 117, 0.1)' : 'transparent',
+                  color: activeFilter === f ? '#1D9E75' : 'rgba(232,230,255,0.4)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  letterSpacing: '0.1em'
+                }}
+              >
+                {f === 'All' ? 'ALL PROJECTS' : `${f} LAYER`}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(360px, 1fr))',
-            gap: 32,
-          }}
-        >
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(360px, 1fr))', 
+          gap: 32 
+        }}>
           {filteredProjects.map((project) => (
-            <div
-              key={project.id}
+            <div 
+              key={project.id} 
               className="glass-card animate-fade-up"
-              style={{
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                borderRadius: 20,
+              style={{ 
+                background: 'rgba(255,255,255,0.02)', 
+                border: '1px solid rgba(255,255,255,0.06)', 
+                borderRadius: 20, 
                 padding: 24,
                 display: 'flex',
                 flexDirection: 'column',
                 transition: 'all 0.3s ease',
                 position: 'relative',
-                overflow: 'hidden',
+                overflow: 'hidden'
               }}
             >
               {/* ROI Badge */}
-              <div style={{
-                position: 'absolute',
-                top: 24,
-                right: 24,
+              <div style={{ 
+                position: 'absolute', 
+                top: 24, 
+                right: 24, 
                 zIndex: 2,
                 background: 'rgba(29, 158, 117, 0.15)',
                 backdropFilter: 'blur(12px)',
@@ -972,48 +923,42 @@ function ProjectShowcase({ activeFilter, setActiveFilter }) {
                 fontFamily: 'Space Mono',
                 fontSize: 9,
                 fontWeight: 700,
-                color: '#1D9E75',
+                color: '#1D9E75'
               }}>
                 {project.roi}
               </div>
 
-              {/* Media Container */}
-              <div
-                style={{
-                  width: '100%',
-                  aspectRatio: '9/16',
-                  background: 'rgba(0,0,0,0.5)',
-                  borderRadius: 12,
+              {/* Media Container (Video or Package Badge) */}
+              <div 
+                style={{ 
+                  width: '100%', 
+                  aspectRatio: '9/16', 
+                  background: 'rgba(0,0,0,0.5)', 
+                  borderRadius: 12, 
                   marginBottom: 24,
                   overflow: 'hidden',
                   position: 'relative',
                   border: '1px solid rgba(255,255,255,0.05)',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  justifyContent: 'center'
                 }}
               >
                 {project.isPackage ? (
                   <div style={{ textAlign: 'center', padding: 20 }}>
                     <div style={{ width: 64, height: 64, background: 'rgba(216, 90, 48, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', border: '1px solid rgba(216, 90, 48, 0.3)' }}>
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D85A30" strokeWidth="2">
-                        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-                        <path d="m3.3 7 8.7 5 8.7-5" />
-                        <path d="M12 22V12" />
-                      </svg>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D85A30" strokeWidth="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
                     </div>
                     <div style={{ fontFamily: 'Space Mono', fontSize: 12, fontWeight: 700, color: '#D85A30', marginBottom: 8 }}>NPM PACKAGE</div>
-                    <a
-                      href={project.url}
-                      target="_blank"
+                    <a 
+                      href={project.url} 
+                      target="_blank" 
                       rel="noopener noreferrer"
                       style={{ fontFamily: 'Inter', fontSize: 11, color: 'rgba(232,230,255,0.4)', textDecoration: 'underline' }}
                     >
                       VIEW ON REGISTRY ↗
                     </a>
                   </div>
-                ) : project.reelPending ? (
-                  <ReelPendingBadge />
                 ) : (
                   <iframe
                     src={`${project.videoUrl}embed/`}
@@ -1023,13 +968,13 @@ function ProjectShowcase({ activeFilter, setActiveFilter }) {
                     scrolling="no"
                     allowTransparency="true"
                     allow="encrypted-media"
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
+                    style={{ 
+                      position: 'absolute', 
+                      top: 0, 
+                      left: 0, 
+                      width: '100%', 
                       height: '100%',
-                      pointerEvents: 'auto',
+                      pointerEvents: 'auto'
                     }}
                   />
                 )}
@@ -1037,17 +982,13 @@ function ProjectShowcase({ activeFilter, setActiveFilter }) {
 
               {/* Content */}
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'Space Mono', fontSize: 9, color: '#1D9E75', marginBottom: 4, letterSpacing: '0.1em' }}>
-                  {project.layer}
-                </div>
-                <h3 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: 20, color: '#E8E6FF', marginBottom: 16 }}>
-                  {project.title}
-                </h3>
-
+                <div style={{ fontFamily: 'Space Mono', fontSize: 9, color: '#1D9E75', marginBottom: 4, letterSpacing: '0.1em' }}>{project.layer}</div>
+                <h3 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: 20, color: '#E8E6FF', marginBottom: 16 }}>{project.title}</h3>
+                
                 <ul style={{ padding: 0, listStyle: 'none', marginBottom: 24 }}>
                   {project.bullets.map((b, i) => (
                     <li key={i} style={{ fontFamily: 'Inter', fontSize: 13, color: 'rgba(232,230,255,0.5)', marginBottom: 10, display: 'flex', gap: 8, lineHeight: 1.5 }}>
-                      <span style={{ color: '#1D9E75', flexShrink: 0 }}>▹</span> {b}
+                      <span style={{ color: '#1D9E75' }}>▹</span> {b}
                     </li>
                   ))}
                 </ul>
@@ -1055,24 +996,24 @@ function ProjectShowcase({ activeFilter, setActiveFilter }) {
 
               {/* Actions */}
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <a
-                  href={project.github}
-                  target="_blank"
+                <a 
+                  href={project.github} 
+                  target="_blank" 
                   rel="noopener noreferrer"
-                  style={{ fontFamily: 'Space Mono', fontSize: 10, color: 'rgba(232,230,255,0.4)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}
-                  onMouseEnter={e => e.currentTarget.style.color = '#1D9E75'}
-                  onMouseLeave={e => e.currentTarget.style.color = 'rgba(232,230,255,0.4)'}
+                  style={{ 
+                    fontFamily: 'Space Mono', 
+                    fontSize: 10, 
+                    color: 'rgba(232,230,255,0.4)', 
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6
+                  }}
+                  onMouseEnter={e => e.target.style.color = '#1D9E75'}
+                  onMouseLeave={e => e.target.style.color = 'rgba(232,230,255,0.4)'}
                 >
-                  SOURCE CODE{' '}
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />
-                  </svg>
+                  SOURCE CODE <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
                 </a>
-                {project.reelPending && (
-                  <span style={{ fontFamily: 'Space Mono', fontSize: 8, color: 'rgba(127,119,221,0.4)', letterSpacing: '0.08em' }}>
-                    REEL PENDING
-                  </span>
-                )}
               </div>
             </div>
           ))}
@@ -1137,7 +1078,7 @@ const inputBlurHandler = e => {
 
 function Contact() {
   const [formData, setFormData] = useState({})
-  const [status, setStatus] = useState('idle')
+  const [status, setStatus] = useState('idle') // idle | sending | success | error
 
   const handleChange = (name, value) => {
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -1177,7 +1118,18 @@ function Contact() {
           overflow: 'hidden',
         }}
       >
-        <div style={{ position: 'absolute', width: 300, height: 300, borderRadius: '50%', background: 'rgba(127, 119, 221, 0.06)', filter: 'blur(60px)', top: -80, right: -60, pointerEvents: 'none' }} />
+        {/* Decorative orb */}
+        <div
+          style={{
+            position: 'absolute',
+            width: 300, height: 300,
+            borderRadius: '50%',
+            background: 'rgba(127, 119, 221, 0.06)',
+            filter: 'blur(60px)',
+            top: -80, right: -60,
+            pointerEvents: 'none',
+          }}
+        />
 
         <div style={{ textAlign: 'center', marginBottom: 36, position: 'relative' }}>
           <span
@@ -1290,7 +1242,9 @@ function Contact() {
                 fontWeight: 700,
                 letterSpacing: '0.08em',
                 color: '#07070F',
-                background: status === 'sending' ? 'rgba(127, 119, 221, 0.3)' : 'linear-gradient(135deg, #7F77DD, #1D9E75)',
+                background: status === 'sending'
+                  ? 'rgba(127, 119, 221, 0.3)'
+                  : 'linear-gradient(135deg, #7F77DD, #1D9E75)',
                 padding: '16px 32px',
                 borderRadius: 8,
                 border: 'none',
@@ -1326,7 +1280,13 @@ function Contact() {
 
 function Footer() {
   return (
-    <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 24px', background: '#07070F' }}>
+    <footer
+      style={{
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        padding: '28px 24px',
+        background: '#07070F',
+      }}
+    >
       <div
         style={{
           maxWidth: 900,
