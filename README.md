@@ -99,6 +99,8 @@ graph TD
     *   End-to-end automation from lead intake to Google Slides generation and invoicing.
 *   **[AI Influencer Factory](./layer-4-execution/AI-Influencer-Factory/)** — *v3 Enterprise Edition*
     *   Autonomous persona generation and 30-day scheduled publishing with multi-modal AI (Ideogram/OpenAI), **Synchronized Safe Mode guardrails**, and **Manual Image Overwrite** support.
+*   **[AI Client Onboarding Machine](./layer-4-execution/onboarding-machine/)** — *v7.6 Resilient Upgrade*
+    *   End-to-end agency onboarding pipeline with **Safe Mode gating**, **Unified Log-Drain**, and **Deliverables Auto-Expansion**.
 
 ### 📂 [Layer 5: Extensions](./layer-5-extensions/)
 *   **[Gemini PDF Node](./layer-5-extensions/n8n-nodes-gemini-pdf-analyzer/)** — *Custom n8n Extension*
@@ -135,6 +137,7 @@ This portfolio implements a **Global SAFE_MODE Toggle** across 4 major automatio
 - **Signal Pipeline**: Gates email alerting / intent notifications.
 - **Auto-Blogger**: Gates WordPress publishing API.
 - **AI Influencer Factory**: Gates Ideogram image generation and Instagram publishing (Synchronized across Gen & Pub workflows).
+- **AI Onboarding Machine**: Gates Gmail outreach and CRM write operations.
 
 **Architecture:** Destructive actions are programmatically gated by environment-based IF branches (`SAFE_MODE=true`). This ensures that developers can run end-to-end tests without triggering real-world side effects. Designed for the n8n Community Edition by leveraging system environment variables instead of Enterprise-only UI features.
 
@@ -148,6 +151,7 @@ This portfolio implements a **Global SAFE_MODE Toggle** across 4 major automatio
 | Signal Pipeline | ~45 min/scan (manual job board review) | ~90 sec/scan (AI scored + deduped) | **30× speed, zero missed signals** |
 | Auto-Blogger | ~3 hrs/article (research + write + publish) | ~2 min/article (prompt → WordPress) | **90× faster production** |
 | AI Influencer Factory | ~5 hrs/persona (research + 30-day plan) | ~5 min/persona (form → full strategy) | **60× throughput** |
+| AI Onboarding Machine | ~6 hrs/client (onboarding + plan + tracker) | ~30 sec/client (fully automated) | **720× faster delivery** |
 
 ---
 
