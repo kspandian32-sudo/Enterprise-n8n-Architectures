@@ -15,8 +15,8 @@ GIDS = {
     "Communications": 847410064
 }
 
-SMTP_CRED_ID = "udtIzlJq8iqmL3Az"
-SHEETS_CRED_ID = "hiWj9Xv9QRzG92Us"
+SMTP_CRED_ID = "udtIzlJq8iqmL3aZ"
+SHEETS_CRED_ID = "hiWj9Xv9QRzG92uS"
 GEMINI_CRED_ID = "1jdjTjj9aaTK6i6Y"
 
 # Mapping node names to GID keys
@@ -153,9 +153,7 @@ for node in wf['nodes']:
             if 'sheetName' in node['parameters'] and isinstance(node['parameters']['sheetName'], dict):
                  node['parameters']['sheetName']['mode'] = 'id'
             
-            # CLEAR Status filters (this fixes #5418)
-            if name == "📥 Fetch All Active Clients":
-                node['parameters']['filtersUI'] = {}
+            # FIX-6: Active client filter preserved (clearing removed — was silently disabling Status=Active filter)
             
             # SET matching columns for Update operations (fixes #5422 & #5431)
             if name == "📝 Update CRM → Reminder Sent":

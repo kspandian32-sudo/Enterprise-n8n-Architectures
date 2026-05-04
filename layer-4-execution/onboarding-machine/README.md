@@ -9,14 +9,14 @@ graph TD
     Trigger[📋 New Client Form] --> Parse[🔧 Parse Client Details]
     Parse --> DB[📥 Read Service DB]
     DB --> Gemini[🤖 Gemini: Planner]
-    Gemini --> FanOut{Parallel Fan-Out}
+    Gemini --> SafeMode1{🛡️ Safe Mode?}
+    SafeMode1 -- No --> FanOut{Parallel Fan-Out}
     
     FanOut --> CRM[📊 Log Client Summary]
     FanOut --> Tasks[📊 Expand Deliverables]
     FanOut --> EmailEngine[📧 Build HTML Email]
     
-    CRM --> SafeMode1{🛡️ Safe Mode?}
-    SafeMode1 -- No --> Send1[📧 Send Onboarding Email]
+    EmailEngine --> Send1[📧 Send Onboarding Email]
     
     subgraph Flow_B[Flow B: Follow-Up]
         TriggerB[⏰ Daily 10 AM] --> FetchB[📥 Fetch Summary]
