@@ -28,11 +28,7 @@
     },
     {
       "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
-          "mode": "id"
-        },
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
         "sheetName": {
           "__rl": true,
           "value": 1994705565,
@@ -59,7 +55,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "hiWj9Xv9QRzG92uS",
-          "name": "AI Lead Gen Machine Google Sheets"
+          "name": "Google Sheets - kspandian32"
         }
       }
     },
@@ -80,7 +76,7 @@
       "parameters": {
         "method": "POST",
         "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-        "authentication": "genericCredentialType",
+        "authentication": "predefinedCredentialType",
         "genericAuthType": "httpQueryAuth",
         "sendHeaders": true,
         "headerParameters": {
@@ -94,7 +90,9 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'You are a professional project manager named ' + $json.yourName + ' from ' + $json.agencyName + '. Write a warm, gentle follow-up email to schedule a kickoff call. Client name: ' + $json.clientName + '. Company: ' + $json.clientCompany + '. Project: ' + $json.serviceRequired + '. Current date: ' + new Date().toDateString() + '. Suggest 3 specific time slots (including dates) for a 30-min kickoff call starting from tomorrow. Keep it under 100 words, professional but friendly. Return ONLY valid JSON: {\"subject\": \"email subject\", \"body\": \"email body\"}. No markdown, no backticks. Sign off as ' + $json.yourName + '.' }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } }) }}",
-        "options": {}
+        "options": {},
+        "nodecredentialtype": "httpQueryAuth",
+        "contentType": "application/json"
       },
       "id": "1ffd1f61-411b-4afd-888a-516a934a1232",
       "name": "\ud83e\udd16 Gemini: Write Follow-Up Email",
@@ -154,11 +152,7 @@
     {
       "parameters": {
         "operation": "update",
-        "documentId": {
-          "__rl": true,
-          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
-          "mode": "id"
-        },
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
         "sheetName": {
           "__rl": true,
           "value": 1994705565,
@@ -187,7 +181,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "hiWj9Xv9QRzG92uS",
-          "name": "AI Lead Gen Machine Google Sheets"
+          "name": "Google Sheets - kspandian32"
         }
       }
     },
@@ -210,11 +204,7 @@
     },
     {
       "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
-          "mode": "id"
-        },
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
         "sheetName": {
           "__rl": true,
           "value": 1994705565,
@@ -241,7 +231,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "hiWj9Xv9QRzG92uS",
-          "name": "AI Lead Gen Machine Google Sheets"
+          "name": "Google Sheets - kspandian32"
         }
       }
     },
@@ -262,7 +252,7 @@
       "parameters": {
         "method": "POST",
         "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-        "authentication": "genericCredentialType",
+        "authentication": "predefinedCredentialType",
         "genericAuthType": "httpQueryAuth",
         "sendHeaders": true,
         "headerParameters": {
@@ -276,7 +266,9 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'You are a professional project manager named ' + $json.yourName + ' from ' + $json.agencyName + '. Write a weekly check-in email. Client: ' + $json.clientName + '. Company: ' + $json.clientCompany + '. Project: ' + $json.serviceRequired + '. Scope: ' + JSON.parse($json.service).description + '. Week number: ' + $json.weekNumber + '. Project duration: ' + JSON.parse($json.service).defaultTimeline + '. Write a professional, warm weekly check-in email that: greets the client by name, mentions it is week ' + $json.weekNumber + ', provides a brief progress update placeholder, lists upcoming milestones for next week, asks if they have any questions or blockers, keeps it under 120 words. Return ONLY valid JSON: {\"subject\": \"email subject mentioning week number\", \"body\": \"email body\"}. No markdown, no backticks. Sign off as ' + $json.yourName + '.' }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } }) }}",
-        "options": {}
+        "options": {},
+        "nodecredentialtype": "httpQueryAuth",
+        "contentType": "application/json"
       },
       "id": "b60350e0-5e69-449f-b87d-fdfe7388cd57",
       "name": "\ud83e\udd16 Gemini: Write Check-In Email",
@@ -336,11 +328,7 @@
     {
       "parameters": {
         "operation": "append",
-        "documentId": {
-          "__rl": true,
-          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
-          "mode": "id"
-        },
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
         "sheetName": {
           "__rl": true,
           "value": 847410064,
@@ -436,7 +424,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "hiWj9Xv9QRzG92uS",
-          "name": "AI Lead Gen Machine Google Sheets"
+          "name": "Google Sheets - kspandian32"
         }
       }
     },
@@ -562,11 +550,7 @@
     },
     {
       "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
-          "mode": "id"
-        },
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
         "sheetName": {
           "__rl": true,
           "value": 0,
@@ -593,7 +577,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "hiWj9Xv9QRzG92uS",
-          "name": "AI Lead Gen Machine Google Sheets"
+          "name": "Google Sheets - kspandian32"
         }
       }
     },
@@ -614,7 +598,7 @@
       "parameters": {
         "method": "POST",
         "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-        "authentication": "genericCredentialType",
+        "authentication": "predefinedCredentialType",
         "genericAuthType": "httpQueryAuth",
         "sendHeaders": true,
         "headerParameters": {
@@ -628,7 +612,9 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'You are a senior project manager at an AI automation agency. You have been given a service database entry and a new client. Using the EXACT deliverables and SOP steps from the database, create a customized project plan.\\n\\nAGENCY SERVICE DATABASE ENTRY:\\nService: ' + $json.service.name + '\\nDescription: ' + $json.service.description + '\\nStandard Deliverables: ' + $json.service.deliverables.join(', ') + '\\nSOP Steps: ' + $json.service.sopSteps.map((s,i) => (i+1) + '. ' + s).join(', ') + '\\nDefault Timeline: ' + $json.service.defaultTimeline + '\\nTools: ' + $json.service.toolsUsed + '\\nPrerequisites from client: ' + $json.service.prerequisites + '\\n\\nNEW CLIENT:\\nName: ' + $json.clientName + '\\nCompany: ' + $json.clientCompany + '\\nRequirements: ' + $json.clientRequirements + '\\nBudget: INR ' + $json.budget + '\\nStart Date: ' + $json.startDate + '\\nAgency: ' + $json.agencyName + ' (Contact: ' + $json.yourName + ')\\n\\nUsing the EXACT deliverables and SOPs from the database (do NOT invent new ones), generate this JSON:\\n{\\n  \"project_title\": \"Project title for this client\",\\n  \"calculated_timeline\": \"Total duration based on SOP steps complexity\",\\n  \"welcome_message\": \"2-3 sentence warm welcome (under 50 words)\",\\n  \"project_summary\": \"3-4 sentence summary of what will be built for this specific client (under 80 words)\",\\n  \"roadmap\": [\\n    {\"week\": \"Week 1\", \"phase\": \"Discovery and Setup\", \"tasks\": [\"task 1 from SOP\", \"task 2 from SOP\", \"task 3\"], \"deliverables_due\": [\"deliverable 1\", \"deliverable 2\"], \"milestone\": \"Key milestone for this week\"},\\n    {\"week\": \"Week 2\", \"phase\": \"Build and Launch\", \"tasks\": [\"task 4\", \"task 5\", \"task 6\"], \"deliverables_due\": [\"deliverable 3\", \"deliverable 4\"], \"milestone\": \"Key milestone for this week\"}\\n  ],\\n  \"deliverables_with_dates\": [\\n    {\"name\": \"Exact deliverable from database\", \"description\": \"1-line description customized for this client\", \"due_week\": \"Week X\", \"owner\": \"Agency or Client\"}\\n  ],\\n  \"sop_for_client\": [\\n    {\"step\": 1, \"title\": \"SOP step from database\", \"description\": \"What happens in this step customized for this client\", \"duration\": \"X days\", \"client_action_needed\": \"What client needs to do (or None)\"}\\n  ],\\n  \"prerequisites_checklist\": [\"Item 1 client must provide before we start\", \"Item 2\"],\\n  \"communication_plan\": {\"kickoff\": \"When and how\", \"updates\": \"Frequency and format\", \"reviews\": \"When client reviews happen\", \"escalation\": \"How to handle urgent issues\"},\\n  \"payment_schedule\": [{\"milestone\": \"Payment milestone\", \"percentage\": \"X%\", \"amount\": \"INR X\", \"due\": \"When\"}],\\n  \"tools_access_needed\": [\"Tool 1 - what access is needed\", \"Tool 2\"],\\n  \"success_metrics\": [\"How we will measure success metric 1\", \"Metric 2\"],\\n  \"warranty_and_support\": \"Post-launch support terms (from database timeline)\",\\n  \"next_immediate_step\": \"The very first thing that happens after this email (schedule kickoff call)\"\\n}\\n\\nCRITICAL ROADMAP RULE: The roadmap array MUST have EXACTLY one entry per week matching the Default Timeline. If Default Timeline is 2 Weeks then create exactly 2 roadmap entries (Week 1 and Week 2). If 3 Weeks then create exactly 3 entries. If 4 Weeks then exactly 4 entries. If 8 Weeks then exactly 8 entries. Distribute ALL SOP steps and deliverables evenly across ALL weeks. Every single SOP step must appear in at least one week. Every deliverable must be assigned to a specific week. No week should be empty. Each week must have a unique phase name describing what happens that week.\\n\\nIMPORTANT: Use the EXACT deliverables and SOP steps from the database. Customize descriptions for this client but do not add or remove deliverables. Return ONLY valid JSON. No markdown, no backticks.' }] }], generationConfig: { temperature: 0.6, maxOutputTokens: 8192 } }) }}",
-        "options": {}
+        "options": {},
+        "nodecredentialtype": "httpQueryAuth",
+        "contentType": "application/json"
       },
       "id": "a3818bc9-0497-43e3-ba45-beb2ec7e36ae",
       "name": "\ud83e\udd16 Gemini: Build Project Plan from SOPs",
@@ -664,11 +650,7 @@
     {
       "parameters": {
         "operation": "append",
-        "documentId": {
-          "__rl": true,
-          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
-          "mode": "id"
-        },
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
         "sheetName": {
           "__rl": true,
           "value": 1994705565,
@@ -826,7 +808,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "hiWj9Xv9QRzG92uS",
-          "name": "AI Lead Gen Machine Google Sheets"
+          "name": "Google Sheets - kspandian32"
         }
       }
     },
@@ -846,11 +828,7 @@
     {
       "parameters": {
         "operation": "append",
-        "documentId": {
-          "__rl": true,
-          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
-          "mode": "id"
-        },
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
         "sheetName": {
           "__rl": true,
           "value": 755310524,
@@ -1006,7 +984,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "hiWj9Xv9QRzG92uS",
-          "name": "AI Lead Gen Machine Google Sheets"
+          "name": "Google Sheets - kspandian32"
         }
       }
     },
@@ -1228,6 +1206,140 @@
         -1000,
         1500
       ]
+    },
+    {
+      "name": "\u23f0 Daily 12 PM: Offboarding?",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        100,
+        1500
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hours": 12
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "\ud83d\udce5 Fetch Completed Clients",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        300,
+        1500
+      ],
+      "parameters": {
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+        "sheetName": {
+          "__rl": true,
+          "value": 1994705565,
+          "mode": "id"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "Google Sheets - kspandian32"
+        }
+      }
+    },
+    {
+      "name": "\ud83e\udd16 Gemini: Write Completion Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        500,
+        1500
+      ],
+      "parameters": {
+        "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'You are a professional project manager named ' + $json.yourName + ' from ' + $json.agencyName + '. Write a project completion and testimonial request email for ' + $json.clientName + ' from ' + $json.clientCompany + '. Based on their service (' + $json.serviceRequired + '), summarize the successful delivery of their project roadmap. Include a warm thank-you, a request for a testimonial, and a link to our feedback form: https://forms.gle/sbZKjFkPS7bJ2enKA. Keep it celebratory and professional, under 150 words. Return ONLY valid JSON: {\"subject\": \"Project Successfully Completed! \ud83c\udfc6\", \"body\": \"email body\"}. No markdown, no backticks.' }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } }) }}",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "method": "POST",
+        "authentication": "predefinedCredentialType",
+        "nodecredentialtype": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "contentType": "application/json"
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 35000,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "1jdjTjj9aaTK6i6Y",
+          "name": "Query Auth Gemini kspandian32"
+        }
+      }
+    },
+    {
+      "name": "\ud83d\udee1\ufe0f IF: Safe Mode? (Completion)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        700,
+        1500
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{.SAFE_MODE}}",
+              "value2": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "\ud83d\udce7 Send Completion Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        900,
+        1500
+      ],
+      "parameters": {
+        "fromEmail": "kspandian32@gmail.com",
+        "toEmail": "={{ $json.clientEmail }}",
+        "subject": "",
+        "html": "",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": {
+          "id": "udtIzlJq8iqmL3aZ",
+          "name": "SMTP account - kspandian32"
+        }
+      }
+    },
+    {
+      "name": "\ud83d\udcdd Update CRM \u2192 Archived",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1100,
+        1500
+      ],
+      "parameters": {
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+        "sheetName": {
+          "__rl": true,
+          "value": 1994705565,
+          "mode": "id"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "Google Sheets - kspandian32"
+        }
+      }
     }
   ],
   "connections": {
@@ -1535,6 +1647,51 @@
         [
           {
             "node": "Log to Unified Drain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\u23f0 Daily 12 PM: Offboarding?": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udce5 Fetch Completed Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83e\udd16 Gemini: Write Completion Report": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udee1\ufe0f IF: Safe Mode? (Completion)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83d\udee1\ufe0f IF: Safe Mode? (Completion)": {
+      "main": [
+        [],
+        [
+          {
+            "node": "\ud83d\udce7 Send Completion Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83d\udce7 Send Completion Email": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udcdd Update CRM \u2192 Archived",
             "type": "main",
             "index": 0
           }
