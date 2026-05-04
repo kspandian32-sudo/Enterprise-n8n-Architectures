@@ -231,7 +231,8 @@ The stack now features a fully restored and hardened **Observability Layer** to 
 ### **Key Upgrades:**
 *   **Telegram Alert Restoration:** Fixed the `Log-Drain` workflow to bypass environment variable restrictions by using a dedicated **Telegram Node** with persistent credentials (`lMh5dlTVHK0LmmG6`).
 *   **Unified Error Handling:** The `FEK7PNwR6I3XZygD` sub-workflow now correctly handles both `SUCCESS` and `ERROR` signals, providing formatted real-time alerts to the administrator's Telegram bot.
-*   **Intelligent Log Filtering:** Implemented logic to filter out `debug` noise while ensuring all production-critical events (publishing successes, generation failures) are pushed to the Telegram channel.
+*   **Intelligent Log Filtering:** Implemented logic to filter out `debug` noise while ensuring all production-critical events are pushed to the Telegram channel.
+*   **End-to-End Client Lifecycle:** Automates the complete project journey—Welcome, Kickoff, Weekly Updates, and Completion Reports—ensuring a professional "always-on" agency experience.
 
 ---
 
