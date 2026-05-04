@@ -68,3 +68,9 @@ graph TD
 2. Configure `deploy_config.py` with your Sheet IDs and Credentials.
 3. Run `deploy_handler.py` to push the configuration to n8n.
 4. Ensure `SAFE_MODE=true` in your n8n environment for initial testing.
+
+## 🚀 Recent Updates (Week 10 Production Hardening)
+- **Resource Locator Fixes**: Upgraded Google Sheets nodes to use standard `__rl` objects for `documentId`, resolving dynamic lookup failures.
+- **Offboarding Engine Sequence**: Repositioned the orphaned "Parse Completion Email" node to ensure sequential execution (Gemini → Parse → Safe Mode → Email → Archive).
+- **Security & Triggers**: Stripped invalid node properties causing API 400 errors and corrected the cron expression for the Monday check-in trigger.
+- **Credential Integrity**: Fixed missing `httpQueryAuth` provisioning and typos in SMTP credentials.
