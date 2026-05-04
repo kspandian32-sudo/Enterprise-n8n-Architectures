@@ -1,11 +1,8 @@
 import json, os
 
-wf_path = r"C:\Users\ks_pa\.gemini\antigravity\brain\43ec68f5-8a55-41f5-8805-04971a7e2053\.system_generated\steps\153\output.txt"
+wf_path = "Updated_AI_Onboarding_Resilient.json"
 with open(wf_path, 'r', encoding='utf-8') as f:
-    raw = json.load(f)
-
-# The actual workflow data is in the 'data' key of the MCP response
-wf = raw['data']
+    wf = json.load(f)
 
 SHEET_ID = "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU"
 GIDS = {
@@ -478,23 +475,25 @@ for r_node in resiliency_nodes:
 # 8. Rewire Resiliency Connections
 conn = wf.get('connections', {})
 
-# Flow A Rewire: Client Summary -> Safe Mode -> Email
-if "📊 Log Client Summary" in conn:
-    # Onboarding copy
-    conn["📊 Log Client Summary"]["main"][0] = [{"node": "🛡️ IF: Safe Mode? (Onboarding)", "type": "main", "index": 0}]
+# Flow A Rewire: Parse Project Plan -> Safe Mode -> [Summary, Expand, HTML Build]
+if "🔀 Parse Project Plan" in conn:
+    conn["🔀 Parse Project Plan"]["main"][0] = [{"node": "🛡️ IF: Safe Mode? (Onboarding)", "type": "main", "index": 0}]
 
 conn["🛡️ IF: Safe Mode? (Onboarding)"] = {
     "main": [
-        [], # True (Safe Mode) -> Do nothing
-        [{"node": "📧 Send Onboarding Email to Client", "type": "main", "index": 0}] # False -> Send
+        [], # True -> Do nothing
+        [
+            {"node": "📊 Log Client Summary", "type": "main", "index": 0},
+            {"node": "📊 Expand Deliverables", "type": "main", "index": 0},
+            {"node": "📝 Build HTML Client Email", "type": "main", "index": 0}
+        ] # False -> Production
     ]
 }
 
-# Flow B Rewire: Parse Follow-Up -> Safe Mode -> Email
+# Flow B Rewire: Parse Follow-Up -> Safe Mode -> Email -> CRM
 if "🔀 Parse Follow-Up Email" in conn:
     conn["🔀 Parse Follow-Up Email"]["main"][0] = [
-        {"node": "🛡️ IF: Safe Mode? (Follow-Up)", "type": "main", "index": 0},
-        {"node": "📝 Update CRM → Reminder Sent", "type": "main", "index": 0}
+        {"node": "🛡️ IF: Safe Mode? (Follow-Up)", "type": "main", "index": 0}
     ]
 
 conn["🛡️ IF: Safe Mode? (Follow-Up)"] = {
@@ -504,11 +503,15 @@ conn["🛡️ IF: Safe Mode? (Follow-Up)"] = {
     ]
 }
 
-# Flow C Rewire: Parse Check-In -> Safe Mode -> Email
+# Ensure CRM Update follows Email
+conn["📧 Send Kickoff Reminder"] = {
+    "main": [[{"node": "📝 Update CRM → Reminder Sent", "type": "main", "index": 0}]]
+}
+
+# Flow C Rewire: Parse Check-In -> Safe Mode -> Email -> Log
 if "🔀 Parse Check-In Email" in conn:
     conn["🔀 Parse Check-In Email"]["main"][0] = [
-        {"node": "🛡️ IF: Safe Mode? (Check-In)", "type": "main", "index": 0},
-        {"node": "📝 Log to Communications", "type": "main", "index": 0}
+        {"node": "🛡️ IF: Safe Mode? (Check-In)", "type": "main", "index": 0}
     ]
 
 conn["🛡️ IF: Safe Mode? (Check-In)"] = {
@@ -516,6 +519,11 @@ conn["🛡️ IF: Safe Mode? (Check-In)"] = {
         [], # True -> Do nothing
         [{"node": "📧 Send Weekly Check-In", "type": "main", "index": 0}] # False -> Send
     ]
+}
+
+# Ensure Log follows Email
+conn["📧 Send Weekly Check-In"] = {
+    "main": [[{"node": "📝 Log to Communications", "type": "main", "index": 0}]]
 }
 
 # Log-Drain Wire
