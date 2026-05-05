@@ -158,14 +158,10 @@
             "value": 1994705565
           },
           "columns": {
-            "mappingMode": "mapEachItem",
+            "mappingMode": "autoMapInputData",
             "matchingColumns": [
               "row_number"
-            ],
-            "value": {
-              "Status": "Reminder Sent",
-              "row_number": "={{ $('🔀 Parse Follow-Up Email').item.json.row_number }}"
-            }
+            ]
           },
           "options": {}
         },
@@ -338,16 +334,7 @@
             "mode": "id"
           },
           "columns": {
-            "mappingMode": "mapEachItem",
-            "value": {
-              "Date": "={{ new Date().toLocaleDateString('en-IN', { year:'numeric', month:'short', day:'numeric' }) }}",
-              "Client": "={{ $('🔀 Parse Check-In Email').item.json.clientName + ' (' + $('🔀 Parse Check-In Email').item.json.clientCompany + ')' }}",
-              "Type": "Weekly Check-In",
-              "Week #": "={{ $('🔢 Calculate Week Number').item.json.weekNumber }}",
-              "Subject": "={{ $('🔀 Parse Check-In Email').item.json.checkinSubject }}",
-              "Sent To": "={{ $('🔀 Parse Check-In Email').item.json.clientEmail }}",
-              "Status": "Sent"
-            }
+            "mappingMode": "autoMapInputData"
           },
           "options": {}
         },
@@ -594,21 +581,8 @@
             "mode": "id"
           },
           "columns": {
-            "mappingMode": "mapEachItem",
-            "matchingColumns": [],
-            "value": {
-              "Client Full Name": "={{ $json.clientName }}",
-              "Client Company Name": "={{ $json.clientCompany }}",
-              "Client Email": "={{ $json.clientEmail }}",
-              "Service Required": "={{ $json.serviceRequired }}",
-              "Agreed Budget (INR)": "={{ $json.budget }}",
-              "Desired Start Date": "={{ $json.startDate }}",
-              "Your Agency Name": "={{ $json.agencyName }}",
-              "Your Name": "={{ $json.yourName }}",
-              "Your Email": "={{ $json.yourEmail }}",
-              "Onboarded At": "={{ $json.timestamp }}",
-              "Status": "={{ $json.Status }}"
-            }
+            "mappingMode": "autoMapInputData",
+            "matchingColumns": []
           },
           "options": {}
         },
@@ -655,21 +629,7 @@
           },
           "columns": {
             "matchingColumns": [],
-            "mappingMode": "mapEachItem",
-            "value": {
-              "Client": "={{ $json.Client }}",
-              "Client Approval": "={{ $json['Client Approval'] }}",
-              "Company": "={{ $json.Company }}",
-              "Deliverable": "={{ $json.Deliverable }}",
-              "Description": "={{ $json.Description }}",
-              "Email": "={{ $json.Email }}",
-              "Notes": "={{ $json.Notes }}",
-              "Onboarded At": "={{ $json['Onboarded At'] }}",
-              "Owner": "={{ $json.Owner }}",
-              "Service": "={{ $json.Service }}",
-              "Status": "={{ $json.Status }}",
-              "Week": "={{ $json.Week }}"
-            }
+            "mappingMode": "autoMapInputData"
           },
           "options": {}
         },
@@ -1070,14 +1030,10 @@
             "value": 1994705565
           },
           "columns": {
-            "mappingMode": "mapEachItem",
+            "mappingMode": "autoMapInputData",
             "matchingColumns": [
               "row_number"
-            ],
-            "value": {
-              "Status": "Archived",
-              "row_number": "={{ $json.row_number }}"
-            }
+            ]
           },
           "options": {}
         },
