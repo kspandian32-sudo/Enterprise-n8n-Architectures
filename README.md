@@ -99,8 +99,10 @@ graph TD
     *   End-to-end automation from lead intake to Google Slides generation and invoicing.
 *   **[AI Influencer Factory](./layer-4-execution/AI-Influencer-Factory/)** — *v3 Enterprise Edition*
     *   Autonomous persona generation and 30-day scheduled publishing with multi-modal AI (Ideogram/OpenAI), **Synchronized Safe Mode guardrails**, and **Manual Image Overwrite** support.
-*   **[AI Client Onboarding Machine](./layer-4-execution/onboarding-machine/)** — *v7.6 Resilient Upgrade*
-    *   End-to-end agency onboarding pipeline with **Safe Mode gating**, **Unified Log-Drain**, and **Deliverables Auto-Expansion**.
+*   **[AI Client Onboarding Machine](./layer-4-execution/onboarding-machine/)** — *v10.0 Production Hardened*
+    *   **5-Engine Architecture:** Complete lifecycle management covering Onboarding, Follow-Up, Weekly Check-In, Resiliency, and Offboarding.
+    *   **Autonomous Intelligence:** Gemini 1.5 Flash powered planning with automatic HTML email generation and dynamic deliverables tracking.
+    *   **Resilient Design:** Fully integrated with the **Unified Log-Drain** (`FEK7PNwR6I3XZygD`) and guarded by **Global SAFE_MODE**.
 
 ### 📂 [Layer 5: Extensions](./layer-5-extensions/)
 *   **[Gemini PDF Node](./layer-5-extensions/n8n-nodes-gemini-pdf-analyzer/)** — *Custom n8n Extension*
@@ -221,6 +223,7 @@ This repository has been hardened with the **v7.6 Resilient Standard**, focusing
 2.  **Centralized Observability:** All workflows now pipe errors through the unified **Log-Drain (v4.4)** sub-workflow, which handles both Supabase logging and Telegram alerts.
 3.  **Type-Strict Logic:** Critical `IF` nodes and `Code` nodes have been refactored for strict type validation to prevent silent routing failures.
 4.  **Google Sheets Resilience:** CRM update nodes now use explicit range definitions and `onError: continueRegularOutput` to ensure that tracking failures do not crash the primary automation logic.
+5.  **Production Hardening (May 2026):** Final surgical audit of the Onboarding Machine, resolving critical sheet mapping modes, Gemini API payload structures, and restoring missing email message bodies.
 
 ---
 
@@ -232,7 +235,7 @@ The stack now features a fully restored and hardened **Observability Layer** to 
 *   **Telegram Alert Restoration:** Fixed the `Log-Drain` workflow to bypass environment variable restrictions by using a dedicated **Telegram Node** with persistent credentials (`lMh5dlTVHK0LmmG6`).
 *   **Unified Error Handling:** The `FEK7PNwR6I3XZygD` sub-workflow now correctly handles both `SUCCESS` and `ERROR` signals, providing formatted real-time alerts to the administrator's Telegram bot.
 *   **Intelligent Log Filtering:** Implemented logic to filter out `debug` noise while ensuring all production-critical events are pushed to the Telegram channel.
-*   **End-to-End Client Lifecycle:** Automates the complete project journey—Welcome, Kickoff, Weekly Updates, and Completion Reports—ensuring a professional "always-on" agency experience.
+*   **End-to-End Client Lifecycle:** Automates the complete project journey—Welcome, Kickoff, Weekly Updates, and Completion Reports—ensuring a professional "always-on" agency experience with zero manual intervention.
 
 ---
 
