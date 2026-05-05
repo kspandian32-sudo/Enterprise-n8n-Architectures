@@ -1,0 +1,16 @@
+# Mission Control Operational Protocols
+
+## N8N Workflow Management
+- **Prioritize CLI over API:** When updating, importing, or exporting n8n workflows, always use the internal `n8n CLI` via `docker exec -i n8n` commands. The external REST API is fragile and prone to schema validation errors with complex workflows.
+- **Import Strategy:** To update a workflow, use: `docker exec -i n8n n8n import:workflow --input=/tmp/workflow.json` (after copying the file into the container).
+- **Activation:** Always ensure workflows are activated after import using: `docker exec n8n n8n update:workflow --id=ID --active=true`.
+
+## Security & Safety
+- **Safe Mode Awareness:** Before running any workflow tests, verify the `SAFE_MODE` status in the project's `.env` file. 
+- **Production Credentials:** Ensure nodes are mapped to these verified production IDs:
+    - Google Sheets: `hiWj9Xv9QRzG92uS`
+    - Gemini API: `1jdjTjj9aaTK6i6Y`
+    - Gmail SMTP: `udtIzlJq8iqmL3aZ`
+
+## Environment & Infrastructure
+- **Container Restarts:** If `.env` variables or core workflow structures are changed, restart the n8n container (`docker restart n8n`) to ensure the changes are loaded into memory.

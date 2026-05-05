@@ -1,0 +1,1572 @@
+{
+  "updatedAt": "2026-05-03T13:37:33.427Z",
+  "createdAt": "2026-05-03T11:24:58.630Z",
+  "id": "kHUqP4bRNKBNkM04",
+  "name": "🏥 AI Client Onboarding",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "id": "4df70e91-e320-46e5-aad0-63a53768a976",
+      "name": "⏰ Daily 10 AM: Kickoff Follow-Up?",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1328,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1994705565,
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Welcome Email Sent"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c47d34f3-a037-4de6-b177-a6499172dc50",
+      "name": "📥 Fetch 'Welcome Email Sent' Clients",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1104,
+        832
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "AI Lead Gen Machine Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter: only clients where 2+ days have passed since onboarding\nconst items = $input.all();\nconst now = Date.now();\nconst TWO_DAYS = 2 * 24 * 60 * 60 * 1000;\n\nconst due = items.filter(item => {\n  const onboardedAt = item.json['timestamp'];\n  if (!onboardedAt) return false;\n  return (now - new Date(onboardedAt).getTime()) >= TWO_DAYS;\n});\n\nif (due.length === 0) return [];\nreturn due;"
+      },
+      "id": "d00b96f2-1aee-43ce-a167-fcd3fa8ee11a",
+      "name": "🔍 Filter: 2+ Days Since Welcome",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'You are a professional project manager named ' + $json.yourName + ' from ' + $json.agencyName + '. Write a warm, gentle follow-up email to schedule a kickoff call. Client name: ' + $json.clientName + '. Company: ' + $json.clientCompany + '. Project: ' + $json.serviceRequired + '. Current date: ' + new Date().toDateString() + '. Suggest 3 specific time slots (including dates) for a 30-min kickoff call starting from tomorrow. Keep it under 100 words, professional but friendly. Return ONLY valid JSON: {\"subject\": \"email subject\", \"body\": \"email body\"}. No markdown, no backticks. Sign off as ' + $json.yourName + '.' }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } }) }}",
+        "options": {}
+      },
+      "id": "1ffd1f61-411b-4afd-888a-516a934a1232",
+      "name": "🤖 Gemini: Write Follow-Up Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -656,
+        832
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "1jdjTjj9aaTK6i6Y",
+          "name": "Query Auth Gemini kspandian32"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 35000
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResps = $input.all();\nconst clients = $('🔍 Filter: 2+ Days Since Welcome').all();\nreturn aiResps.map((aiResp, i) => {\n  const client = clients[i]?.json || {};\n  let email = {};\n  try {\n    const raw = aiResp.json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\n    email = JSON.parse(raw.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim());\n  } catch (e) {\n    email = {\n      subject: `Quick follow-up — Scheduling our kickoff call for ${client['serviceRequired']}`,\n      body: `Hi ${client['clientName']},\\n\\nHope you're doing well! Just following up on my welcome email from a couple of days ago. We're excited to get started on the ${client['serviceRequired']} project for ${client['clientCompany']}.\\n\\nWould any of these times work for a 30-minute kickoff call?\\n- Tomorrow at 11 AM IST\\n- Tomorrow at 3 PM IST\\n- Day after at 10 AM IST\\n\\nLooking forward to kicking things off!\\n\\nBest regards`\n    };\n  }\n  const formattedBody = (email.body || '').replace(/\\n/g, '<br>') + `<br><div style=\"display:none!important\">Ref ID: ${client.row_number}</div>`;\n  return { json: { ...client, followUpSubject: email.subject, followUpBody: formattedBody } };\n});"
+      },
+      "id": "45ba883e-8f8a-4748-bbe2-5277f365a0b6",
+      "name": "🔀 Parse Follow-Up Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "kspandian32@gmail.com",
+        "toEmail": "={{ $json.clientEmail }}",
+        "subject": "={{ $json.followUpSubject }}",
+        "html": "={{ $json.followUpBody }}",
+        "options": {}
+      },
+      "id": "23c836bc-edad-408d-8013-474c02cb0a16",
+      "name": "📧 Send Kickoff Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -208,
+        832
+      ],
+      "webhookId": "5cb2c1f3-01cb-44a3-b433-bc47da3c384a",
+      "credentials": {
+        "smtp": {
+          "id": "udtIzlJq8iqmL3Az",
+          "name": "SMTP account - kspandian32"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1994705565,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "row_number"
+          ],
+          "value": {
+            "Status": "Reminder Sent",
+            "row_number": "={{ $('🔀 Parse Follow-Up Email').item.json.row_number }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "07ff2bd1-f256-45ba-b761-0586657224da",
+      "name": "📝 Update CRM → Reminder Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        16,
+        832
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "AI Lead Gen Machine Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "e181be91-12b2-441d-9a1e-1b292bb93d7a",
+      "name": "⏰ Every Monday: Weekly Check-In",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1328,
+        1056
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1994705565,
+          "mode": "id"
+        },
+        "filtersUI": {},
+        "options": {}
+      },
+      "id": "e3884fc4-e413-4e0d-a6d8-f706954c0756",
+      "name": "📥 Fetch All Active Clients",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1104,
+        1056
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "AI Lead Gen Machine Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate week number for each active client\nconst items = $input.all();\nconst now = Date.now();\n\nif (items.length === 0) return [];\n\nreturn items.map(item => {\n  const onboardedAt = item.json['timestamp'];\n  let weekNum = 1;\n  if (onboardedAt) {\n    const daysSince = Math.floor((now - new Date(onboardedAt).getTime()) / (24 * 60 * 60 * 1000));\n    weekNum = Math.max(1, Math.ceil(daysSince / 7));\n  }\n  return { json: { ...item.json, weekNumber: weekNum } };\n});"
+      },
+      "id": "547d6510-cf21-4462-be73-de75c5351756",
+      "name": "🔢 Calculate Week Number",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        1056
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'You are a professional project manager named ' + $json.yourName + ' from ' + $json.agencyName + '. Write a weekly check-in email. Client: ' + $json.clientName + '. Company: ' + $json.clientCompany + '. Project: ' + $json.serviceRequired + '. Scope: ' + JSON.parse($json.service).description + '. Week number: ' + $json.weekNumber + '. Project duration: ' + JSON.parse($json.service).defaultTimeline + '. Write a professional, warm weekly check-in email that: greets the client by name, mentions it is week ' + $json.weekNumber + ', provides a brief progress update placeholder, lists upcoming milestones for next week, asks if they have any questions or blockers, keeps it under 120 words. Return ONLY valid JSON: {\"subject\": \"email subject mentioning week number\", \"body\": \"email body\"}. No markdown, no backticks. Sign off as ' + $json.yourName + '.' }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } }) }}",
+        "options": {}
+      },
+      "id": "b60350e0-5e69-449f-b87d-fdfe7388cd57",
+      "name": "🤖 Gemini: Write Check-In Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -656,
+        1056
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "1jdjTjj9aaTK6i6Y",
+          "name": "Query Auth Gemini kspandian32"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 35000
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResps = $input.all();\nconst clients = $('🔢 Calculate Week Number').all();\nreturn aiResps.map((aiResp, i) => {\n  const client = clients[i]?.json || {};\n  let email = {};\n  try {\n    const raw = aiResp.json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\n    email = JSON.parse(raw.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim());\n  } catch (e) {\n    email = {\n      subject: `Week ${client.weekNumber} Check-In — ${client['serviceRequired']} for ${client['clientCompany']}`,\n      body: `Hi ${client['clientName']},\\n\\nHappy Monday! Here's your Week ${client.weekNumber} update on the ${client['serviceRequired']} project.\\n\\nThis week's focus:\\n- Continuing development on core features\\n- Review session scheduled midweek\\n\\nDo you have any questions or concerns? Happy to hop on a quick call anytime.\\n\\nBest regards`\n    };\n  }\n  const formattedBody = (email.body || '').replace(/\\n/g, '<br>') + `<br><div style=\"display:none!important\">Ref ID: ${client.row_number}</div>`;\n  return { json: { ...client, checkinSubject: email.subject, checkinBody: formattedBody } };\n});"
+      },
+      "id": "2f6e8b48-614d-41a9-bdce-316ada557e77",
+      "name": "🔀 Parse Check-In Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        1056
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "kspandian32@gmail.com",
+        "toEmail": "={{ $json.clientEmail }}",
+        "subject": "={{ $json.checkinSubject }}",
+        "html": "={{ $json.checkinBody }}",
+        "options": {}
+      },
+      "id": "dcf253fe-6a76-4208-9a50-353995cdeb93",
+      "name": "📧 Send Weekly Check-In",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -208,
+        1056
+      ],
+      "webhookId": "16090942-91fc-4e3e-82ef-d6a440a90ffb",
+      "credentials": {
+        "smtp": {
+          "id": "udtIzlJq8iqmL3Az",
+          "name": "SMTP account - kspandian32"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 847410064,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ new Date().toLocaleDateString('en-IN', { year:'numeric', month:'short', day:'numeric' }) }}",
+            "Client": "={{ $('🔀 Parse Check-In Email').item.json.clientName + ' (' + $('🔀 Parse Check-In Email').item.json.clientCompany + ')' }}",
+            "Type": "Weekly Check-In",
+            "Week #": "={{ $('🔢 Calculate Week Number').item.json.weekNumber }}",
+            "Subject": "={{ $('🔀 Parse Check-In Email').item.json.checkinSubject }}",
+            "Sent To": "={{ $('🔀 Parse Check-In Email').item.json.clientEmail }}",
+            "Status": "Sent"
+          },
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Client",
+              "displayName": "Client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Week #",
+              "displayName": "Week #",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sent To",
+              "displayName": "Sent To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3ba931f4-ca73-4881-ba32-b678f383478f",
+      "name": "📝 Log to Communications",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        16,
+        1056
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "AI Lead Gen Machine Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "🏥 New Client Onboarding",
+        "formDescription": "Enter client details and select the service. The system will auto-pull SOPs, deliverables, and timelines from your agency database and generate a complete onboarding package.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Client Full Name",
+              "fieldType": "string",
+              "placeholder": "e.g. Rahul Mehta",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Client Company Name",
+              "fieldType": "string",
+              "placeholder": "e.g. FreshBasket D2C",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Client Email",
+              "fieldType": "string",
+              "placeholder": "client@company.com",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Service Required",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "AI Chatbot Setup"
+                  },
+                  {
+                    "option": "Workflow Automation"
+                  },
+                  {
+                    "option": "AI Voice Agent"
+                  },
+                  {
+                    "option": "Lead Generation System"
+                  },
+                  {
+                    "option": "Content Automation"
+                  },
+                  {
+                    "option": "AI Video Production"
+                  },
+                  {
+                    "option": "AI Customer Support System"
+                  },
+                  {
+                    "option": "Full AI Transformation"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Client Specific Requirements",
+              "fieldType": "textarea",
+              "placeholder": "e.g. Need a chatbot for our Shopify store that handles product queries, recommends items based on preferences, and captures leads. We get ~500 visitors/day.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Agreed Budget (INR)",
+              "fieldType": "string",
+              "placeholder": "e.g. 40000",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Desired Start Date",
+              "fieldType": "string",
+              "placeholder": "e.g. 15 May 2026",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Your Agency Name",
+              "fieldType": "string",
+              "placeholder": "e.g. LanceMart AI",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Your Name",
+              "fieldType": "string",
+              "placeholder": "Your full name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Your Email",
+              "fieldType": "string",
+              "placeholder": "you@agency.com",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "79d653d5-ca67-419c-849b-53dd228ea699",
+      "name": "📋 New Client Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -1328,
+        416
+      ],
+      "webhookId": "81633eb1-2011-4ff8-a1d4-f46c1ec22621"
+    },
+    {
+      "parameters": {
+        "jsCode": "const f = $input.first().json;\nreturn [{ json: {\n  clientName: (f['Client Full Name'] || '').trim(),\n  clientCompany: (f['Client Company Name'] || '').trim(),\n  clientEmail: (f['Client Email'] || '').trim(),\n  serviceRequired: (f['Service Required'] || '').trim(),\n  clientRequirements: (f['Client Specific Requirements'] || '').trim(),\n  budget: (f['Agreed Budget (INR)'] || '').trim(),\n  startDate: (f['Desired Start Date'] || new Date().toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric' })).trim(),\n  agencyName: (f['Your Agency Name'] || '').trim(),\n  yourName: (f['Your Name'] || '').trim(),\n  yourEmail: (f['Your Email'] || '').trim(),\n  timestamp: new Date().toISOString()\n}}];"
+      },
+      "id": "179b7f5c-9045-4098-9ca2-537b3e06ba40",
+      "name": "🔧 Parse Client Details",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 0,
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Service Name",
+              "lookupValue": "={{ $node[\"🔧 Parse Client Details\"].json[\"serviceRequired\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e301fd95-2fff-44d1-ba6d-43e7516ae4f8",
+      "name": "📥 Read Service from Database",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -880,
+        416
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "AI Lead Gen Machine Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge client data with service database data\nconst serviceRow = $input.first().json;\nconst client = $('🔧 Parse Client Details').first().json;\n\nconst service = {\n  id: serviceRow['Service ID'] || '',\n  name: serviceRow['Service Name'] || '',\n  description: serviceRow['Description'] || '',\n  deliverables: (serviceRow['Deliverables'] || '').split('|').map(d => d.trim()).filter(Boolean),\n  sopSteps: (serviceRow['SOP Steps'] || '').split('|').map(s => s.trim()).filter(Boolean),\n  defaultTimeline: serviceRow['Default Timeline'] || '2 Weeks',\n  toolsUsed: serviceRow['Tools Used'] || '',\n  priceRange: serviceRow['Price Range (INR)'] || '',\n  prerequisites: serviceRow['Prerequisites From Client'] || ''\n};\n\nreturn [{ json: { ...client, service } }];"
+      },
+      "id": "270aab7d-72a6-4edb-af92-cc5d7a9d504e",
+      "name": "🔀 Merge Client + Service Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'You are a senior project manager at an AI automation agency. You have been given a service database entry and a new client. Using the EXACT deliverables and SOP steps from the database, create a customized project plan.\\n\\nAGENCY SERVICE DATABASE ENTRY:\\nService: ' + $json.service.name + '\\nDescription: ' + $json.service.description + '\\nStandard Deliverables: ' + $json.service.deliverables.join(', ') + '\\nSOP Steps: ' + $json.service.sopSteps.map((s,i) => (i+1) + '. ' + s).join(', ') + '\\nDefault Timeline: ' + $json.service.defaultTimeline + '\\nTools: ' + $json.service.toolsUsed + '\\nPrerequisites from client: ' + $json.service.prerequisites + '\\n\\nNEW CLIENT:\\nName: ' + $json.clientName + '\\nCompany: ' + $json.clientCompany + '\\nRequirements: ' + $json.clientRequirements + '\\nBudget: INR ' + $json.budget + '\\nStart Date: ' + $json.startDate + '\\nAgency: ' + $json.agencyName + ' (Contact: ' + $json.yourName + ')\\n\\nUsing the EXACT deliverables and SOPs from the database (do NOT invent new ones), generate this JSON:\\n{\\n  \"project_title\": \"Project title for this client\",\\n  \"calculated_timeline\": \"Total duration based on SOP steps complexity\",\\n  \"welcome_message\": \"2-3 sentence warm welcome (under 50 words)\",\\n  \"project_summary\": \"3-4 sentence summary of what will be built for this specific client (under 80 words)\",\\n  \"roadmap\": [\\n    {\"week\": \"Week 1\", \"phase\": \"Discovery and Setup\", \"tasks\": [\"task 1 from SOP\", \"task 2 from SOP\", \"task 3\"], \"deliverables_due\": [\"deliverable 1\", \"deliverable 2\"], \"milestone\": \"Key milestone for this week\"},\\n    {\"week\": \"Week 2\", \"phase\": \"Build and Launch\", \"tasks\": [\"task 4\", \"task 5\", \"task 6\"], \"deliverables_due\": [\"deliverable 3\", \"deliverable 4\"], \"milestone\": \"Key milestone for this week\"}\\n  ],\\n  \"deliverables_with_dates\": [\\n    {\"name\": \"Exact deliverable from database\", \"description\": \"1-line description customized for this client\", \"due_week\": \"Week X\", \"owner\": \"Agency or Client\"}\\n  ],\\n  \"sop_for_client\": [\\n    {\"step\": 1, \"title\": \"SOP step from database\", \"description\": \"What happens in this step customized for this client\", \"duration\": \"X days\", \"client_action_needed\": \"What client needs to do (or None)\"}\\n  ],\\n  \"prerequisites_checklist\": [\"Item 1 client must provide before we start\", \"Item 2\"],\\n  \"communication_plan\": {\"kickoff\": \"When and how\", \"updates\": \"Frequency and format\", \"reviews\": \"When client reviews happen\", \"escalation\": \"How to handle urgent issues\"},\\n  \"payment_schedule\": [{\"milestone\": \"Payment milestone\", \"percentage\": \"X%\", \"amount\": \"INR X\", \"due\": \"When\"}],\\n  \"tools_access_needed\": [\"Tool 1 - what access is needed\", \"Tool 2\"],\\n  \"success_metrics\": [\"How we will measure success metric 1\", \"Metric 2\"],\\n  \"warranty_and_support\": \"Post-launch support terms (from database timeline)\",\\n  \"next_immediate_step\": \"The very first thing that happens after this email (schedule kickoff call)\"\\n}\\n\\nCRITICAL ROADMAP RULE: The roadmap array MUST have EXACTLY one entry per week matching the Default Timeline. If Default Timeline is 2 Weeks then create exactly 2 roadmap entries (Week 1 and Week 2). If 3 Weeks then create exactly 3 entries. If 4 Weeks then exactly 4 entries. If 8 Weeks then exactly 8 entries. Distribute ALL SOP steps and deliverables evenly across ALL weeks. Every single SOP step must appear in at least one week. Every deliverable must be assigned to a specific week. No week should be empty. Each week must have a unique phase name describing what happens that week.\\n\\nIMPORTANT: Use the EXACT deliverables and SOP steps from the database. Customize descriptions for this client but do not add or remove deliverables. Return ONLY valid JSON. No markdown, no backticks.' }] }], generationConfig: { temperature: 0.6, maxOutputTokens: 8192 } }) }}",
+        "options": {}
+      },
+      "id": "a3818bc9-0497-43e3-ba45-beb2ec7e36ae",
+      "name": "🤖 Gemini: Build Project Plan from SOPs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -432,
+        416
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "1jdjTjj9aaTK6i6Y",
+          "name": "Query Auth Gemini kspandian32"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 35000
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResp = $input.first().json;\nconst prev = $('🔀 Merge Client + Service Data').first().json;\n\nlet plan = {};\ntry {\n  const raw = aiResp?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\n  plan = JSON.parse(raw.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim());\n} catch (e) {\n  // Fallback using database data directly\n  const s = prev.service;\n  plan = {\n    project_title: `${s.name} for ${prev.clientCompany}`,\n    calculated_timeline: s.defaultTimeline,\n    welcome_message: `Welcome to ${prev.agencyName}! We are excited to build your ${s.name} solution.`,\n    project_summary: `We will ${s.description} for ${prev.clientCompany}. ${prev.clientRequirements}`,\n    roadmap: [{ week: 'Week 1', phase: 'Discovery & Setup', tasks: s.sopSteps.slice(0,4), deliverables_due: s.deliverables.slice(0,3), milestone: 'Project kickoff complete' }],\n    deliverables_with_dates: s.deliverables.map((d, i) => ({ name: d, description: d, due_week: `Week ${Math.ceil((i+1) / 3)}`, owner: 'Agency' })),\n    sop_for_client: s.sopSteps.map((step, i) => ({ step: i+1, title: step, description: step, duration: '2-3 days', client_action_needed: 'None' })),\n    prerequisites_checklist: s.prerequisites.split(' and ').map(p => p.trim()),\n    communication_plan: { kickoff: 'Within 2 days', updates: 'Weekly on Monday', reviews: 'End of each phase', escalation: 'Email with URGENT in subject' },\n    payment_schedule: [{ milestone: 'Project Start', percentage: '50%', amount: `INR ${Math.round(parseInt(prev.budget)/2)}`, due: 'Before kickoff' }, { milestone: 'Project Completion', percentage: '50%', amount: `INR ${Math.round(parseInt(prev.budget)/2)}`, due: 'On delivery' }],\n    tools_access_needed: s.toolsUsed.split(' and ').map(t => t.trim()),\n    success_metrics: ['Project delivered on time', 'All deliverables approved by client', 'Client satisfaction score above 8/10'],\n    warranty_and_support: '14-day post-launch support included',\n    next_immediate_step: 'Schedule kickoff call within 48 hours'\n  };\n}\n\nreturn [{ json: { ...prev, plan } }];"
+      },
+      "id": "60c99e8a-0867-4034-ba49-e9ab22c1d945",
+      "name": "🔀 Parse Project Plan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1994705565,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "clientName",
+              "displayName": "clientName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "clientCompany",
+              "displayName": "clientCompany",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "clientEmail",
+              "displayName": "clientEmail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "serviceRequired",
+              "displayName": "serviceRequired",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "clientRequirements",
+              "displayName": "clientRequirements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "budget",
+              "displayName": "budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "agencyName",
+              "displayName": "agencyName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "yourName",
+              "displayName": "yourName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "yourEmail",
+              "displayName": "yourEmail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "startDate",
+              "displayName": "startDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "service",
+              "displayName": "service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "plan",
+              "displayName": "plan",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8a569a48-d396-46a4-879d-5d29b92f3304",
+      "name": "📊 Log Client Summary",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        16,
+        224
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "AI Lead Gen Machine Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Expand deliverables into individual rows for tracking\nconst d = $input.first().json;\nconst deliverables = d.plan.deliverables_with_dates || [];\nconst client = `${d.clientName} (${d.clientCompany})`;\n\nif (deliverables.length === 0) return [];\n\nreturn deliverables.map(del => ({ json: {\n  Client: client,\n  Company: d.clientCompany,\n  Email: d.clientEmail,\n  Service: d.service.name,\n  Deliverable: del.name || '',\n  Description: del.description || '',\n  'Due Date': del.due_week || '',\n  Week: del.due_week || '',\n  Owner: del.owner || 'Agency',\n  Status: 'Not Started',\n  'Client Approval': 'Pending',\n  Notes: '',\n  'Onboarded At': d.timestamp\n} }));"
+      },
+      "id": "1533dbf2-c3b7-4f6f-8032-3b7278d02193",
+      "name": "📊 Expand Deliverables",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 755310524,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Company": "={{ $json.Company }}",
+            "Email": "={{ $json.Email }}",
+            "Service": "={{ $json.Service }}",
+            "Status": "={{ $json.Status }}",
+            "Onboarded At": "={{ $json.timestamp }}",
+            "Client": "={{ $json.Client }}",
+            "Deliverable": "={{ $json.Deliverable }}",
+            "Description": "={{ $('🔀 Parse Project Plan').item.json.service.description }}",
+            "Week": "={{ $json.Week }}",
+            "Owner": "={{ $json.Owner }}",
+            "Client Approval": "={{ $json['Client Approval'] }}",
+            "Notes": "={{ $json.Notes }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Client",
+              "displayName": "Client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service",
+              "displayName": "Service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Deliverable",
+              "displayName": "Deliverable",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Week",
+              "displayName": "Week",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Owner",
+              "displayName": "Owner",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Client Approval",
+              "displayName": "Client Approval",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Onboarded At",
+              "displayName": "Onboarded At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "4f076fb8-a06b-44f8-ad4d-1b0dce352c11",
+      "name": "📝 Log Deliverables Tracker",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        416
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "AI Lead Gen Machine Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $('🔀 Parse Project Plan').first().json;\nconst p = d.plan;\nconst s = d.service;\n\nconst colors = {\n  bg: '#0d1117', card: '#161b22', border: '#1e293b',\n  orange: '#f97316', blue: '#2563eb', teal: '#0d9488',\n  green: '#22c55e', purple: '#8b5cf6', yellow: '#f59e0b',\n  pink: '#ec4899', cyan: '#06b6d4', red: '#ef4444',\n  white: '#ffffff', light: '#e2e8f0', gray: '#94a3b8', darkGray: '#475569'\n};\n\nconst weekColors = [colors.orange, colors.blue, colors.teal, colors.green, colors.purple, colors.yellow, colors.pink, colors.cyan];\n\n// ═══════════════════════════════════════════\n// VISUAL ROADMAP TIMELINE\n// ═══════════════════════════════════════════\nconst roadmap = p.roadmap || [];\nconst totalWeeks = roadmap.length;\n\nconst timelineHTML = roadmap.map((w, i) => {\n  const clr = weekColors[i % weekColors.length];\n  const isLast = i === totalWeeks - 1;\n  const progressPct = Math.round(((i + 1) / totalWeeks) * 100);\n  return '<table style=\"width:100%;border-collapse:collapse;margin:0;\"><tr>' +\n    '<td style=\"width:48px;vertical-align:top;padding:0;\">' +\n      '<table style=\"border-collapse:collapse;margin:0 auto;\"><tr><td style=\"text-align:center;\">' +\n        '<div style=\"width:36px;height:36px;border-radius:50%;background:' + clr + ';color:#fff;text-align:center;line-height:36px;font-size:14px;font-weight:800;margin:0 auto;\">' + (i + 1) + '</div>' +\n        (!isLast ? '<div style=\"width:3px;height:80px;background:linear-gradient(' + clr + ',' + weekColors[(i+1) % weekColors.length] + ');margin:0 auto;\"></div>' : '') +\n      '</td></tr></table>' +\n    '</td>' +\n    '<td style=\"vertical-align:top;padding:0 0 16px 12px;\">' +\n      '<div style=\"background:' + colors.card + ';border-radius:8px;padding:14px 16px;border:1px solid ' + colors.border + ';border-left:3px solid ' + clr + ';\">' +\n        '<table style=\"width:100%;border-collapse:collapse;\"><tr>' +\n          '<td><h4 style=\"margin:0 0 2px;color:' + clr + ';font-size:15px;font-weight:700;\">' + w.week + '</h4>' +\n          '<p style=\"margin:0 0 8px;color:' + colors.white + ';font-size:13px;font-weight:600;\">' + w.phase + '</p></td>' +\n          '<td style=\"text-align:right;vertical-align:top;\"><span style=\"background:' + clr + '22;color:' + clr + ';padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;\">' + progressPct + '% Complete</span></td>' +\n        '</tr></table>' +\n        '<div style=\"margin:8px 0;\">' +\n          (w.tasks || []).map(task => \n            '<span style=\"display:inline-block;background:' + colors.bg + ';color:' + colors.light + ';padding:4px 10px;border-radius:4px;font-size:11px;margin:2px 4px 2px 0;border:1px solid ' + colors.border + ';\">' + task + '</span>'\n          ).join('') +\n        '</div>' +\n        '<table style=\"width:100%;border-collapse:collapse;margin:6px 0 0;\"><tr>' +\n          '<td style=\"padding:6px 0 0;border-top:1px solid ' + colors.border + ';\">' +\n            '<span style=\"color:' + colors.gray + ';font-size:11px;\">📦 Deliverables: </span>' +\n            '<span style=\"color:' + colors.light + ';font-size:11px;\">' + (w.deliverables_due || []).join(' • ') + '</span>' +\n          '</td>' +\n        '</tr><tr>' +\n          '<td style=\"padding:4px 0 0;\">' +\n            '<span style=\"color:' + colors.green + ';font-size:11px;\">🏁 ' + (w.milestone || '') + '</span>' +\n          '</td>' +\n        '</tr></table>' +\n      '</div>' +\n    '</td>' +\n  '</tr></table>';\n}).join('');\n\n// ═══════════════════════════════════════════\n// VISUAL WORKFLOW DIAGRAM\n// ═══════════════════════════════════════════\nconst sopSteps = p.sop_for_client || [];\nconst totalSteps = sopSteps.length;\nconst phaseSize = Math.ceil(totalSteps / 3);\nconst phases = [\n  { name: 'DISCOVERY', icon: '🔍', color: colors.blue, steps: sopSteps.slice(0, phaseSize) },\n  { name: 'BUILD', icon: '⚙️', color: colors.orange, steps: sopSteps.slice(phaseSize, phaseSize * 2) },\n  { name: 'DELIVER', icon: '🚀', color: colors.green, steps: sopSteps.slice(phaseSize * 2) }\n];\n\nconst workflowDiagramHTML = '<table style=\"width:100%;border-collapse:collapse;\">' +\n  '<tr>' +\n  phases.map(ph => \n    '<td style=\"width:33.3%;text-align:center;padding:8px 4px;\">' +\n      '<div style=\"background:' + ph.color + '22;border:2px solid ' + ph.color + ';border-radius:12px;padding:12px 8px;\">' +\n        '<div style=\"font-size:24px;margin:0 0 4px;\">' + ph.icon + '</div>' +\n        '<div style=\"color:' + ph.color + ';font-size:13px;font-weight:800;letter-spacing:1px;\">' + ph.name + '</div>' +\n      '</div>' +\n    '</td>'\n  ).join('<td style=\"width:0;padding:8px 0;vertical-align:middle;text-align:center;\"><span style=\"color:' + colors.orange + ';font-size:20px;\">→</span></td>') +\n  '</tr>' +\n  '<tr>' +\n  phases.map(ph =>\n    '<td style=\"vertical-align:top;padding:4px;\">' +\n      ph.steps.map(step =>\n        '<div style=\"background:' + colors.bg + ';border-radius:6px;padding:8px 10px;margin:4px 0;border:1px solid ' + colors.border + ';\">' +\n          '<table style=\"width:100%;border-collapse:collapse;\"><tr>' +\n            '<td style=\"width:24px;vertical-align:top;\"><span style=\"color:' + ph.color + ';font-weight:bold;font-size:12px;\">' + step.step + '.</span></td>' +\n            '<td><span style=\"color:' + colors.light + ';font-size:11px;\">' + step.title + '</span></td>' +\n          '</tr></table>' +\n        '</div>'\n      ).join('') +\n    '</td>'\n  ).join('<td style=\"width:0;\"></td>') +\n  '</tr></table>';\n\n// ═══════════════════════════════════════════\n// PROGRESS BAR\n// ═══════════════════════════════════════════\nconst progressBarHTML = '<table style=\"width:100%;border-collapse:collapse;margin:0 0 20px;\">' +\n  '<tr><td style=\"padding:0 0 6px;\"><table style=\"width:100%;border-collapse:collapse;\"><tr>' +\n    '<td style=\"color:' + colors.gray + ';font-size:12px;\">Project Start</td>' +\n    '<td style=\"text-align:center;color:' + colors.orange + ';font-size:12px;font-weight:600;\">' + p.calculated_timeline + '</td>' +\n    '<td style=\"text-align:right;color:' + colors.green + ';font-size:12px;\">🎯 Launch</td>' +\n  '</tr></table></td></tr>' +\n  '<tr><td style=\"padding:0;\">' +\n    '<div style=\"background:' + colors.border + ';border-radius:6px;height:10px;overflow:hidden;\">' +\n      '<div style=\"background:linear-gradient(90deg,' + colors.orange + ',' + colors.yellow + ',' + colors.green + ');height:10px;width:8%;border-radius:6px;\"></div>' +\n    '</div>' +\n  '</td></tr>' +\n  '<tr><td style=\"padding:4px 0 0;\"><table style=\"width:100%;border-collapse:collapse;\"><tr>' +\n    roadmap.map((w, i) => {\n      const clr = weekColors[i % weekColors.length];\n      return '<td style=\"text-align:center;\"><span style=\"color:' + clr + ';font-size:10px;font-weight:600;\">W' + (i+1) + '</span></td>';\n    }).join('') +\n  '</tr></table></td></tr></table>';\n\n// ═══════════════════════════════════════════\n// SOP SECTION (Built BEFORE email assembly)\n// ═══════════════════════════════════════════\nconst sopTableHTML = (p.sop_for_client || []).map((step, i) => {\n  const clr = weekColors[i % weekColors.length];\n  const hasClientAction = step.client_action_needed && step.client_action_needed !== 'None';\n  return '<table style=\"width:100%;border-collapse:collapse;margin:0 0 8px;\"><tr>' +\n    '<td style=\"background:' + colors.bg + ';border-radius:8px;padding:14px;border:1px solid ' + colors.border + ';\">' +\n      '<table style=\"width:100%;border-collapse:collapse;\"><tr>' +\n        '<td style=\"width:40px;vertical-align:top;\">' +\n          '<div style=\"width:32px;height:32px;background:' + clr + ';border-radius:50%;text-align:center;line-height:32px;color:#fff;font-size:14px;font-weight:800;\">' + step.step + '</div>' +\n        '</td>' +\n        '<td style=\"vertical-align:top;padding-left:12px;\">' +\n          '<p style=\"color:' + colors.white + ';font-size:14px;font-weight:700;margin:0 0 4px;\">' + step.title + '</p>' +\n          '<p style=\"color:' + colors.gray + ';font-size:12px;line-height:1.6;margin:0 0 6px;\">' + step.description + '</p>' +\n          '<table style=\"border-collapse:collapse;\"><tr>' +\n            '<td style=\"padding-right:16px;\"><span style=\"color:' + colors.teal + ';font-size:11px;\">⏱ ' + step.duration + '</span></td>' +\n            (hasClientAction ? '<td><span style=\"background:' + colors.yellow + '22;color:' + colors.yellow + ';padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;\">👤 Client: ' + step.client_action_needed + '</span></td>' : '') +\n          '</tr></table>' +\n        '</td>' +\n      '</tr></table>' +\n    '</td>' +\n  '</tr></table>';\n}).join('');\n\n// ═══════════════════════════════════════════\n// DELIVERABLES TABLE\n// ═══════════════════════════════════════════\nconst delHTML = (p.deliverables_with_dates || []).map((del, i) => {\n  const clr = weekColors[i % weekColors.length];\n  return '<tr style=\"border-bottom:1px solid ' + colors.border + ';\">' +\n    '<td style=\"padding:10px 12px;\"><table style=\"border-collapse:collapse;\"><tr>' +\n      '<td style=\"width:24px;vertical-align:top;\"><div style=\"width:20px;height:20px;border:2px solid ' + clr + ';border-radius:4px;text-align:center;line-height:18px;font-size:10px;color:' + clr + ';\">☐</div></td>' +\n      '<td style=\"padding-left:8px;\"><span style=\"color:' + colors.white + ';font-size:13px;font-weight:600;\">' + del.name + '</span><br>' +\n        '<span style=\"color:' + colors.gray + ';font-size:11px;\">' + del.description + '</span></td>' +\n    '</tr></table></td>' +\n    '<td style=\"padding:10px 12px;text-align:center;\"><span style=\"background:' + clr + '22;color:' + clr + ';padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;\">' + del.due_week + '</span></td>' +\n    '<td style=\"padding:10px 12px;color:' + colors.gray + ';font-size:12px;text-align:center;\">' + del.owner + '</td>' +\n  '</tr>';\n}).join('');\n\n// ═══════════════════════════════════════════\n// PREREQUISITES\n// ═══════════════════════════════════════════\nconst prereqHTML = (p.prerequisites_checklist || []).map((item, i) =>\n  '<tr><td style=\"padding:10px 12px;border-bottom:1px solid ' + colors.border + ';\">' +\n    '<table style=\"border-collapse:collapse;\"><tr>' +\n      '<td style=\"width:28px;vertical-align:top;\"><div style=\"width:22px;height:22px;border:2px solid ' + colors.purple + ';border-radius:50%;text-align:center;line-height:20px;font-size:10px;color:' + colors.purple + ';\">' + (i+1) + '</div></td>' +\n      '<td style=\"padding-left:8px;color:' + colors.light + ';font-size:13px;\">' + item + '</td>' +\n    '</tr></table>' +\n  '</td></tr>'\n).join('');\n\n// ═══════════════════════════════════════════\n// PAYMENT SCHEDULE\n// ═══════════════════════════════════════════\nconst paymentHTML = (p.payment_schedule || []).map((pay, i) => {\n  const pct = parseInt(pay.percentage) || 50;\n  const clr = i === 0 ? colors.orange : colors.green;\n  return '<tr style=\"border-bottom:1px solid ' + colors.border + ';\">' +\n    '<td style=\"padding:12px;\"><span style=\"color:' + colors.white + ';font-size:13px;font-weight:600;\">' + pay.milestone + '</span><br>' +\n      '<span style=\"color:' + colors.gray + ';font-size:11px;\">' + pay.due + '</span></td>' +\n    '<td style=\"padding:12px;text-align:center;\">' +\n      '<div style=\"background:' + colors.border + ';border-radius:4px;height:8px;width:100px;display:inline-block;overflow:hidden;\">' +\n        '<div style=\"background:' + clr + ';height:8px;width:' + pct + '%;border-radius:4px;\"></div>' +\n      '</div>' +\n      '<br><span style=\"color:' + clr + ';font-size:12px;font-weight:700;\">' + pay.percentage + '</span>' +\n    '</td>' +\n    '<td style=\"padding:12px;text-align:right;\"><span style=\"color:' + colors.green + ';font-size:15px;font-weight:800;\">' + pay.amount + '</span></td>' +\n  '</tr>';\n}).join('');\n\n// ═══════════════════════════════════════════\n// COMMUNICATION PLAN\n// ═══════════════════════════════════════════\nconst comm = p.communication_plan || {};\nconst commItems = [\n  { icon: '📞', label: 'Kickoff', value: comm.kickoff || '', color: colors.blue },\n  { icon: '📊', label: 'Updates', value: comm.updates || '', color: colors.orange },\n  { icon: '🔍', label: 'Reviews', value: comm.reviews || '', color: colors.teal },\n  { icon: '🚨', label: 'Escalation', value: comm.escalation || '', color: colors.red }\n];\n\nconst commHTML = '<table style=\"width:100%;border-collapse:collapse;\"><tr>' +\n  commItems.map(c =>\n    '<td style=\"width:25%;padding:4px;vertical-align:top;\">' +\n      '<div style=\"background:' + colors.bg + ';border-radius:8px;padding:12px 8px;text-align:center;border:1px solid ' + colors.border + ';min-height:80px;\">' +\n        '<div style=\"font-size:20px;margin:0 0 6px;\">' + c.icon + '</div>' +\n        '<div style=\"color:' + c.color + ';font-size:11px;font-weight:700;margin:0 0 4px;\">' + c.label + '</div>' +\n        '<div style=\"color:' + colors.light + ';font-size:11px;\">' + c.value + '</div>' +\n      '</div>' +\n    '</td>'\n  ).join('') +\n'</tr></table>';\n\n// ═══════════════════════════════════════════\n// SUCCESS METRICS\n// ═══════════════════════════════════════════\nconst metricsHTML = (p.success_metrics || []).map(m =>\n  '<tr><td style=\"padding:8px 12px;border-bottom:1px solid ' + colors.border + ';\">' +\n    '<table style=\"border-collapse:collapse;\"><tr>' +\n      '<td style=\"width:28px;vertical-align:top;\"><div style=\"width:22px;height:22px;background:' + colors.green + '22;border-radius:50%;text-align:center;line-height:22px;font-size:12px;\">✓</div></td>' +\n      '<td style=\"padding-left:8px;color:' + colors.light + ';font-size:13px;\">' + m + '</td>' +\n    '</tr></table>' +\n  '</td></tr>'\n).join('');\n\n// ═══════════════════════════════════════════\n// SECTION BUILDER\n// ═══════════════════════════════════════════\nconst section = (icon, title, content, borderColor) =>\n  '<div style=\"margin-bottom:20px;\"><div style=\"background:' + colors.card + ';border-radius:10px;overflow:hidden;border:1px solid ' + colors.border + ';\">' +\n  '<div style=\"background:linear-gradient(135deg,' + borderColor + ' 0%,' + borderColor + '99 100%);padding:14px 18px;\">' +\n  '<h2 style=\"margin:0;color:' + colors.white + ';font-size:15px;font-weight:700;\">' + icon + '  ' + title + '</h2></div>' +\n  '<div style=\"padding:18px;\">' + content + '</div></div></div>';\n\n// ═══════════════════════════════════════════\n// ASSEMBLE THE COMPLETE EMAIL\n// ═══════════════════════════════════════════\nconst clientEmail = '<div style=\"background:' + colors.bg + ';padding:0;font-family:Segoe UI,Arial,sans-serif;max-width:720px;margin:0 auto;\">' +\n\n'<div style=\"background:linear-gradient(135deg,#f97316 0%,#ea580c 50%,#dc2626 100%);padding:36px 28px;text-align:center;border-radius:10px 10px 0 0;\">' +\n'<div style=\"font-size:40px;margin:0 0 8px;\">🚀</div>' +\n'<h1 style=\"margin:0;color:' + colors.white + ';font-size:24px;font-weight:800;letter-spacing:-0.5px;\">Welcome to ' + d.agencyName + '</h1>' +\n'<p style=\"margin:8px 0 0;color:#fed7aa;font-size:15px;\">' + (p.project_title || '') + '</p>' +\n'<div style=\"margin:16px auto 0;width:60px;height:3px;background:#ffffff44;border-radius:2px;\"></div>' +\n'</div>' +\n\n'<div style=\"background:' + colors.card + ';padding:28px;border:1px solid ' + colors.border + ';border-top:none;\">' +\n\n'<p style=\"color:' + colors.light + ';font-size:16px;line-height:1.7;margin:0 0 8px;\">Dear ' + d.clientName + ',</p>' +\n'<p style=\"color:' + colors.light + ';font-size:15px;line-height:1.7;margin:0 0 16px;\">' + (p.welcome_message || '') + '</p>' +\n'<p style=\"color:' + colors.gray + ';font-size:14px;line-height:1.7;margin:0 0 24px;\">' + (p.project_summary || '') + '</p>' +\n\n'<div style=\"background:' + colors.bg + ';border-radius:10px;padding:18px;margin:0 0 24px;border:1px solid ' + colors.border + ';\">' +\n'<table style=\"width:100%;border-collapse:collapse;\">' +\n'<tr><td style=\"padding:6px 0;color:' + colors.gray + ';width:120px;font-size:13px;\">📌 Service</td><td style=\"padding:6px 0;color:' + colors.white + ';font-weight:700;font-size:14px;\">' + s.name + '</td></tr>' +\n'<tr><td style=\"padding:6px 0;color:' + colors.gray + ';font-size:13px;\">⏱ Timeline</td><td style=\"padding:6px 0;color:' + colors.white + ';font-size:14px;\">' + (p.calculated_timeline || '') + '</td></tr>' +\n'<tr><td style=\"padding:6px 0;color:' + colors.gray + ';font-size:13px;\">📅 Start Date</td><td style=\"padding:6px 0;color:' + colors.white + ';font-size:14px;\">' + d.startDate + '</td></tr>' +\n'<tr><td style=\"padding:6px 0;color:' + colors.gray + ';font-size:13px;\">💰 Investment</td><td style=\"padding:6px 0;color:' + colors.green + ';font-weight:800;font-size:16px;\">INR ' + d.budget + '</td></tr>' +\n'<tr><td style=\"padding:6px 0;color:' + colors.gray + ';font-size:13px;\">🛠 Tools</td><td style=\"padding:6px 0;color:' + colors.light + ';font-size:13px;\">' + s.toolsUsed.replace(/ and /g, ', ') + '</td></tr>' +\n'</table></div>' +\n\nprogressBarHTML +\n\nsection('📅', 'PROJECT ROADMAP', timelineHTML, colors.orange) +\n\nsection('⚙️', 'HOW WE BUILD YOUR ' + s.name.toUpperCase(), workflowDiagramHTML, colors.blue) +\n\nsection('📋', 'STANDARD OPERATING PROCEDURE', sopTableHTML, colors.teal) +\n\nsection('📦', 'DELIVERABLES & TIMELINE', \n  '<table style=\"width:100%;border-collapse:collapse;\">' +\n  '<tr style=\"border-bottom:2px solid ' + colors.orange + ';\">' +\n    '<th style=\"text-align:left;padding:10px 12px;color:' + colors.orange + ';font-size:12px;font-weight:700;\">DELIVERABLE</th>' +\n    '<th style=\"text-align:center;padding:10px 12px;color:' + colors.orange + ';font-size:12px;font-weight:700;\">DUE</th>' +\n    '<th style=\"text-align:center;padding:10px 12px;color:' + colors.orange + ';font-size:12px;font-weight:700;\">OWNER</th>' +\n  '</tr>' + delHTML + '</table>', colors.teal) +\n\nsection('✅', 'WHAT WE NEED FROM YOU', '<table style=\"width:100%;border-collapse:collapse;\">' + prereqHTML + '</table><p style=\"color:' + colors.yellow + ';font-size:12px;margin:12px 0 0;font-style:italic;\">⚡ Please share these before the kickoff call for a smooth start.</p>', colors.purple) +\n\nsection('💰', 'PAYMENT SCHEDULE', '<table style=\"width:100%;border-collapse:collapse;\">' + paymentHTML + '</table>', colors.green) +\n\nsection('💬', 'COMMUNICATION PLAN', commHTML, colors.yellow) +\n\nsection('📊', 'HOW WE MEASURE SUCCESS', '<table style=\"width:100%;border-collapse:collapse;\">' + metricsHTML + '</table>', colors.cyan) +\n\nsection('🛡️', 'WARRANTY & SUPPORT', '<p style=\"color:' + colors.light + ';font-size:14px;line-height:1.7;margin:0;\">' + (p.warranty_and_support || '') + '</p>', '#64748b') +\n\n'<div style=\"background:linear-gradient(135deg,' + colors.green + '22 0%,' + colors.teal + '22 100%);border-radius:10px;padding:20px;margin:20px 0;border:2px solid ' + colors.green + ';text-align:center;\">' +\n'<div style=\"font-size:28px;margin:0 0 8px;\">🚀</div>' +\n'<h3 style=\"margin:0 0 8px;color:' + colors.green + ';font-size:16px;font-weight:800;\">NEXT IMMEDIATE STEP</h3>' +\n'<p style=\"color:' + colors.light + ';font-size:14px;margin:0;\">' + (p.next_immediate_step || '') + '</p></div>' +\n\n'<div style=\"margin:24px 0 0;padding:20px 0 0;border-top:1px solid ' + colors.border + ';\">' +\n'<p style=\"color:' + colors.light + ';font-size:15px;line-height:1.7;margin:0 0 12px;\">We are genuinely excited about this partnership and committed to delivering exceptional results for ' + d.clientCompany + '.</p>' +\n'<table style=\"border-collapse:collapse;\"><tr>' +\n'<td style=\"padding-right:14px;vertical-align:top;\">' +\n  '<div style=\"width:48px;height:48px;background:' + colors.orange + ';border-radius:50%;text-align:center;line-height:48px;color:#fff;font-size:20px;font-weight:800;\">' + d.yourName.charAt(0).toUpperCase() + '</div>' +\n'</td>' +\n'<td style=\"vertical-align:top;\">' +\n  '<p style=\"margin:0;color:' + colors.orange + ';font-size:15px;font-weight:700;\">' + d.yourName + '</p>' +\n  '<p style=\"margin:2px 0 0;color:' + colors.gray + ';font-size:13px;\">' + d.agencyName + '</p>' +\n  '<p style=\"margin:2px 0 0;color:' + colors.blue + ';font-size:12px;\">' + d.yourEmail + '</p>' +\n'</td></tr></table></div>' +\n\n'</div>' +\n\n'<div style=\"background:' + colors.bg + ';padding:14px;text-align:center;border-radius:0 0 10px 10px;border:1px solid ' + colors.border + ';border-top:none;\">' +\n'<p style=\"color:' + colors.darkGray + ';font-size:11px;margin:0;\">' + d.agencyName + ' • Crafted with AI • ' + d.startDate + '</p>' +\n'</div>' +\n\n'</div>';\n\nreturn [{ json: { ...d, clientEmailHTML: clientEmail } }];"
+      },
+      "id": "3a391915-26ea-4bdf-9e4b-405f7935a512",
+      "name": "📝 Build HTML Client Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "kspandian32@gmail.com",
+        "toEmail": "={{ $json.clientEmail }}",
+        "subject": "={{ '🚀 Welcome to ' + $json.agencyName + ' — ' + $json.plan.project_title + ' | Project Roadmap & Onboarding' }}",
+        "html": "={{ $json.clientEmailHTML }}",
+        "options": {
+          "replyTo": "={{ $json.yourEmail }}"
+        }
+      },
+      "id": "62904e0c-15a0-44aa-8a6e-893498dcaa27",
+      "name": "📧 Send Onboarding Email to Client",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        608
+      ],
+      "webhookId": "b08bb302-1fca-48a7-ac61-7ac2007e7956",
+      "credentials": {
+        "smtp": {
+          "id": "udtIzlJq8iqmL3Az",
+          "name": "SMTP account - kspandian32"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "kspandian32@gmail.com",
+        "toEmail": "kspandian32@gmail.com",
+        "subject": "={{ '🏥 Client Onboarded: ' + $('🔀 Parse Project Plan').first().json.clientName + ' (' + $('🔀 Parse Project Plan').first().json.clientCompany + ') — ' + $('🔀 Parse Project Plan').first().json.service.name }}",
+        "html": "={{ (function() {\nconst d = $('🔀 Parse Project Plan').first().json;\nconst p = d.plan;\nconst s = d.service;\nconst delCount = (p.deliverables_with_dates || []).length;\n\nconst delRows = (p.deliverables_with_dates || []).map((del, i) =>\n  '<tr style=\"border-bottom:1px solid #1e293b;\"><td style=\"padding:8px 12px;color:#e2e8f0;font-size:13px;\">' + (i+1) + '. ' + del.name + '</td><td style=\"padding:8px 12px;color:#f97316;font-size:13px;\">' + del.due_week + '</td><td style=\"padding:8px 12px;color:#94a3b8;font-size:13px;\">' + del.owner + '</td></tr>'\n).join('');\n\nconst sopRows = (p.sop_for_client || []).map(step =>\n  '<tr style=\"border-bottom:1px solid #1e293b;\"><td style=\"padding:8px 12px;color:#2563eb;font-weight:bold;font-size:13px;width:40px;\">' + step.step + '</td><td style=\"padding:8px 12px;color:#e2e8f0;font-size:13px;\">' + step.title + '</td><td style=\"padding:8px 12px;color:#94a3b8;font-size:12px;\">' + step.duration + '</td></tr>'\n).join('');\n\nconst payRows = (p.payment_schedule || []).map(pay =>\n  '<tr style=\"border-bottom:1px solid #1e293b;\"><td style=\"padding:8px 12px;color:#e2e8f0;font-size:13px;\">' + pay.milestone + '</td><td style=\"padding:8px 12px;color:#f97316;font-size:13px;\">' + pay.percentage + '</td><td style=\"padding:8px 12px;color:#22c55e;font-weight:bold;font-size:13px;\">' + pay.amount + '</td></tr>'\n).join('');\n\nconst prereqs = (p.prerequisites_checklist || []).map(item =>\n  '<tr><td style=\"padding:6px 12px;color:#e2e8f0;font-size:13px;border-bottom:1px solid #1e293b;\">☐ ' + item + '</td></tr>'\n).join('');\n\nconst comm = p.communication_plan || {};\n\nreturn '<div style=\"background:#0d1117;padding:0;font-family:Segoe UI,Arial,sans-serif;max-width:700px;margin:0 auto;\">' +\n\n'<div style=\"background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);padding:24px;text-align:center;border-radius:8px 8px 0 0;\">' +\n'<p style=\"margin:0 0 4px;color:#93c5fd;font-size:12px;letter-spacing:2px;\">⚡ AGENCY INTERNAL COPY</p>' +\n'<h1 style=\"margin:0;color:#ffffff;font-size:20px;font-weight:800;\">Client Onboarded: ' + d.clientName + '</h1>' +\n'<p style=\"margin:6px 0 0;color:#bfdbfe;font-size:14px;\">' + d.clientCompany + ' — ' + s.name + '</p>' +\n'</div>' +\n\n'<div style=\"background:#161b22;padding:20px;border:1px solid #1e293b;border-top:none;\">' +\n\n'<div style=\"background:#0d1117;border-radius:8px;padding:14px;margin:0 0 16px;border:1px solid #22c55e;\">' +\n'<p style=\"color:#22c55e;font-weight:700;font-size:14px;margin:0 0 8px;\">✅ ONBOARDING STATUS</p>' +\n'<table style=\"width:100%;border-collapse:collapse;\">' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Welcome email sent to</td><td style=\"padding:4px 0;color:#22c55e;font-size:13px;font-weight:600;\">' + d.clientEmail + '</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Client logged to</td><td style=\"padding:4px 0;color:#e2e8f0;font-size:13px;\">Summary tab ✅</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Deliverables tracked</td><td style=\"padding:4px 0;color:#e2e8f0;font-size:13px;\">' + delCount + ' deliverables in Projects tab ✅</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Onboarded at</td><td style=\"padding:4px 0;color:#e2e8f0;font-size:13px;\">' + d.startDate + '</td></tr>' +\n'</table></div>' +\n\n'<div style=\"background:#0d1117;border-radius:8px;padding:14px;margin:0 0 16px;border-left:4px solid #f97316;\">' +\n'<h3 style=\"margin:0 0 8px;color:#f97316;font-size:14px;\">📊 PROJECT OVERVIEW</h3>' +\n'<table style=\"width:100%;border-collapse:collapse;\">' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;width:120px;font-size:13px;\">Client</td><td style=\"padding:4px 0;color:#fff;font-weight:600;font-size:13px;\">' + d.clientName + ' (' + d.clientCompany + ')</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Email</td><td style=\"padding:4px 0;color:#2563eb;font-size:13px;\">' + d.clientEmail + '</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Service</td><td style=\"padding:4px 0;color:#fff;font-size:13px;\">' + s.name + '</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Scope</td><td style=\"padding:4px 0;color:#e2e8f0;font-size:12px;\">' + d.clientRequirements + '</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Budget</td><td style=\"padding:4px 0;color:#22c55e;font-weight:700;font-size:13px;\">INR ' + d.budget + '</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Timeline</td><td style=\"padding:4px 0;color:#fff;font-size:13px;\">' + p.calculated_timeline + '</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Tools</td><td style=\"padding:4px 0;color:#e2e8f0;font-size:13px;\">' + s.toolsUsed.replace(/ and /g, ', ') + '</td></tr>' +\n'</table></div>' +\n\n'<div style=\"background:#0d1117;border-radius:8px;padding:14px;margin:0 0 16px;border-left:4px solid #2563eb;\">' +\n'<h3 style=\"margin:0 0 8px;color:#2563eb;font-size:14px;\">📦 DELIVERABLES (' + delCount + ')</h3>' +\n'<table style=\"width:100%;border-collapse:collapse;\">' +\n'<tr style=\"border-bottom:2px solid #2563eb;\"><th style=\"text-align:left;padding:6px 12px;color:#2563eb;font-size:12px;\">Deliverable</th><th style=\"text-align:left;padding:6px 12px;color:#2563eb;font-size:12px;\">Due</th><th style=\"text-align:left;padding:6px 12px;color:#2563eb;font-size:12px;\">Owner</th></tr>' +\ndelRows + '</table></div>' +\n\n'<div style=\"background:#0d1117;border-radius:8px;padding:14px;margin:0 0 16px;border-left:4px solid #0d9488;\">' +\n'<h3 style=\"margin:0 0 8px;color:#0d9488;font-size:14px;\">📋 SOP STEPS</h3>' +\n'<table style=\"width:100%;border-collapse:collapse;\">' +\n'<tr style=\"border-bottom:2px solid #0d9488;\"><th style=\"text-align:left;padding:6px 12px;color:#0d9488;font-size:12px;\">#</th><th style=\"text-align:left;padding:6px 12px;color:#0d9488;font-size:12px;\">Step</th><th style=\"text-align:left;padding:6px 12px;color:#0d9488;font-size:12px;\">Duration</th></tr>' +\nsopRows + '</table></div>' +\n\n'<div style=\"background:#0d1117;border-radius:8px;padding:14px;margin:0 0 16px;border-left:4px solid #22c55e;\">' +\n'<h3 style=\"margin:0 0 8px;color:#22c55e;font-size:14px;\">💰 PAYMENT SCHEDULE</h3>' +\n'<table style=\"width:100%;border-collapse:collapse;\">' +\n'<tr style=\"border-bottom:2px solid #22c55e;\"><th style=\"text-align:left;padding:6px 12px;color:#22c55e;font-size:12px;\">Milestone</th><th style=\"text-align:left;padding:6px 12px;color:#22c55e;font-size:12px;\">%</th><th style=\"text-align:left;padding:6px 12px;color:#22c55e;font-size:12px;\">Amount</th></tr>' +\npayRows + '</table></div>' +\n\n'<div style=\"background:#0d1117;border-radius:8px;padding:14px;margin:0 0 16px;border-left:4px solid #8b5cf6;\">' +\n'<h3 style=\"margin:0 0 8px;color:#8b5cf6;font-size:14px;\">📝 PREREQUISITES (Client Must Provide)</h3>' +\n'<table style=\"width:100%;border-collapse:collapse;\">' + prereqs + '</table></div>' +\n\n'<div style=\"background:#0d1117;border-radius:8px;padding:14px;margin:0 0 16px;border-left:4px solid #f59e0b;\">' +\n'<h3 style=\"margin:0 0 8px;color:#f59e0b;font-size:14px;\">💬 COMMUNICATION PLAN</h3>' +\n'<table style=\"width:100%;border-collapse:collapse;\">' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;width:90px;font-size:13px;\">Kickoff</td><td style=\"padding:4px 0;color:#e2e8f0;font-size:13px;\">' + (comm.kickoff||'') + '</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Updates</td><td style=\"padding:4px 0;color:#e2e8f0;font-size:13px;\">' + (comm.updates||'') + '</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Reviews</td><td style=\"padding:4px 0;color:#e2e8f0;font-size:13px;\">' + (comm.reviews||'') + '</td></tr>' +\n'<tr><td style=\"padding:4px 0;color:#94a3b8;font-size:13px;\">Escalation</td><td style=\"padding:4px 0;color:#e2e8f0;font-size:13px;\">' + (comm.escalation||'') + '</td></tr>' +\n'</table></div>' +\n\n'<div style=\"background:#0d1117;border-radius:8px;padding:14px;border:1px solid #f97316;text-align:center;\">' +\n'<h3 style=\"margin:0 0 6px;color:#f97316;font-size:14px;\">🚀 NEXT STEP</h3>' +\n'<p style=\"color:#e2e8f0;font-size:13px;margin:0;\">' + (p.next_immediate_step||'Schedule kickoff call within 48 hours') + '</p></div>' +\n\n'</div>' +\n'<div style=\"background:#0d1117;padding:10px;text-align:center;border-radius:0 0 8px 8px;border:1px solid #1e293b;border-top:none;\">' +\n'<p style=\"color:#475569;font-size:11px;margin:0;\">Internal Agency Document • ' + d.agencyName + ' • ' + d.startDate + '</p></div></div>';\n})() }}",
+        "options": {}
+      },
+      "id": "e84e39f3-c8a1-4a94-a1af-6ba91e36c6a1",
+      "name": "📧 Send Copy to Agency",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        464,
+        608
+      ],
+      "webhookId": "c8b36363-cbbc-4dbb-bb3b-7665fb71a637",
+      "credentials": {
+        "smtp": {
+          "id": "udtIzlJq8iqmL3Az",
+          "name": "SMTP account - kspandian32"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "wait-followup-id",
+      "name": "Wait (10s) - Follow-Up",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "wait-checkin-id",
+      "name": "Wait (10s) - Check-In",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        1056
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "safe-mode-cond",
+              "leftValue": "={{$env.SAFE_MODE}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "true"
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "safe-mode-onboarding-id",
+      "name": "🛡️ IF: Safe Mode? (Onboarding)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1400,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "safe-mode-cond",
+              "leftValue": "={{$env.SAFE_MODE}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "true"
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "safe-mode-followup-id",
+      "name": "🛡️ IF: Safe Mode? (Follow-Up)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -384,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "safe-mode-cond",
+              "leftValue": "={{$env.SAFE_MODE}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "true"
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "safe-mode-checkin-id",
+      "name": "🛡️ IF: Safe Mode? (Check-In)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -384,
+        1056
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "error-trigger-id",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        1500
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "FEK7PNwR6I3XZygD",
+        "mode": "parameter",
+        "parameters": {
+          "workflow_name": "AI Client Onboarding Machine",
+          "level": "error",
+          "message": "={{ $json.error.message }}",
+          "tool_name": "={{ $json.node.name }}",
+          "metadata": "={{ JSON.stringify({ execution_id: $execution.id, error_stack: $json.error.stack }) }}"
+        }
+      },
+      "id": "log-drain-id",
+      "name": "Log to Unified Drain",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        -1000,
+        1500
+      ]
+    }
+  ],
+  "connections": {
+    "⏰ Daily 10 AM: Kickoff Follow-Up?": {
+      "main": [
+        [
+          {
+            "node": "📥 Fetch 'Welcome Email Sent' Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📥 Fetch 'Welcome Email Sent' Clients": {
+      "main": [
+        [
+          {
+            "node": "🔍 Filter: 2+ Days Since Welcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔍 Filter: 2+ Days Since Welcome": {
+      "main": [
+        [
+          {
+            "node": "Wait (10s) - Follow-Up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Gemini: Write Follow-Up Email": {
+      "main": [
+        [
+          {
+            "node": "🔀 Parse Follow-Up Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔀 Parse Follow-Up Email": {
+      "main": [
+        [
+          {
+            "node": "🛡️ IF: Safe Mode? (Follow-Up)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📧 Send Kickoff Reminder": {
+      "main": [
+        [
+          {
+            "node": "📝 Update CRM → Reminder Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⏰ Every Monday: Weekly Check-In": {
+      "main": [
+        [
+          {
+            "node": "📥 Fetch All Active Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📥 Fetch All Active Clients": {
+      "main": [
+        [
+          {
+            "node": "🔢 Calculate Week Number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔢 Calculate Week Number": {
+      "main": [
+        [
+          {
+            "node": "Wait (10s) - Check-In",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Gemini: Write Check-In Email": {
+      "main": [
+        [
+          {
+            "node": "🔀 Parse Check-In Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔀 Parse Check-In Email": {
+      "main": [
+        [
+          {
+            "node": "🛡️ IF: Safe Mode? (Check-In)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📧 Send Weekly Check-In": {
+      "main": [
+        [
+          {
+            "node": "📝 Log to Communications",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📋 New Client Form": {
+      "main": [
+        [
+          {
+            "node": "🔧 Parse Client Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔧 Parse Client Details": {
+      "main": [
+        [
+          {
+            "node": "📥 Read Service from Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📥 Read Service from Database": {
+      "main": [
+        [
+          {
+            "node": "🔀 Merge Client + Service Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔀 Merge Client + Service Data": {
+      "main": [
+        [
+          {
+            "node": "🤖 Gemini: Build Project Plan from SOPs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Gemini: Build Project Plan from SOPs": {
+      "main": [
+        [
+          {
+            "node": "🔀 Parse Project Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔀 Parse Project Plan": {
+      "main": [
+        [
+          {
+            "node": "🛡️ IF: Safe Mode? (Onboarding)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 Expand Deliverables": {
+      "main": [
+        [
+          {
+            "node": "📝 Log Deliverables Tracker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📝 Build HTML Client Email": {
+      "main": [
+        [
+          {
+            "node": "📧 Send Onboarding Email to Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📧 Send Onboarding Email to Client": {
+      "main": [
+        [
+          {
+            "node": "📧 Send Copy to Agency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (10s) - Follow-Up": {
+      "main": [
+        [
+          {
+            "node": "🤖 Gemini: Write Follow-Up Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (10s) - Check-In": {
+      "main": [
+        [
+          {
+            "node": "🤖 Gemini: Write Check-In Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🛡️ IF: Safe Mode? (Onboarding)": {
+      "main": [
+        [],
+        [
+          {
+            "node": "📊 Log Client Summary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📊 Expand Deliverables",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📝 Build HTML Client Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🛡️ IF: Safe Mode? (Follow-Up)": {
+      "main": [
+        [],
+        [
+          {
+            "node": "📧 Send Kickoff Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🛡️ IF: Safe Mode? (Check-In)": {
+      "main": [
+        [],
+        [
+          {
+            "node": "📧 Send Weekly Check-In",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Log to Unified Drain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "ceadb9fc-688d-4a05-bf29-08cb046dd7f4",
+  "activeVersionId": null,
+  "versionCounter": 10,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-03T11:24:58.648Z",
+      "createdAt": "2026-05-03T11:24:58.648Z",
+      "role": "workflow:owner",
+      "workflowId": "kHUqP4bRNKBNkM04",
+      "projectId": "4z38v6JO6ntgY8gF",
+      "project": {
+        "updatedAt": "2026-01-13T19:13:51.671Z",
+        "createdAt": "2026-01-13T19:11:25.659Z",
+        "id": "4z38v6JO6ntgY8gF",
+        "name": "PANDIAN K S <kspandia@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
