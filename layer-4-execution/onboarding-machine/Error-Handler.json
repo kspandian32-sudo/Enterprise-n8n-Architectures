@@ -1,0 +1,49 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "error-trigger-id",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        1500
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "FEK7PNwR6I3XZygD",
+        "mode": "parameter",
+        "parameters": {
+          "workflow_name": "AI Client Onboarding Machine",
+          "level": "error",
+          "message": "={{ $json.error.message }}",
+          "tool_name": "={{ $json.node.name }}",
+          "metadata": "={{ JSON.stringify({ execution_id: $execution.id, error_stack: $json.error.stack }) }}"
+        }
+      },
+      "id": "log-drain-id",
+      "name": "Log to Unified Drain",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        -1000,
+        1500
+      ]
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Log to Unified Drain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

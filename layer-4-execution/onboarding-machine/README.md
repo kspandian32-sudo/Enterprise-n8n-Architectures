@@ -64,9 +64,15 @@ graph TD
 | Weekly Check-Ins | ~10 Min/Client | 0 Min | **100% Autonomous** |
 
 ## 🛠️ Setup & Deployment
-1. Import `AI_Client_Onboarding_Machine.json`.
-2. Configure `deploy_config.py` with your Sheet IDs and Credentials.
-3. Run `deploy_handler.py` to push the configuration to n8n.
+1. This repository contains **6 separate workflow files** for maximum modularity:
+   - `Onboarding.json` (13 nodes)
+   - `Follow-Up.json` (9 nodes)
+   - `Weekly-CheckIn.json` (9 nodes)
+   - `Error-Handler.json` (2 nodes)
+   - `Offboarding-Trigger.json` (2 nodes)
+   - `Completion-Logic.json` (4 nodes)
+2. Import each file into your n8n instance as a separate workflow.
+3. Configure `deploy_config.py` with your Sheet IDs and Credentials.
 4. Ensure `SAFE_MODE=true` in your n8n environment for initial testing.
 
 ## 🚀 Recent Updates (Week 10 Production Hardening)
