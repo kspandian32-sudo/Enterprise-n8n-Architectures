@@ -154,6 +154,17 @@
           1200,
           300
         ]
+      },
+      {
+        "parameters": {},
+        "id": "execute-workflow-trigger-id",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          280,
+          1500
+        ]
       }
     ],
     "connections": {
@@ -206,6 +217,17 @@
           [
             {
               "node": "🛡️ Log ROI & Completion",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Gemini: Write Completion Report",
               "type": "main",
               "index": 0
             }
