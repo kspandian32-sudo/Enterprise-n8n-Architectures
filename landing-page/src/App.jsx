@@ -287,6 +287,7 @@ const PROJECTS = [
     id: 'onboarding-machine',
     title: 'v7.6 "Gold Standard" Onboarding Machine',
     layer: 'L4 Execution',
+    videoUrl: 'https://www.instagram.com/reel/DYc22NCRP-b/',
     useBlueprint: true,
     bullets: [
       'Compound AI Architecture: 7-engine modular suite (v7.6 Gold) with Planner -> Evaluator loop for zero-hallucination sanity checks.',
