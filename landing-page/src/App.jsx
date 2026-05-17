@@ -283,6 +283,21 @@ const PROJECTS = [
     github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/layer-4-execution/Local-Legal-AI'
   },
 
+  {
+    id: 'onboarding-machine',
+    title: 'v7.6 "Gold Standard" Onboarding Machine',
+    layer: 'L4 Execution',
+    useBlueprint: true,
+    bullets: [
+      'Compound AI Architecture: 7-engine modular suite (v7.6 Gold) with Planner -> Evaluator loop for zero-hallucination sanity checks.',
+      'Infrastructure Portability: 100% zero-hardcoding — dynamic brand persona and ID resolution via centralized global config.',
+      'Automated ROI Value Tracking: Centralized Log-Drain registry records precise human-labor ROI directly into Supabase analytics.'
+    ],
+    roi: '90x Speed (6hrs -> 30s)',
+    stats: '7 Modular Engines | Gemini 2.5 Flash',
+    github: 'https://github.com/kspandian32-sudo/Enterprise-n8n-Architectures/tree/main/Enterprise-n8n-Architectures'
+  },
+
   // ── L5 EXTENSIONS ──────────────────────────────────────────────────────────
   {
     id: 'npm-node',
@@ -301,7 +316,7 @@ const PROJECTS = [
 ]
 
 const METRICS = [
-  { value: '17', label: 'Production Builds', color: '#7F77DD' },
+  { value: '18', label: 'Production Builds', color: '#7F77DD' },
   { value: 'L4', label: 'Autonomy Level', color: '#1D9E75' },
   { value: '1 pkg', label: 'Published to npm', color: '#D85A30' },
   { value: '9/10', label: 'Enterprise Audit Score', color: '#BA7517' },
@@ -479,7 +494,7 @@ function Hero() {
   const isMobile = useMobile()
   return (
     <section
-      id="hero"
+      id="home"
       style={{
         position: 'relative',
         minHeight: '100vh',
@@ -737,6 +752,7 @@ function Architecture({ setActiveFilter }) {
 // ── METRICS STRIP ─────────────────────────────────────────────────────────────
 
 function Metrics() {
+  const isMobile = useMobile()
   return (
     <section
       style={{
@@ -751,12 +767,12 @@ function Metrics() {
           {METRICS.map(m => (
             <div
               key={m.label}
-              style={{ textAlign: 'center', padding: '24px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}
+              style={{ textAlign: 'center', padding: isMobile ? '32px 20px' : '24px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}
             >
-              <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: 36, color: m.color, letterSpacing: '-0.02em', lineHeight: 1, marginBottom: 8 }}>
+              <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: isMobile ? 44 : 36, color: m.color, letterSpacing: '-0.02em', lineHeight: 1, marginBottom: 8 }}>
                 {m.value}
               </div>
-              <div style={{ fontFamily: 'Inter', fontSize: 12, color: 'rgba(232,230,255,0.4)', letterSpacing: '0.02em' }}>
+              <div style={{ fontFamily: 'Inter', fontSize: 13, color: 'rgba(232,230,255,0.4)', letterSpacing: '0.02em' }}>
                 {m.label}
               </div>
             </div>
@@ -844,8 +860,8 @@ function ProjectCard({ project }) {
         ) : null}
       </div>
 
-      <div style={{ padding: 24, flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+      <div style={{ padding: 24, flex: 1, display: 'flex', flexDirection: 'column', alignItems: isMobile ? 'center' : 'stretch', textAlign: isMobile ? 'center' : 'left' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'center' : 'flex-start', marginBottom: 16, gap: isMobile ? 12 : 0 }}>
           <div>
             <h3 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: 20, color: '#E8E6FF', marginBottom: 4 }}>{project.title}</h3>
             <span style={{ fontFamily: 'Space Mono', fontSize: 10, color: '#7F77DD', letterSpacing: '0.05em' }}>{project.layer.toUpperCase()}</span>
@@ -933,7 +949,7 @@ function ProjectShowcase({ activeFilter, setActiveFilter }) {
     <section id="projects" style={{ padding: '100px 24px', background: '#07070F' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'flex-end', marginBottom: 48, gap: 24 }}>
-          <div>
+          <div style={{ textAlign: isMobile ? 'center' : 'left', width: isMobile ? '100%' : 'auto' }}>
             <span style={{ fontFamily: 'Space Mono', fontSize: 10, letterSpacing: '0.2em', color: '#1D9E75', display: 'block', marginBottom: 12 }}>BUILD REGISTRY</span>
             <h2 style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: 'clamp(28px, 4vw, 44px)', color: '#E8E6FF', letterSpacing: '-0.02em' }}>Production Instances</h2>
           </div>
@@ -975,6 +991,7 @@ function ProjectShowcase({ activeFilter, setActiveFilter }) {
 // ── CONTACT SECTION ───────────────────────────────────────────────────────────
 
 function Contact() {
+  const isMobile = useMobile()
   const [formState, setFormState] = useState('idle')
   const [formData, setFormData] = useState({ 
     fullName: '', 
@@ -1019,8 +1036,8 @@ function Contact() {
   return (
     <section id="contact" style={{ padding: '100px 24px', background: '#0A0A14' }}>
       <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
-        <span style={{ fontFamily: 'Space Mono', fontSize: 10, letterSpacing: '0.2em', color: '#D85A30', display: 'block', marginBottom: 12 }}>INTAKE PORTAL</span>
-        <h2 style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: 36, color: '#E8E6FF', marginBottom: 40 }}>Start Your Build</h2>
+        <span style={{ fontFamily: 'Space Mono', fontSize: isMobile ? 12 : 10, letterSpacing: '0.2em', color: '#D85A30', display: 'block', marginBottom: 12 }}>INTAKE PORTAL</span>
+        <h2 style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: 'clamp(28px, 5vw, 36px)', color: '#E8E6FF', marginBottom: 40, letterSpacing: '-0.02em' }}>Start Your Build</h2>
 
         {formState === 'success' ? (
           <div style={{ padding: '60px 40px', borderRadius: 16, background: 'rgba(29, 158, 117, 0.05)', border: '1px solid rgba(29, 158, 117, 0.2)' }}>
@@ -1040,7 +1057,7 @@ function Contact() {
         ) : (
           <form onSubmit={handleSubmit} style={{ textAlign: 'left', display: 'grid', gap: 20 }}>
             {/* ROW 1: Identity */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label style={{ fontFamily: 'Space Mono', fontSize: 10, color: 'rgba(232,230,255,0.4)', letterSpacing: '0.1em' }}>FULL NAME</label>
                 <input
@@ -1063,7 +1080,7 @@ function Contact() {
             </div>
 
             {/* ROW 2: Organization */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label style={{ fontFamily: 'Space Mono', fontSize: 10, color: 'rgba(232,230,255,0.4)', letterSpacing: '0.1em' }}>COMPANY / DOMAIN</label>
                 <input
@@ -1085,7 +1102,7 @@ function Contact() {
             </div>
 
             {/* ROW 3: Project Specifics */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label style={{ fontFamily: 'Space Mono', fontSize: 10, color: 'rgba(232,230,255,0.4)', letterSpacing: '0.1em' }}>PROJECT CATEGORY</label>
                 <select
@@ -1119,7 +1136,7 @@ function Contact() {
             </div>
 
             {/* ROW 4: Logistics */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label style={{ fontFamily: 'Space Mono', fontSize: 10, color: 'rgba(232,230,255,0.4)', letterSpacing: '0.1em' }}>TIMELINE</label>
                 <select
@@ -1172,16 +1189,20 @@ function Contact() {
               style={{
                 marginTop: 10,
                 fontFamily: 'Space Mono',
-                fontSize: 12,
-                fontWeight: 700,
+                fontSize: isMobile ? 15 : 12,
+                fontWeight: 800,
                 color: '#07070F',
                 background: formState === 'error' ? '#D85A30' : 'linear-gradient(135deg, #7F77DD, #1D9E75)',
-                padding: '16px',
+                padding: isMobile ? '22px' : '16px',
+                width: '100%',
                 borderRadius: 8,
                 border: 'none',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
-                opacity: formState === 'submitting' ? 0.7 : 1
+                boxShadow: isMobile ? '0 10px 30px -10px rgba(127, 119, 221, 0.5)' : 'none',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                opacity: formState === 'submitting' ? 0.7 : 1,
+                transform: formState === 'submitting' ? 'scale(0.98)' : 'scale(1)',
+                letterSpacing: '0.05em'
               }}
             >
               {formState === 'submitting' ? 'INITIALIZING UPLINK...' : formState === 'error' ? 'UPLINK FAILED — RETRY?' : 'DISPATCH SIGNAL'}
