@@ -218,14 +218,14 @@
       },
       "🛡️ IF: Safe Mode? (Offboarding)": {
         "main": [
-          [],
           [
             {
               "node": "🛡️ Execute Completion Logic",
               "type": "main",
               "index": 0
             }
-          ]
+          ],
+          []
         ]
       },
       "📥 Fetch Completed Clients": {

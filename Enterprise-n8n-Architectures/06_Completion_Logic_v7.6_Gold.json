@@ -136,7 +136,7 @@
           1500
         ],
         "parameters": {
-          "jsCode": "// Global Config (cogdef)\nconst config = {\n  safeMode: false,\n  logDrainId: \"DYM20qkiv0Ds1xsu\",\n  spreadsheetId: \"16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU\",\n  env: \"production\"\n};\nreturn $input.all().map(item => ({\n  json: { ...item.json, cogdef: config }\n}));"
+          "jsCode": "// Global Config (cogdef)\nconst config = {\n  safeMode: false,\n  logDrainId: \"FEK7PNwR6I3XZygD\",\n  spreadsheetId: \"16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU\",\n  env: \"production\",\n  roiMins: 120\n};\nreturn $input.all().map(item => ({\n  json: { ...item.json, ...config, cogdef: config }\n}));"
         }
       },
       {
