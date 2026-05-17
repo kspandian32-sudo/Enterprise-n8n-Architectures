@@ -6,26 +6,26 @@
 ## The Impressive Problem Statement (9 words):
 "Manual onboarding burns hours. High-value clients need proof."
 
-## The 59-Word Solution Demo:
-"The Gold Standard AI Onboarding Machine. A form triggers Gemini 2.5 Flash to build a project plan grounded in your service database. Every plan is intercepted by a secondary AI Evaluator node for a production-grade sanity check. Watch: it fans into CRM logging, task expansion, and a premium HTML email. We track precise ROI — minutes saved — automatically. Seven engines, ₹2 per client."
+## The 58-Word Solution Demo:
+"The Gold Standard AI Onboarding Machine. A form triggers Gemini 2.5 Flash to build a plan grounded in your database. Every plan is intercepted by an AI Evaluator for a sanity check. Watch: it fans into CRM logging, task expansion, and premium HTML. We track precise ROI automatically. From daily follow-ups to weekly check-ins and final offboarding—all 100% autonomous. Seven engines, ₹2 per client."
 
 ---
 
-**Word Count Verification: 7 + 9 + 59 = 75 words ✅ (EXACTLY 75)**
+**Word Count Verification: 7 + 9 + 58 = 74 words ✅ (within 65–75)**
 
 ---
 
 ## Visual Cue Notes (for recording):
 
-| Timestamp | What to Show on Screen | What You're Saying |
+| Timestamp | What to Show on Screen | Logic / Purpose |
 |---|---|---|
-| 0:00–0:05 | **Full n8n canvas** — zoom-to-fit showing all 7 modular engine rows | *"One form. Seven engines. Zero manual work."* |
-| 0:05–0:10 | **Slowly zoom into the `📋 New Client Form` trigger** | *"Manual onboarding burns hours. High-value clients need proof."* |
-| 0:10–0:18 | **Click `🤖 Gemini: Build Project Plan`** → show prompt and model version (2.5 Flash) | *"The Gold Standard AI Onboarding Machine. A form triggers Gemini 2.5 Flash to build a project plan grounded in your service database."* |
-| 0:18–0:28 | **🏆 WOW MOMENT 1:** Click `🛡️ Evaluator: Sanity Check` → show the "Planner -> Auditor" loop logic | *"Every plan is intercepted by a secondary AI Evaluator node for a production-grade sanity check."* |
-| 0:28–0:38 | **Show the parallel fan-out** → highlight Log Summary + Expand Deliverables + HTML Email | *"Watch: it fans into CRM logging, task expansion, and a premium HTML email."* |
-| 0:38–0:50 | **🏆 WOW MOMENT 2:** Pan to `🛡️ Log-Drain ROI Registry` → show it recording "120 mins saved" to Supabase | *"We track precise ROI — minutes saved — automatically. This turns automation into a measurable financial asset."* |
-| 0:50–1:00 | **Zoom to fit — all engines visible** | *"Seven engines, ₹2 per client. This is the new architecture for the AI-First Agency."* |
+| **0:00–0:10** | **Full n8n Canvas** (Zoom-to-fit) | Show the scale of the **7-Engine Architecture**. |
+| **0:10–0:18** | **Gemini Node (Onboarding)** | Click to show the **Grounded Prompt** (Anti-hallucination). |
+| **0:18–0:28** | **🛡️ Evaluator Node** | **WOW MOMENT 1:** Show how it audits the plan before sending. |
+| **0:28–0:38** | **HTML Code Node** | Show the **500-line Premium Email engine** output. |
+| **0:38–0:48** | **Follow-Up & Check-In Rows** | **ENGINE DEMO:** Pan down to show the **Daily/Weekly triggers** in action. |
+| **0:48–0:55** | **🛡️ Log-Drain ROI Node** | **WOW MOMENT 2:** Show the node sending **"120 mins saved"** to Supabase. |
+| **0:55–1:00** | **Final Zoom-to-fit** | Close with the image of the entire **Autonomous Lifecycle**. |
 
 ---
 
