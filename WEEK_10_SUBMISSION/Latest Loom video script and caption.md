@@ -1,27 +1,28 @@
 # Deliverable 8 — Loom Video Script (60 Seconds)
 
 ## The Atomic Live-Demo Script:
-*Target word count: 65–75 words. Current: 70 words.*
+*Target word count: 65–75 words. Current: 71 words.*
 
 | Visual Cue | Exact Words to Speak |
 | :--- | :--- |
-| **0:00** — Full n8n Canvas showing 7 engines | **Seven modular engines. Professional agency lifecycle.** |
-| **0:05** — On your Intake Form → Click Submit | **Intake form triggers Onboarding engine.** |
-| **0:10** — Onboarding engine running (green pulses) | **Gemini builds grounded, database-accurate plans.** |
-| **0:15** — Open node: `🛡️ Evaluator: Sanity Check` | **AI Evaluator audits budget and tone.** |
-| **0:20** — Open node: `Global Config (cogdef)` | **Zero-hardcoding. True infrastructure level portability.** |
-| **0:25** — Show "Sent" Inbox with high-end HTML | **Premium dark-themed, responsive HTML sent.** |
-| **0:30** — Show Google Sheet Summary → "Welcome Sent" | **CRM updated: Status Welcome Sent.** |
-| **0:35** — Manually edit Timestamp in Sheet (-2 days) | **Shifting timestamp. Manual Follow-up triggered.** |
-| **0:40** — Run `🏥 Follow-Up Engine` → See success | **CRM updated again: Follow-up Sent.** |
-| **0:45** — Change Status to "Active" → Run `Check-In` | **Monday batch. Temporal, week-aware check-in.** |
-| **0:50** — Change Status to "Completed" → Run `Offboarding` | **Final wrap. Standardized and delegated completion.** |
-| **0:55** — Show Google Sheet Summary → "Archived" | **CRM archived. ROI registry records value.** |
-| **1:00** — Full n8n Canvas (Zoom to fit) | **Seven engines. v7.6 Gold Standard.** |
+| **0:00** — Full n8n Canvas showing 7 engines | **Intake to offboard. 100% autonomous.** |
+| **0:03** — Zoom to Onboarding Engine | **Manual onboarding burns six hours.** |
+| **0:06** — On your Intake Form → Click Submit | **One form triggers Onboarding engine.** |
+| **0:11** — Onboarding engine running (green pulses) | **Gemini builds grounded, database-accurate roadmaps.** |
+| **0:16** — Open node: `🛡️ Evaluator: Sanity Check` | **AI Auditor verifies budget and tone.** |
+| **0:21** — Open node: `Global Config (cogdef)` | **Zero-hardcoding. True infrastructure level portability.** |
+| **0:26** — Show "Sent" Inbox with high-end HTML | **Premium dark-themed, responsive HTML sent.** |
+| **0:31** — Show Google Sheet Summary → "Welcome Sent" | **CRM updated: Status Welcome Sent.** |
+| **0:36** — Manually edit Timestamp in Sheet (-2 days) | **Shifting timestamp. Manual Follow-up triggered.** |
+| **0:41** — Run `🏥 Follow-Up Engine` → See success | **Lead nurtured. CRM updated again.** |
+| **0:46** — Change Status to "Active" → Run `Check-In` | **Monday batch. Temporal, week-aware check-in.** |
+| **0:51** — Change Status to "Completed" → Run `Offboarding` | **Final wrap. Standardized and delegated completion.** |
+| **0:56** — Show Google Sheet Summary → "Archived" | **CRM archived. ROI registry records value.** |
+| **1:00** — Full n8n Canvas (Zoom to fit) | **Seven modular engines. Gold Standard.** |
 
 ---
 
-**Word Count Verification: 6+5+6+6+5+5+5+5+5+5+6+6+5 = 70 words ✅**
+**Word Count Verification: 5+4+5+5+6+5+5+5+5+5+5+5+6+5 = 71 words ✅**
 
 ---
 
