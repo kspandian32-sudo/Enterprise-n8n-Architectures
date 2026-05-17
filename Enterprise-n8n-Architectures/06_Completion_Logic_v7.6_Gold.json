@@ -200,6 +200,17 @@
             }
           ]
         ]
+      },
+      "Update CRM → Archived": {
+        "main": [
+          [
+            {
+              "node": "🛡️ Log ROI & Completion",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
       }
     },
     "settings": {
