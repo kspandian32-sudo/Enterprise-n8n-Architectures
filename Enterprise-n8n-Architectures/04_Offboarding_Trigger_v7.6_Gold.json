@@ -29,15 +29,17 @@
       },
       {
         "parameters": {
+          "resource": "sheet",
+          "operation": "read",
           "documentId": {
             "__rl": true,
-            "mode": "list",
+            "mode": "id",
             "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU"
           },
           "sheetName": {
             "__rl": true,
-            "mode": "list",
-            "value": "1994705565"
+            "mode": "name",
+            "value": "Summary"
           },
           "filtersUI": {
             "values": [
@@ -51,7 +53,7 @@
         },
         "name": "📥 Fetch Completed Clients",
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5,
+        "typeVersion": 4.7,
         "position": [
           352,
           400
@@ -70,7 +72,7 @@
       },
       {
         "parameters": {
-          "jsCode": "// Global Config (cogdef) - Pulling from Environment Variables\nconst config = {\n  safeMode: $env.SAFE_MODE === 'true',\n  logDrainId: $env.LOG_DRAIN_ID || \"FEK7PNwR6I3XZygD\",\n  spreadsheetId: $env.SPREADSHEET_ID || \"16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU\",\n  env: $env.NODE_ENV || \"production\",\n  roiMins: 60\n};\n\nreturn $input.all().map(item => ({\n  json: { \n    ...item.json,\n    ...config,\n    cogdef: config \n  }\n}));"
+          "jsCode": "// Global Config (cogdef)\nconst config = {\n  safeMode: false,\n  logDrainId: \"FEK7PNwR6I3XZygD\",\n  spreadsheetId: \"16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU\",\n  env: \"production\",\n  roiMins: 120\n};\nreturn $input.all().map(item => ({\n  json: { ...item.json, ...config, cogdef: config }\n}));"
         },
         "id": "global-config-cogdef-id",
         "name": "Global Config (cogdef)",
@@ -172,7 +174,7 @@
       }
     ],
     "connections": {
-      "⏰ Daily 12 PM: Offboarding?": {
+      "Manual Trigger": {
         "main": [
           [
             {
@@ -194,18 +196,7 @@
           ]
         ]
       },
-      "Webhook Trigger": {
-        "main": [
-          [
-            {
-              "node": "🛠️ MOCK: User Data",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "🛠️ MOCK: User Data": {
+      "📥 Fetch Completed Clients": {
         "main": [
           [
             {
@@ -228,18 +219,7 @@
           []
         ]
       },
-      "📥 Fetch Completed Clients": {
-        "main": [
-          [
-            {
-              "node": "🛡️ IF: Safe Mode? (Offboarding)",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Manual Trigger": {
+      "⏰ Daily 12 PM: Offboarding?": {
         "main": [
           [
             {

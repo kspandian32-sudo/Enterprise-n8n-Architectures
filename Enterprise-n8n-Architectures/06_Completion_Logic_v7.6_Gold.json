@@ -108,21 +108,23 @@
       {
         "name": "Update CRM → Archived",
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5,
+        "typeVersion": 4.7,
         "position": [
           1100,
           1500
         ],
         "parameters": {
+          "resource": "sheet",
+          "operation": "update",
           "documentId": {
             "__rl": true,
             "mode": "id",
-            "value": "={{ $node[\"Global Config (cogdef)\"].json[\"spreadsheetId\"] }}"
+            "value": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU"
           },
           "sheetName": {
             "__rl": true,
-            "mode": "id",
-            "value": "1994705565"
+            "mode": "name",
+            "value": "Summary"
           },
           "filtersUI": {
             "values": [
@@ -139,7 +141,8 @@
                 "value": "Archived"
               }
             ]
-          }
+          },
+          "options": {}
         },
         "credentials": {
           "googleSheetsOAuth2Api": {
@@ -166,7 +169,7 @@
         "parameters": {
           "workflowId": "FEK7PNwR6I3XZygD",
           "mode": "parameter",
-          "data": "={{ JSON.stringify({ status: 'SUCCESS', message: 'Workflow Completed', workflow_name: $workflow.name, metadata: { ...$json, roi_mins: $node[\"Global Config (cogdef)\"].json.roiMins } }) }}",
+          "data": "={{ JSON.stringify({ status: 'SUCCESS', message: 'Workflow Completed', workflow_name: $workflow.name, metadata: { ...$json, roi_mins: $json.roiMins || 120 } }) }}",
           "options": {}
         },
         "id": "roi-node-completion",
@@ -256,7 +259,8 @@
               "type": "main",
               "index": 0
             }
-          ]
+          ],
+          []
         ]
       },
       "Send Completion Email": {
