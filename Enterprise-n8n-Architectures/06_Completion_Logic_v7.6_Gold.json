@@ -1,1 +1,242 @@
-[{"updatedAt":"2026-05-08T16:18:16.489Z","createdAt":"2026-05-08T15:23:06.610Z","id":"dOaP06QgRFRT70l2","name":"🛡️ Completion Logic (Standardized)","description":null,"active":false,"isArchived":false,"nodes":[{"name":"Gemini: Write Completion Report","type":"n8n-nodes-base.httpRequest","typeVersion":1,"position":[500,1500],"parameters":{"jsonBody":"={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'You are a professional project manager named ' + $json.yourName + ' from ' + $json.agencyName + '. Write a project completion and testimonial request email for ' + $json.clientName + ' from ' + $json.clientCompany + '. Based on their service (' + $json.serviceRequired + '), summarize the successful delivery of their project roadmap. Include a warm thank-you, a request for a testimonial, and a link to our feedback form: https://forms.gle/sbZKjFkPS7bJ2enKA. Keep it celebratory and professional, under 150 words. Return ONLY valid JSON: {\"subject\": \"Project Successfully Completed! 🏆\", \"body\": \"email body\"}. No markdown, no backticks.' }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } }) }}","url":"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent","method":"POST","authentication":"predefinedCredentialType","nodecredentialtype":"httpQueryAuth","sendBody":true,"specifyBody":"json","contentType":"json","options":{"timeout":120000},"nodeCredentialType":"httpQueryAuth"},"retryOnFail":true,"maxTries":5,"waitBetweenTries":35000,"credentials":{"httpQueryAuth":{"id":"1jdjTjj9aaTK6i6Y","name":"Query Auth Gemini kspandian32"}},"alwaysOutputData":true,"id":"f781b5a5-8556-46c2-afe2-9731d0915606"},{"name":"IF: Safe Mode? (Completion)","type":"n8n-nodes-base.if","typeVersion":2.2,"position":[700,1500],"parameters":{"combinator":"and","conditions":{"conditions":[{"id":"safe-mode-cond-completion","leftValue":"={{ $node[\"Global Config (cogdef)\"].json[\"safeMode\"] }}","operator":{"operation":"true","type":"boolean","singleValue":true}}],"options":{"version":2,"leftValue":"","caseSensitive":true,"typeValidation":"strict"}}},"id":"07c884d3-9bdc-4681-9872-ff5fa63c12c9"},{"name":"Send Completion Email","type":"n8n-nodes-base.emailSend","typeVersion":2.1,"position":[900,1500],"parameters":{"fromEmail":"kspandian32@gmail.com","toEmail":"={{ $json.clientEmail }}","subject":"","html":"","options":{}},"credentials":{"smtp":{"id":"udtIzlJq8iqmL3aZ","name":"SMTP account - kspandian32"}},"id":"a0f8d9cf-4769-4e47-a1fb-0b3fed56486b","webhookId":"e8775ae0-9029-41dd-a728-eadd7c12e581"},{"name":"Update CRM → Archived","type":"n8n-nodes-base.googleSheets","typeVersion":4.5,"position":[1100,1500],"parameters":{"documentId":{"__rl":true,"mode":"id","value":"={{ $node[\"Global Config (cogdef)\"].json[\"spreadsheetId\"] }}"},"sheetName":{"__rl":true,"mode":"id","value":"1994705565"}},"credentials":{"googleSheetsOAuth2Api":{"id":"hiWj9Xv9QRzG92uS","name":"AI Lead Gen Machine Google Sheets"}},"id":"f6c75834-9b70-46bb-9374-3c18e31efc1b"},{"id":"global-config-cogdef-id","name":"Global Config (cogdef)","type":"n8n-nodes-base.code","typeVersion":2,"position":[400,1500],"parameters":{"jsCode":"// Global Config (cogdef)\nconst config = {\n  safeMode: false,\n  logDrainId: \"DYM20qkiv0Ds1xsu\",\n  spreadsheetId: \"16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU\",\n  env: \"production\"\n};\nreturn $input.all().map(item => ({\n  json: { ...item.json, cogdef: config }\n}));"}}],"connections":{"IF: Safe Mode? (Completion)":{"main":[[{"node":"Send Completion Email","type":"main","index":0}]]},"Send Completion Email":{"main":[[{"node":"Update CRM → Archived","type":"main","index":0}]]},"Gemini: Write Completion Report":{"main":[[{"node":"Global Config (cogdef)","type":"main","index":0}]]},"Global Config (cogdef)":{"main":[[{"node":"IF: Safe Mode? (Completion)","type":"main","index":0}]]}},"settings":{"executionOrder":"v1","callerPolicy":"workflowsFromSameOwner","availableInMCP":false},"staticData":null,"meta":null,"pinData":null,"versionId":"b8d746f0-e940-46ef-9723-9aecf3699ebd","activeVersionId":null,"versionCounter":3,"triggerCount":0,"tags":[],"shared":[{"updatedAt":"2026-05-08T15:23:06.613Z","createdAt":"2026-05-08T15:23:06.613Z","role":"workflow:owner","workflowId":"dOaP06QgRFRT70l2","projectId":"4z38v6JO6ntgY8gF","project":{"updatedAt":"2026-01-13T19:13:51.671Z","createdAt":"2026-01-13T19:11:25.659Z","id":"4z38v6JO6ntgY8gF","name":"PANDIAN K S <kspandia@gmail.com>","type":"personal","icon":null,"description":null,"creatorId":"75bbfac3-5195-4843-9435-78dfd0d8f34f"}}],"versionMetadata":{"name":null,"description":null}}]
+[
+  {
+    "updatedAt": "2026-05-17T05:17:04.000Z",
+    "createdAt": "2026-05-08T15:23:06.610Z",
+    "id": "dOaP06QgRFRT70l2",
+    "name": "🛡️ Completion Logic (Standardized)",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "name": "Gemini: Write Completion Report",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 1,
+        "position": [
+          500,
+          1500
+        ],
+        "parameters": {
+          "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'You are a professional project manager named ' + $json.yourName + ' from ' + $json.agencyName + '. Write a project completion and testimonial request email for ' + $json.clientName + ' from ' + $json.clientCompany + '. Based on their service (' + $json.serviceRequired + '), summarize the successful delivery of their project roadmap. Include a warm thank-you, a request for a testimonial, and a link to our feedback form: https://forms.gle/sbZKjFkPS7bJ2enKA. Keep it celebratory and professional, under 150 words. Return ONLY valid JSON: {\"subject\": \"Project Successfully Completed! 🏆\", \"body\": \"email body\"}. No markdown, no backticks.' }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } }) }}",
+          "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+          "method": "POST",
+          "authentication": "predefinedCredentialType",
+          "nodecredentialtype": "httpQueryAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "contentType": "json",
+          "options": {
+            "timeout": 120000
+          },
+          "nodeCredentialType": "httpQueryAuth"
+        },
+        "retryOnFail": true,
+        "maxTries": 5,
+        "waitBetweenTries": 35000,
+        "credentials": {
+          "httpQueryAuth": {
+            "id": "1jdjTjj9aaTK6i6Y",
+            "name": "Query Auth Gemini kspandian32"
+          }
+        },
+        "alwaysOutputData": true,
+        "id": "f781b5a5-8556-46c2-afe2-9731d0915606"
+      },
+      {
+        "name": "IF: Safe Mode? (Completion)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          700,
+          1500
+        ],
+        "parameters": {
+          "combinator": "and",
+          "conditions": {
+            "conditions": [
+              {
+                "id": "safe-mode-cond-completion",
+                "leftValue": "={{ $node[\"Global Config (cogdef)\"].json[\"safeMode\"] }}",
+                "operator": {
+                  "operation": "true",
+                  "type": "boolean",
+                  "singleValue": true
+                }
+              }
+            ],
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            }
+          }
+        },
+        "id": "07c884d3-9bdc-4681-9872-ff5fa63c12c9"
+      },
+      {
+        "name": "Send Completion Email",
+        "type": "n8n-nodes-base.emailSend",
+        "typeVersion": 2.1,
+        "position": [
+          900,
+          1500
+        ],
+        "parameters": {
+          "fromEmail": "kspandian32@gmail.com",
+          "toEmail": "={{ $json.clientEmail }}",
+          "subject": "",
+          "html": "",
+          "options": {}
+        },
+        "credentials": {
+          "smtp": {
+            "id": "udtIzlJq8iqmL3aZ",
+            "name": "SMTP account - kspandian32"
+          }
+        },
+        "id": "a0f8d9cf-4769-4e47-a1fb-0b3fed56486b",
+        "webhookId": "e8775ae0-9029-41dd-a728-eadd7c12e581"
+      },
+      {
+        "name": "Update CRM → Archived",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1100,
+          1500
+        ],
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $node[\"Global Config (cogdef)\"].json[\"spreadsheetId\"] }}"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1994705565"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "hiWj9Xv9QRzG92uS",
+            "name": "AI Lead Gen Machine Google Sheets"
+          }
+        },
+        "id": "f6c75834-9b70-46bb-9374-3c18e31efc1b"
+      },
+      {
+        "id": "global-config-cogdef-id",
+        "name": "Global Config (cogdef)",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          400,
+          1500
+        ],
+        "parameters": {
+          "jsCode": "// Global Config (cogdef)\nconst config = {\n  safeMode: false,\n  logDrainId: \"DYM20qkiv0Ds1xsu\",\n  spreadsheetId: \"16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU\",\n  env: \"production\"\n};\nreturn $input.all().map(item => ({\n  json: { ...item.json, cogdef: config }\n}));"
+        }
+      },
+      {
+        "parameters": {
+          "workflowId": "FEK7PNwR6I3XZygD",
+          "mode": "parameter",
+          "data": "={{ JSON.stringify({ status: 'SUCCESS', message: 'Workflow Completed', workflow_name: $workflow.name, metadata: { ...$json, roi_mins: $node[\"Global Config (cogdef)\"].json.roiMins } }) }}",
+          "options": {}
+        },
+        "id": "roi-node-completion",
+        "name": "🛡️ Log ROI & Completion",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          1200,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "IF: Safe Mode? (Completion)": {
+        "main": [
+          [
+            {
+              "node": "Send Completion Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send Completion Email": {
+        "main": [
+          [
+            {
+              "node": "Update CRM → Archived",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gemini: Write Completion Report": {
+        "main": [
+          [
+            {
+              "node": "Global Config (cogdef)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Global Config (cogdef)": {
+        "main": [
+          [
+            {
+              "node": "IF: Safe Mode? (Completion)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": null,
+    "versionId": "caedf3ba-7083-40eb-a97c-6f0f0d34c16d",
+    "activeVersionId": "caedf3ba-7083-40eb-a97c-6f0f0d34c16d",
+    "versionCounter": 7,
+    "triggerCount": 0,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-05-08T15:23:06.613Z",
+        "createdAt": "2026-05-08T15:23:06.613Z",
+        "role": "workflow:owner",
+        "workflowId": "dOaP06QgRFRT70l2",
+        "projectId": "4z38v6JO6ntgY8gF",
+        "project": {
+          "updatedAt": "2026-01-13T19:13:51.671Z",
+          "createdAt": "2026-01-13T19:11:25.659Z",
+          "id": "4z38v6JO6ntgY8gF",
+          "name": "PANDIAN K S <kspandia@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]
