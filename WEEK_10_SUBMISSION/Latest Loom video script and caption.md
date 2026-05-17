@@ -1,31 +1,27 @@
 # Deliverable 8 — Loom Video Script (60 Seconds)
 
-## The Scroll-Stoppable Hook (7 words):
-"One form. Seven engines. Zero manual work."
+## The Atomic Live-Demo Script:
+*Target word count: 65–75 words. Current: 70 words.*
 
-## The Impressive Problem Statement (9 words):
-"Manual onboarding burns hours. High-value clients need proof."
-
-## The 58-Word Solution Demo:
-"The Gold Standard AI Onboarding Machine. A form triggers Gemini 2.5 Flash to build a plan grounded in your database. Every plan is intercepted by an AI Evaluator for a sanity check. Watch: it fans into CRM logging, task expansion, and premium HTML. We track precise ROI automatically. From daily follow-ups to weekly check-ins and final offboarding—all 100% autonomous. Seven engines, ₹2 per client."
+| Visual Cue | Exact Words to Speak |
+| :--- | :--- |
+| **0:00** — Full n8n Canvas showing 7 engines | **Seven modular engines. Professional agency lifecycle.** |
+| **0:05** — On your Intake Form → Click Submit | **Intake form triggers Onboarding engine.** |
+| **0:10** — Onboarding engine running (green pulses) | **Gemini builds grounded, database-accurate plans.** |
+| **0:15** — Open node: `🛡️ Evaluator: Sanity Check` | **AI Evaluator audits budget and tone.** |
+| **0:20** — Open node: `Global Config (cogdef)` | **Zero-hardcoding. True infrastructure level portability.** |
+| **0:25** — Show "Sent" Inbox with high-end HTML | **Premium dark-themed, responsive HTML sent.** |
+| **0:30** — Show Google Sheet Summary → "Welcome Sent" | **CRM updated: Status Welcome Sent.** |
+| **0:35** — Manually edit Timestamp in Sheet (-2 days) | **Shifting timestamp. Manual Follow-up triggered.** |
+| **0:40** — Run `🏥 Follow-Up Engine` → See success | **CRM updated again: Follow-up Sent.** |
+| **0:45** — Change Status to "Active" → Run `Check-In` | **Monday batch. Temporal, week-aware check-in.** |
+| **0:50** — Change Status to "Completed" → Run `Offboarding` | **Final wrap. Standardized and delegated completion.** |
+| **0:55** — Show Google Sheet Summary → "Archived" | **CRM archived. ROI registry records value.** |
+| **1:00** — Full n8n Canvas (Zoom to fit) | **Seven engines. v7.6 Gold Standard.** |
 
 ---
 
-**Word Count Verification: 7 + 9 + 58 = 74 words ✅ (within 65–75)**
-
----
-
-## Visual Cue Notes (for recording):
-
-| Timestamp | What to Show on Screen | Logic / Purpose |
-|---|---|---|
-| **0:00–0:10** | **Full n8n Canvas** (Zoom-to-fit) | Show the scale of the **7-Engine Architecture**. |
-| **0:10–0:18** | **Gemini Node (Onboarding)** | Click to show the **Grounded Prompt** (Anti-hallucination). |
-| **0:18–0:28** | **🛡️ Evaluator Node** | **WOW MOMENT 1:** Show how it audits the plan before sending. |
-| **0:28–0:38** | **HTML Code Node** | Show the **500-line Premium Email engine** output. |
-| **0:38–0:48** | **Follow-Up & Check-In Rows** | **ENGINE DEMO:** Pan down to show the **Daily/Weekly triggers** in action. |
-| **0:48–0:55** | **🛡️ Log-Drain ROI Node** | **WOW MOMENT 2:** Show the node sending **"120 mins saved"** to Supabase. |
-| **0:55–1:00** | **Final Zoom-to-fit** | Close with the image of the entire **Autonomous Lifecycle**. |
+**Word Count Verification: 6+5+6+6+5+5+5+5+5+5+6+6+5 = 70 words ✅**
 
 ---
 
