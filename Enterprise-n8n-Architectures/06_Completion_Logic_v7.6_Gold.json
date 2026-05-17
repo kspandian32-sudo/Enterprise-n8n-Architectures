@@ -123,22 +123,37 @@
           },
           "sheetName": {
             "__rl": true,
-            "mode": "name",
-            "value": "Summary"
+            "mode": "id",
+            "value": "1994705565"
           },
-          "filtersUI": {
-            "values": [
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Status": "Archived",
+              "row_number": "={{ $('Execute Workflow Trigger').first().json.row_number }}"
+            },
+            "matchingColumns": [
+              "row_number"
+            ],
+            "schema": [
               {
-                "lookupColumn": "row_number",
-                "lookupValue": "={{ $json.row_number }}"
-              }
-            ]
-          },
-          "valuesUI": {
-            "values": [
+                "id": "Status",
+                "displayName": "Status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
               {
-                "columnName": "Status",
-                "value": "Archived"
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true
               }
             ]
           },
