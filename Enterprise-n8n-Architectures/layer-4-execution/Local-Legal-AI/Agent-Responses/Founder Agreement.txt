@@ -1,0 +1,73 @@
+Okay, I have carefully reviewed the provided contract sections (Contexts 0-3) regarding termination, expiry, exit, and post-termination obligations.
+
+Here is the **Termination & Exit Report** based *exclusively* on the information provided:
+
+---
+
+**1. CONTRACT DURATION**
+
+*   **Start date:** Not explicitly stated in the provided sections. The contract was executed on April 13, 2026 (as per the "IN WITNESS WHEREOF" clause in Context 0). The term likely starts on this date.
+*   **End date:** Not explicitly stated. However, Context 3 mentions a 12-month term for the auto-renewal clause (Section 9.1). Assuming the initial term is also 12 months unless stated otherwise.
+*   **Auto-renewal terms:** Yes, the contract auto-renews annually. (Context 3, Section 9.1)
+    *   **Opt-out window and deadline:** To opt-out, a party must provide written notice of non-renewal at least 7 days prior to the end of the then-current term. (Context 3, Section 9.1)
+
+**Flag:** Does it auto-renew? **Yes**. What is the opt-out window and deadline? **Opt-out requires written notice at least 7 days before the end of the current term.**
+
+---
+
+**2. HOW YOU CAN EXIT — YOUR TERMINATION RIGHTS (Client - Verdant Commerce)**
+
+| Termination Type         | Notice Required | Conditions                                                                                                | Compensation Due | Clause |
+| :----------------------- | :-------------- | :--------------------------------------------------------------------------------------------------------- | :--------------- | :----- |
+| **For Cause**            |                 | Material breach by the Service Provider (NexaTech). Notice required.                                         | Not specified    | 9.4    |
+| **For Convenience**      | 90 days         | No specific cause required.                                                                                | Not specified    | 9.3(a) |
+| **Breach by Them**       | 15 days cure period | Service Provider commits a material breach. Client provides notice. Provider fails to cure within 15 days. | Not specified    | 9.4    |
+
+*(Note: "Your" termination rights are interpreted as the Client's rights, based on the context provided where the Client is the one receiving services.)*
+
+---
+
+**3. HOW THEY CAN EXIT — THEIR TERMINATION RIGHTS (Service Provider - NexaTech)**
+
+| Termination Type         | Notice Required | Conditions                                                                                                | Compensation Due | Clause |
+| :----------------------- | :-------------- | :--------------------------------------------------------------------------------------------------------- | :--------------- | :----- |
+| **For Cause**            |                 | Material breach by the Client. Notice required.                                                             | Not specified    | 9.4    |
+| **For Convenience**      | 7 days          | No specific cause required.                                                                                | Not specified    | 9.3(b) |
+| **Breach by Them**       | 15 days cure period | Client commits a material breach. Service Provider provides notice. Client fails to cure within 15 days. | Not specified    | 9.4    |
+
+---
+
+**4. POST-TERMINATION OBLIGATIONS**
+
+*   **Confidentiality:** Obligation to maintain confidentiality survives termination for a period of **5 years**. (Context 2, Section 5.2)
+*   **Non-compete (Client):** The Client agrees not to engage other similar software development firms for **24 months** after termination/expiry. (Context 2, Section 6.1)
+*   **Non-solicitation (Both Parties):** Neither party may solicit employees/partners of the other party for **18 months** after termination/expiry. (Context 2, Section 6.2)
+*   **Payment Obligations:** The Client must pay all outstanding amounts due under the contract, including undisputed invoices. (Implied by standard contract clauses, though not explicitly detailed in the provided snippets regarding post-termination payments).
+*   **IP Return:** Not explicitly detailed in the provided sections.
+*   **Data Deletion:** Not explicitly detailed in the provided sections.
+
+---
+
+**5. EXIT COST ANALYSIS**
+
+Based on the provided sections, the explicit costs associated with exiting are primarily tied to **time** rather than specific liquidated damages or clawbacks:
+
+*   **Financial Penalties:** **None** explicitly mentioned in the provided sections for termination costs (neither for convenience nor for cause).
+*   **Notice Period Costs:** This is the primary cost. The notice periods vary significantly:
+    *   Client terminating for **Convenience:** Requires **90 days** notice. During this period, the Service Provider continues to be paid (though work may stop). This represents a significant cost/loss in opportunity or resources.
+    *   Service Provider terminating for **Convenience:** Requires only **7 days** notice. Minimal direct cost from the Service Provider's perspective, but potentially significant for the Client if work stops abruptly.
+    *   Termination for **Cause** (Client): Requires 15 days cure period if breach exists. If no cure, termination can occur sooner, but no direct exit cost specified.
+    *   Termination for **Cause** (Service Provider): Requires 15 days cure period if breach exists. If no cure, termination can occur sooner, but no direct exit cost specified.
+*   **Clawback or Liquidated Damages:** **None** explicitly mentioned in the provided sections.
+
+**Flag:** Clause references for all points are included above. No clauses appear *unusually harsh* or *unenforceable* under the Indian Contract Act 1872 based *solely* on the provided sections, although the lack of compensation clauses for convenience termination could be viewed as harsh by some standards. The long post-termination restrictions (5 years confidentiality, 24 months non-compete) might be scrutinized under Section 27 of the Indian Contract Act (Impossibility of Performance), but they appear standard for service contracts.
+
+---
+
+**6. TERMINATION RISK VERDICT**
+
+*   **Rate:** **HIGH**
+*   **Plain-English answer:** Yes, you can exit the contract, but primarily by giving a long notice period (90 days for convenience). There are no direct financial penalties for your exit, but the Service Provider's exit (via convenience) requires only a short notice (7 days). The main risk lies in the Service Provider potentially having significant leverage due to the long notice period you must give, and there is no clear financial remedy if they breach the contract.
+*   **Flag:** **Termination for Convenience (Section 9.3(a))** requires 90 days' notice from the Client. **Termination for Cause (Section 9.4)** does not specify compensation for the non-breaching party whose convenience is terminated. These clauses lack financial penalty provisions, which could be seen as harsh or potentially unenforceable if challenged (though not necessarily under the Act itself, but potentially in practice or via other remedies). The post-termination obligations (Confidentiality 5 years, Client Non-compete 24 months) are also very long and could be challenged.
+
+---

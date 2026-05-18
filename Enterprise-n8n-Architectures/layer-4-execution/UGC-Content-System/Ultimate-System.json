@@ -1,0 +1,1575 @@
+﻿{
+    "updatedAt":  "2026-01-17T22:09:02.582Z",
+    "createdAt":  "2026-01-17T17:41:25.512Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "Nano plus Veo, Veo and Sora Lanes Added - Ultimate UGC Content System with AI Agents",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "field":  "minutes",
+                                                                           "minutesInterval":  15
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -336,
+                                       1632
+                                   ],
+                      "id":  "f26be425-ae95-470e-9328-191e71be7da1",
+                      "name":  "Schedule Trigger"
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "UGC Ads Veo \u0026 Sora",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "gid=0",
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Sheet1",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU/edit#gid=0"
+                                                       },
+                                         "filtersUI":  {
+                                                           "values":  [
+                                                                          {
+                                                                              "lookupColumn":  "Status",
+                                                                              "lookupValue":  "Ready"
+                                                                          }
+                                                                      ]
+                                                       },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       -112,
+                                       1632
+                                   ],
+                      "id":  "cb6fb684-6ad4-483f-b826-607d342e85ae",
+                      "name":  "Get row(s) in sheet",
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "your-email@example.com"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "rules":  {
+                                                       "values":  [
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "strict",
+                                                                                                             "version":  3
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "leftValue":  "={{ $json.Model }}",
+                                                                                                                    "rightValue":  "Veo 3.1",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "equals"
+                                                                                                                                 },
+                                                                                                                    "id":  "8adb1525-1d86-45fb-8c32-eecf5fe8e7eb"
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      },
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "strict",
+                                                                                                             "version":  3
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "e9be0f9b-3753-46ad-bd14-00eb99ef3bd9",
+                                                                                                                    "leftValue":  "={{ $json.Model }}",
+                                                                                                                    "rightValue":  "=Nano + Veo 3.1",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "dateTime",
+                                                                                                                                     "operation":  "equals"
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      },
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "strict",
+                                                                                                             "version":  3
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "e8c91d42-c98e-4cdd-8235-b24b7ee01a2d",
+                                                                                                                    "leftValue":  "={{ $json.Model }}",
+                                                                                                                    "rightValue":  "=Sora 2",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "dateTime",
+                                                                                                                                     "operation":  "equals"
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      },
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "strict",
+                                                                                                             "version":  3
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "685d727f-3730-4623-a6db-20c9d1cc844d",
+                                                                                                                    "leftValue":  "",
+                                                                                                                    "rightValue":  "",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "equals",
+                                                                                                                                     "name":  "filter.operator.equals"
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      }
+                                                                  ]
+                                                   },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.switch",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       112,
+                                       1600
+                                   ],
+                      "id":  "89c51fcb-c331-4873-a84b-c9f4027bbfb6",
+                      "name":  "Switch"
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  "openai/gpt-4o-mini",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+                      "typeVersion":  1,
+                      "position":  [
+                                       408,
+                                       1456
+                                   ],
+                      "id":  "980b48c3-4c7b-48b3-9162-3b5489251f14",
+                      "name":  "OpenRouter Chat Model",
+                      "credentials":  {
+                                          "openRouterApi":  {
+                                                                "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                "name":  "OpenRouter account"
+                                                            }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "=Product: {{ $(\u0027Get row(s) in sheet\u0027).item.json.Product }}\nProduct ICP: {{ $(\u0027Get row(s) in sheet\u0027).item.json.ICP }}\nProduct Features: {{ $(\u0027Get row(s) in sheet\u0027).item.json[\u0027Product Features\u0027] }}\nVideo Setting: {{ $(\u0027Get row(s) in sheet\u0027).item.json[\u0027Video Setting\u0027] }}",
+                                         "options":  {
+                                                         "systemMessage":  "# System Prompt Template: Veo 3 UGC Selfie Video Generation (8 Seconds)\n\n## Role\nYou are an **advanced UGC video creator** optimizing for **Veo 3**.\nYour task is to **generate a prompt for a Veo 3 AI video model** based on the product, customer profile, features, and setting.\n\n## Requirements\n- Subject: A realistic human influencer holding the product.\n- Framing: Selfie-style, vertical (9:16), handheld.\n- Style: Natural lighting, realistic environment, slight camera shake.\n- Tone: Authentic, unscripted, genuine.\n- Duration: 8 seconds.\n- Output: Write ONLY the prompt text describing the video scene and the script. Do not add explanations."
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3,
+                      "position":  [
+                                       336,
+                                       1232
+                                   ],
+                      "id":  "36d9c706-c404-407a-a7e2-6baf5ac3a374",
+                      "name":  "AI Agent"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.kie.ai/api/v1/veo/generate",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={\n  \"prompt\": \"{{ $json.output.replace(/\\r?\\n|\\r/g, \u0027 \u0027).replace(/\"/g, \u0027\u0027).replace(/[â€œâ€]/g, \u0027\u0027) }}\",\n  \"imageUrls\": [\"{{ $(\u0027Get row(s) in sheet\u0027).item.json[\u0027Product Photo\u0027] }}\"],\n  \"model\": \"veo3_fast\",\n  \"aspectRatio\": \"9:16\",\n  \"enableTranslation\": true\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       688,
+                                       1336
+                                   ],
+                      "id":  "c76bf8e2-621a-4a40-b301-cee1c1dec81a",
+                      "name":  "HTTP Request",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "Header Auth account 2"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "amount":  10
+                                     },
+                      "type":  "n8n-nodes-base.wait",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       912,
+                                       1336
+                                   ],
+                      "id":  "d0c73ff9-a4b4-4401-ad21-a880f8274a5b",
+                      "name":  "Wait",
+                      "webhookId":  "531618ed-e7f2-4a96-b367-bd7641718061"
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "https://api.kie.ai/api/v1/veo/record-info",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendQuery":  true,
+                                         "queryParameters":  {
+                                                                 "parameters":  [
+                                                                                    {
+                                                                                        "name":  "taskId",
+                                                                                        "value":  "={{ $(\u0027HTTP Request\u0027).item.json.data.taskId }}"
+                                                                                    }
+                                                                                ]
+                                                             },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       1136,
+                                       1264
+                                   ],
+                      "id":  "224f68ea-608b-446f-9785-b9f74540f493",
+                      "name":  "HTTP Request1",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "Header Auth account 2"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  3
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "422668e4-ed0f-4422-8bcf-d17cd89215a7",
+                                                                                   "leftValue":  "={{ $json.data.successFlag }}",
+                                                                                   "rightValue":  1,
+                                                                                   "operator":  {
+                                                                                                    "type":  "number",
+                                                                                                    "operation":  "equals"
+                                                                                                }
+                                                                               },
+                                                                               {
+                                                                                   "id":  "b2c10767-028d-4f49-8868-41214844dcf3",
+                                                                                   "leftValue":  "",
+                                                                                   "rightValue":  "",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "equals",
+                                                                                                    "name":  "filter.operator.equals"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       1360,
+                                       1336
+                                   ],
+                      "id":  "c0e25a57-e492-4776-aaa2-2ba30aed683a",
+                      "name":  "If"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "update",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "UGC Ads Veo \u0026 Sora",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "gid=0",
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Sheet1",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU/edit#gid=0"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "Status":  "Finished",
+                                                                       "Finished Video":  "={{ $(\u0027HTTP Request1\u0027).item.json.data.response.resultUrls[0] }}",
+                                                                       "No":  "={{ $(\u0027Get row(s) in sheet\u0027).item.json.No }}"
+                                                                   },
+                                                         "matchingColumns":  [
+                                                                                 "No"
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "No",
+                                                                            "displayName":  "No",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "Product",
+                                                                            "displayName":  "Product",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Product Photo",
+                                                                            "displayName":  "Product Photo",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "ICP",
+                                                                            "displayName":  "ICP",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Product Features",
+                                                                            "displayName":  "Product Features",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Video Setting",
+                                                                            "displayName":  "Video Setting",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Model",
+                                                                            "displayName":  "Model",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Status",
+                                                                            "displayName":  "Status",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Finished Video",
+                                                                            "displayName":  "Finished Video",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "row_number",
+                                                                            "displayName":  "row_number",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "readOnly":  true,
+                                                                            "removed":  true
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     },
+                                         "range":  "A:Z",
+                                         "values":  [
+
+                                                    ]
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       1648,
+                                       1336
+                                   ],
+                      "id":  "1bdb636c-a2ad-4545-aecb-0a7fa9b2e1f7",
+                      "name":  "Update row in sheet",
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "your-email@example.com"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "=Product: {{ $(\u0027Get row(s) in sheet\u0027).item.json.Product }}\nProduct ICP: {{ $(\u0027Get row(s) in sheet\u0027).item.json.ICP }}\nProduct Features: {{ $(\u0027Get row(s) in sheet\u0027).item.json[\u0027Product Features\u0027] }}\nVideo Setting: {{ $(\u0027Get row(s) in sheet\u0027).item.json[\u0027Video Setting\u0027] }}",
+                                         "options":  {
+                                                         "systemMessage":  "# System Prompt Template: Sora UGC Video Generation\n\n## Role\nYou are an expert video director optimized for OpenAI\u0027s **Sora**.\nYour task is to generate a highly detailed, cinematic prompt based on the product and setting.\n\n## Requirements\n- Style: Photorealistic, cinematic lighting, high resolution, 8k.\n- Motion: Smooth, stable camera movement.\n- Subject: Influencer holding the product naturally.\n- Duration: 10 seconds.\n- Output: Write ONLY the prompt text. No explanations."
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3,
+                      "position":  [
+                                       336,
+                                       1920
+                                   ],
+                      "id":  "fa59558d-5553-41ed-8660-f0867bdaae03",
+                      "name":  "AI Agent1"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.kie.ai/api/v1/jobs/createTask",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={\n  \"model\": \"sora-2-text-to-video\",\n  \"input\": {\n    \"prompt\": \"{{ $json.output.replace(/\\r?\\n|\\r/g, \u0027 \u0027).replace(/\"/g, \u0027\u0027).replace(/[â€œâ€]/g, \u0027\u0027) }}\",\n    \"aspect_ratio\": \"portrait\"\n  }\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       688,
+                                       1920
+                                   ],
+                      "id":  "9a7bec02-a62e-4c18-b70c-81f0cdd004af",
+                      "name":  "HTTP Request2",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "Header Auth account 2"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "amount":  10
+                                     },
+                      "type":  "n8n-nodes-base.wait",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       912,
+                                       1920
+                                   ],
+                      "id":  "4e9b432d-f1f9-4b9c-8375-467520f48da1",
+                      "name":  "Wait1",
+                      "webhookId":  "5e46b5cf-cc80-47fd-803b-6251ff317932"
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "https://api.kie.ai/api/v1/jobs/recordInfo",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendQuery":  true,
+                                         "queryParameters":  {
+                                                                 "parameters":  [
+                                                                                    {
+                                                                                        "name":  "taskId",
+                                                                                        "value":  "={{ $json.data.taskId }}"
+                                                                                    }
+                                                                                ]
+                                                             },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       1136,
+                                       1848
+                                   ],
+                      "id":  "971fae65-3cfb-41a5-b236-a5883654fd1d",
+                      "name":  "HTTP Request3",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "Header Auth account 2"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  3
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "d6425839-beb3-4a85-9b46-92a0af3029c1",
+                                                                                   "leftValue":  "={{ $json.data.state }}",
+                                                                                   "rightValue":  "success",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "equals"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       1360,
+                                       1920
+                                   ],
+                      "id":  "144c5216-ad5f-4fb0-bece-ca1e7a37c7e4",
+                      "name":  "If1"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "update",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "UGC Ads Veo \u0026 Sora",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "gid=0",
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Sheet1",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU/edit#gid=0"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "No":  "={{ $(\u0027Get row(s) in sheet\u0027).item.json.No }}",
+                                                                       "Status":  "Finished",
+                                                                       "Finished Video":  "={{ $(\u0027HTTP Request3\u0027).item.json.data.resultJson }}"
+                                                                   },
+                                                         "matchingColumns":  [
+                                                                                 "No"
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "No",
+                                                                            "displayName":  "No",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "Product",
+                                                                            "displayName":  "Product",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Product Photo",
+                                                                            "displayName":  "Product Photo",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "ICP",
+                                                                            "displayName":  "ICP",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Product Features",
+                                                                            "displayName":  "Product Features",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Video Setting",
+                                                                            "displayName":  "Video Setting",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Model",
+                                                                            "displayName":  "Model",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Status",
+                                                                            "displayName":  "Status",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Finished Video",
+                                                                            "displayName":  "Finished Video",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "row_number",
+                                                                            "displayName":  "row_number",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "readOnly":  true,
+                                                                            "removed":  true
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     },
+                                         "range":  "A:Z",
+                                         "values":  [
+
+                                                    ]
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       1648,
+                                       1920
+                                   ],
+                      "id":  "8261b760-3016-4c94-ac3e-55a95fb64523",
+                      "name":  "Update row in sheet1",
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "your-email@example.com"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "=Product: {{ $(\u0027Get row(s) in sheet\u0027).item.json.Product }}\nProduct ICP: {{ $(\u0027Get row(s) in sheet\u0027).item.json.ICP }}\nProduct Features: {{ $(\u0027Get row(s) in sheet\u0027).item.json[\u0027Product Features\u0027] }}\nVideo Setting: {{ $(\u0027Get row(s) in sheet\u0027).item.json[\u0027Video Setting\u0027] }}",
+                                         "options":  {
+                                                         "systemMessage":  "# System Prompt Template: Flux/Nano Image Generation\n\n## Role\nYou are an expert photographer creating a prompt for a **hyper-realistic portrait**.\nYour task is to describe the Influencer (Avatar) based on the ICP and Product.\n\n## Requirements\n- Subject: Close-up or medium shot of a person matching the ICP (Ideal Customer Profile).\n- Details: Describe their face, hair, expression, and lighting.\n- Product: Mention they are holding the product naturally.\n- Style: 8k resolution, raw photo, realistic texture, soft lighting.\n- Output: Write ONLY the image prompt. No explanations."
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3,
+                      "position":  [
+                                       336,
+                                       1632
+                                   ],
+                      "id":  "a6e6b1e5-815d-4bc9-98a8-fcd416028c6b",
+                      "name":  "AI Agent2"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.kie.ai/api/v1/jobs/createTask",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={\n  \"model\": \"google/nano-banana\",\n  \"input\": {\n    \"prompt\": \"{{ $json.output.replace(/\\r?\\n|\\r/g, \u0027 \u0027).replace(/\"/g, \u0027\u0027).replace(/[â€œâ€]/g, \u0027\u0027) }}\",\n    \"aspect_ratio\": \"9:16\"\n  }\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       688,
+                                       1632
+                                   ],
+                      "id":  "74b1c622-dea4-45f7-8ee8-ca2da27142fa",
+                      "name":  "HTTP Request4",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "Header Auth account 2"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "amount":  10
+                                     },
+                      "type":  "n8n-nodes-base.wait",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       912,
+                                       1632
+                                   ],
+                      "id":  "bdbcd406-153a-434d-b910-ee4754d05f92",
+                      "name":  "Wait2",
+                      "webhookId":  "d408d4a5-1ce1-4442-b7eb-e58a6aaac5d3"
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "https://api.kie.ai/api/v1/jobs/recordInfo",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendQuery":  true,
+                                         "queryParameters":  {
+                                                                 "parameters":  [
+                                                                                    {
+                                                                                        "name":  "taskId",
+                                                                                        "value":  "={{ $json.data.taskId }}"
+                                                                                    }
+                                                                                ]
+                                                             },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       1136,
+                                       1552
+                                   ],
+                      "id":  "e4b6f28a-6cad-4403-8f0d-a0de22304e25",
+                      "name":  "HTTP Request5",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "Header Auth account 2"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  3
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "91d72962-0c0b-42ad-9144-78fd7565cdce",
+                                                                                   "leftValue":  "={{ $json.data.state }}",
+                                                                                   "rightValue":  "success",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "equals"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       1360,
+                                       1632
+                                   ],
+                      "id":  "5bf9b44c-c6ee-427e-a625-0c6a96332b6a",
+                      "name":  "If2"
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "=Product: {{ $(\u0027Get row(s) in sheet\u0027).item.json.Product }}\nProduct ICP: {{ $(\u0027Get row(s) in sheet\u0027).item.json.ICP }}\nProduct Features: {{ $(\u0027Get row(s) in sheet\u0027).item.json[\u0027Product Features\u0027] }}\nVideo Setting: {{ $(\u0027Get row(s) in sheet\u0027).item.json[\u0027Video Setting\u0027] }}",
+                                         "options":  {
+                                                         "systemMessage":  "# System Prompt Template: Veo Image-to-Video\n\n## Role\nYou are an expert video director. You have a static image of an influencer.\nYour task is to write a prompt to animate this image using Google Veo.\n\n## Requirements\n- Motion: Describe natural, fluid movements (e.g., \"The character smiles and lifts the product\", \"Soft camera zoom\").\n- Action: The character should interact with the product.\n- Style: Keep it cinematic and realistic.\n- Output: Write ONLY the prompt text."
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3,
+                      "position":  [
+                                       1552,
+                                       1632
+                                   ],
+                      "id":  "87538c3e-4346-4416-aa78-0619d66ae07c",
+                      "name":  "AI Agent3"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.kie.ai/api/v1/veo/generate",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={\n  \"model\": \"veo3_fast\",\n  \"aspectRatio\": \"9:16\",\n  \"prompt\": \"{{ $json.prompt.replace(/\\r?\\n|\\r/g, \u0027 \u0027).replace(/\"/g, \u0027\u0027) }}\",\n  \"imageUrls\": [\n    \"{{ $json.clean_image_url }}\"\n  ]\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       1952,
+                                       1632
+                                   ],
+                      "id":  "fd368b7a-2c2a-4905-9e1c-bb9647b28d09",
+                      "name":  "HTTP Request6",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "Header Auth account 2"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// 1. Get the Check Status Node\nconst statusNode = $(\u0027HTTP Request5\u0027).first();\n\nif (!statusNode) {\n  throw new Error(\"âŒ I cannot find \u0027HTTP Request5\u0027. Please re-run the previous nodes to fill the pipe.\");\n}\n\n// 2. THE FIX: We look inside \u0027.data\u0027 first\n// The error log showed us that \u0027resultJson\u0027 is nested inside \u0027data\u0027\nconst actualData = statusNode.json.data || statusNode.json;\n\n// 3. Unzip the folder\nlet cleanUrl;\ntry {\n  const dataObj = JSON.parse(actualData.resultJson);\n  cleanUrl = dataObj.resultUrls[0];\n} catch (error) {\n  throw new Error(\"âŒ Parsing failed. Structure found: \" + JSON.stringify(actualData));\n}\n\n// 4. Return the clean Link\nreturn [\n  {\n    json: {\n      clean_image_url: cleanUrl,\n      prompt: $input.item.json.output\n    }\n  }\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       1824,
+                                       1632
+                                   ],
+                      "id":  "b50f2416-2c05-4ffc-9407-fb887d3f20f5",
+                      "name":  "Code in JavaScript"
+                  },
+                  {
+                      "parameters":  {
+                                         "amount":  1.5,
+                                         "unit":  "minutes"
+                                     },
+                      "type":  "n8n-nodes-base.wait",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       2128,
+                                       1632
+                                   ],
+                      "id":  "963a095f-1926-497c-9498-2377e4326432",
+                      "name":  "Wait3",
+                      "webhookId":  "b3c8eebc-aaf0-42f2-80ac-429475ad4d77"
+                  },
+                  {
+                      "parameters":  {
+                                         "url":  "https://api.kie.ai/api/v1/veo/record-info",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpHeaderAuth",
+                                         "sendQuery":  true,
+                                         "queryParameters":  {
+                                                                 "parameters":  [
+                                                                                    {
+                                                                                        "name":  "taskId",
+                                                                                        "value":  "={{ $(\u0027HTTP Request6\u0027).first().json.data.taskId }}"
+                                                                                    }
+                                                                                ]
+                                                             },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       2272,
+                                       1632
+                                   ],
+                      "id":  "feaa00f4-6eb2-4931-b2d4-8d754178af54",
+                      "name":  "HTTP Request7",
+                      "credentials":  {
+                                          "httpHeaderAuth":  {
+                                                                 "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                 "name":  "Header Auth account 2"
+                                                             }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  3
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "dc205f46-a77b-4946-b66c-19e5753ae67d",
+                                                                                   "leftValue":  "={{ $json.msg }}",
+                                                                                   "rightValue":  "success",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "equals"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       2480,
+                                       1632
+                                   ],
+                      "id":  "7dcf859f-b05a-4588-a631-ea6156aed1ab",
+                      "name":  "If3"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "update",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "UGC Ads Veo \u0026 Sora",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "gid=0",
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Sheet1",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1blZVMxuNv5k0tXHcbT0HWsa6TvJYDT-H2trSSGeswIU/edit#gid=0"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "No":  "={{ $(\u0027Get row(s) in sheet\u0027).item.json.No }}",
+                                                                       "Status":  "Finished",
+                                                                       "Finished Video":  "={{ $(\u0027HTTP Request7\u0027).item.json.data.response.resultUrls[0] }}"
+                                                                   },
+                                                         "matchingColumns":  [
+                                                                                 "No"
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "No",
+                                                                            "displayName":  "No",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "Product",
+                                                                            "displayName":  "Product",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Product Photo",
+                                                                            "displayName":  "Product Photo",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "ICP",
+                                                                            "displayName":  "ICP",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Product Features",
+                                                                            "displayName":  "Product Features",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Video Setting",
+                                                                            "displayName":  "Video Setting",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Model",
+                                                                            "displayName":  "Model",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Status",
+                                                                            "displayName":  "Status",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Finished Video",
+                                                                            "displayName":  "Finished Video",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "row_number",
+                                                                            "displayName":  "row_number",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "readOnly":  true,
+                                                                            "removed":  true
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     },
+                                         "range":  "A:Z",
+                                         "values":  [
+
+                                                    ]
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       2720,
+                                       1408
+                                   ],
+                      "id":  "00463323-12fd-45b7-bd36-8e05218b2c27",
+                      "name":  "Update row in sheet2",
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "your-email@example.com"
+                                                                    }
+                                      }
+                  }
+              ],
+    "connections":  {
+                        "Schedule Trigger":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Get row(s) in sheet",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "Get row(s) in sheet":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Switch",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Switch":  {
+                                       "main":  [
+                                                    [
+                                                        {
+                                                            "node":  "AI Agent",
+                                                            "type":  "main",
+                                                            "index":  0
+                                                        }
+                                                    ],
+                                                    [
+                                                        {
+                                                            "node":  "AI Agent2",
+                                                            "type":  "main",
+                                                            "index":  0
+                                                        }
+                                                    ],
+                                                    [
+                                                        {
+                                                            "node":  "AI Agent1",
+                                                            "type":  "main",
+                                                            "index":  0
+                                                        }
+                                                    ]
+                                                ]
+                                   },
+                        "OpenRouter Chat Model":  {
+                                                      "ai_languageModel":  [
+                                                                               [
+                                                                                   {
+                                                                                       "node":  "AI Agent",
+                                                                                       "type":  "ai_languageModel",
+                                                                                       "index":  0
+                                                                                   },
+                                                                                   {
+                                                                                       "node":  "AI Agent1",
+                                                                                       "type":  "ai_languageModel",
+                                                                                       "index":  0
+                                                                                   },
+                                                                                   {
+                                                                                       "node":  "AI Agent2",
+                                                                                       "type":  "ai_languageModel",
+                                                                                       "index":  0
+                                                                                   },
+                                                                                   {
+                                                                                       "node":  "AI Agent3",
+                                                                                       "type":  "ai_languageModel",
+                                                                                       "index":  0
+                                                                                   }
+                                                                               ]
+                                                                           ]
+                                                  },
+                        "AI Agent":  {
+                                         "main":  [
+                                                      [
+                                                          {
+                                                              "node":  "HTTP Request",
+                                                              "type":  "main",
+                                                              "index":  0
+                                                          }
+                                                      ]
+                                                  ]
+                                     },
+                        "HTTP Request":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Wait",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "Wait":  {
+                                     "main":  [
+                                                  [
+                                                      {
+                                                          "node":  "HTTP Request1",
+                                                          "type":  "main",
+                                                          "index":  0
+                                                      }
+                                                  ]
+                                              ]
+                                 },
+                        "HTTP Request1":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "If",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "If":  {
+                                   "main":  [
+                                                [
+                                                    {
+                                                        "node":  "Update row in sheet",
+                                                        "type":  "main",
+                                                        "index":  0
+                                                    }
+                                                ],
+                                                [
+                                                    {
+                                                        "node":  "Wait",
+                                                        "type":  "main",
+                                                        "index":  0
+                                                    }
+                                                ]
+                                            ]
+                               },
+                        "AI Agent1":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "HTTP Request2",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "HTTP Request2":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Wait1",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Wait1":  {
+                                      "main":  [
+                                                   [
+                                                       {
+                                                           "node":  "HTTP Request3",
+                                                           "type":  "main",
+                                                           "index":  0
+                                                       }
+                                                   ]
+                                               ]
+                                  },
+                        "HTTP Request3":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "If1",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "If1":  {
+                                    "main":  [
+                                                 [
+                                                     {
+                                                         "node":  "Update row in sheet1",
+                                                         "type":  "main",
+                                                         "index":  0
+                                                     }
+                                                 ],
+                                                 [
+                                                     {
+                                                         "node":  "Wait1",
+                                                         "type":  "main",
+                                                         "index":  0
+                                                     }
+                                                 ]
+                                             ]
+                                },
+                        "AI Agent2":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "HTTP Request4",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "HTTP Request4":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Wait2",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Wait2":  {
+                                      "main":  [
+                                                   [
+                                                       {
+                                                           "node":  "HTTP Request5",
+                                                           "type":  "main",
+                                                           "index":  0
+                                                       }
+                                                   ]
+                                               ]
+                                  },
+                        "HTTP Request5":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "If2",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "If2":  {
+                                    "main":  [
+                                                 [
+                                                     {
+                                                         "node":  "AI Agent3",
+                                                         "type":  "main",
+                                                         "index":  0
+                                                     }
+                                                 ],
+                                                 [
+                                                     {
+                                                         "node":  "Wait2",
+                                                         "type":  "main",
+                                                         "index":  0
+                                                     }
+                                                 ]
+                                             ]
+                                },
+                        "AI Agent3":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Code in JavaScript",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Code in JavaScript":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "HTTP Request6",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "HTTP Request6":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Wait3",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Wait3":  {
+                                      "main":  [
+                                                   [
+                                                       {
+                                                           "node":  "HTTP Request7",
+                                                           "type":  "main",
+                                                           "index":  0
+                                                       }
+                                                   ]
+                                               ]
+                                  },
+                        "HTTP Request7":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "If3",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "If3":  {
+                                    "main":  [
+                                                 [
+                                                     {
+                                                         "node":  "Update row in sheet2",
+                                                         "type":  "main",
+                                                         "index":  0
+                                                     }
+                                                 ],
+                                                 [
+                                                     {
+                                                         "node":  "Wait3",
+                                                         "type":  "main",
+                                                         "index":  0
+                                                     }
+                                                 ]
+                                             ]
+                                }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1"
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "templateCredsSetupCompleted":  true
+             },
+    "pinData":  {
+                    "Schedule Trigger":  [
+                                             {
+                                                 "json":  {
+                                                              "timestamp":  "2026-01-17T17:57:18.833+05:30",
+                                                              "Readable date":  "January 17th 2026, 5:57:18 pm",
+                                                              "Readable time":  "5:57:18 pm",
+                                                              "Day of week":  "Saturday",
+                                                              "Year":  "2026",
+                                                              "Month":  "January",
+                                                              "Day of month":  "17",
+                                                              "Hour":  "17",
+                                                              "Minute":  "57",
+                                                              "Second":  "18",
+                                                              "Timezone":  "Asia/Kolkata (UTC+05:30)"
+                                                          },
+                                                 "pairedItem":  {
+                                                                    "item":  0
+                                                                }
+                                             }
+                                         ]
+                },
+    "versionId":  "68d90f43-fa3e-4e7f-9d35-9a208d0b9bd6",
+    "activeVersionId":  null,
+    "versionCounter":  66,
+    "triggerCount":  0,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-01-17T17:41:25.522Z",
+                       "createdAt":  "2026-01-17T17:41:25.522Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "4XktIjlnuWYNqiFq",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+                 {
+                     "updatedAt":  "2026-01-17T16:13:40.863Z",
+                     "createdAt":  "2026-01-17T16:13:40.863Z",
+                     "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                     "name":  "Nate Herk"
+                 }
+             ],
+    "activeVersion":  null
+}

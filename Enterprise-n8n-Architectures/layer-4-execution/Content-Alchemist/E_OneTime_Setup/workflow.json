@@ -1,0 +1,890 @@
+﻿{
+    "updatedAt":  "2026-04-10T04:22:47.341Z",
+    "createdAt":  "2026-04-10T02:22:20.926Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "âš™ï¸ Content Alchemist â€” ONE-TIME SETUP (Run Once Then Disable)",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "id":  "feec612a-8f8e-4365-9100-f48244f76d31",
+                      "name":  "Manual Trigger â€” Run Once",
+                      "parameters":  {
+
+                                     },
+                      "position":  [
+                                       3552,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.manualTrigger",
+                      "typeVersion":  1
+                  },
+                  {
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      },
+                      "id":  "7d50b747-be29-4629-bb99-2f4c4e99813c",
+                      "name":  "Create Content Factory Root Folder",
+                      "parameters":  {
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "list",
+                                                          "value":  "root"
+                                                      },
+                                         "name":  "Content Alchemist - Root",
+                                         "operation":  "create",
+                                         "options":  {
+
+                                                     },
+                                         "resource":  "folder"
+                                     },
+                      "position":  [
+                                       3808,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3
+                  },
+                  {
+                      "id":  "1c513d8e-cb2d-421e-9084-39ceef3d7d20",
+                      "name":  "Store Root Folder ID",
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "root-id",
+                                                                                     "name":  "rootFolderId",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $json.id }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "root-name",
+                                                                                     "name":  "rootFolderName",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $json.name }}"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "mode":  "manual",
+                                         "options":  {
+                                                         "includeBinary":  true
+                                                     }
+                                     },
+                      "position":  [
+                                       4048,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4
+                  },
+                  {
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      },
+                      "id":  "be8fae58-65f1-4db2-952d-de9a297460ec",
+                      "name":  "Create Incoming Audio Folder",
+                      "parameters":  {
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $json.rootFolderId }}"
+                                                      },
+                                         "name":  "Incoming Audio",
+                                         "operation":  "create",
+                                         "options":  {
+
+                                                     },
+                                         "resource":  "folder"
+                                     },
+                      "position":  [
+                                       4304,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3
+                  },
+                  {
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      },
+                      "id":  "b5125dd1-cb13-406c-b3ee-49502b72e136",
+                      "name":  "Create Transcript Folder",
+                      "parameters":  {
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Store Root Folder ID\u0027).item.json.rootFolderId }}"
+                                                      },
+                                         "name":  "Transcript",
+                                         "operation":  "create",
+                                         "options":  {
+
+                                                     },
+                                         "resource":  "folder"
+                                     },
+                      "position":  [
+                                       4560,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3
+                  },
+                  {
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      },
+                      "id":  "911a2c4d-38b2-4473-ac56-3ec46d545d5b",
+                      "name":  "Create LinkedIn Posts Folder",
+                      "parameters":  {
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Store Root Folder ID\u0027).item.json.rootFolderId }}"
+                                                      },
+                                         "name":  "LinkedIn Posts",
+                                         "operation":  "create",
+                                         "options":  {
+
+                                                     },
+                                         "resource":  "folder"
+                                     },
+                      "position":  [
+                                       4816,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3
+                  },
+                  {
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      },
+                      "id":  "3f773d0c-dfab-4e96-b967-ff09855f0c40",
+                      "name":  "Create Twitter Posts Folder",
+                      "parameters":  {
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Store Root Folder ID\u0027).item.json.rootFolderId }}"
+                                                      },
+                                         "name":  "Twitter Posts",
+                                         "operation":  "create",
+                                         "options":  {
+
+                                                     },
+                                         "resource":  "folder"
+                                     },
+                      "position":  [
+                                       5072,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3
+                  },
+                  {
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      },
+                      "id":  "e4b0bf95-eb64-4709-bc3f-b1b20d334431",
+                      "name":  "Create Hooks Folder",
+                      "parameters":  {
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Store Root Folder ID\u0027).item.json.rootFolderId }}"
+                                                      },
+                                         "name":  "Hooks",
+                                         "operation":  "create",
+                                         "options":  {
+
+                                                     },
+                                         "resource":  "folder"
+                                     },
+                      "position":  [
+                                       5328,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3
+                  },
+                  {
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      },
+                      "id":  "5038edb2-ec21-41e5-a584-499e062a8dbe",
+                      "name":  "Create Post Images Folder",
+                      "parameters":  {
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Store Root Folder ID\u0027).item.json.rootFolderId }}"
+                                                      },
+                                         "name":  "Post Images",
+                                         "operation":  "create",
+                                         "options":  {
+
+                                                     },
+                                         "resource":  "folder"
+                                     },
+                      "position":  [
+                                       5584,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3
+                  },
+                  {
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "AI Proposal - Google Drive"
+                                                                   }
+                                      },
+                      "id":  "dcce9b20-7229-4c42-b835-27774ecc7b2f",
+                      "name":  "Create Archive Folder",
+                      "parameters":  {
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Store Root Folder ID\u0027).item.json.rootFolderId }}"
+                                                      },
+                                         "name":  "Archive",
+                                         "operation":  "create",
+                                         "options":  {
+
+                                                     },
+                                         "resource":  "folder"
+                                     },
+                      "position":  [
+                                       5840,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3
+                  },
+                  {
+                      "id":  "8c961d19-3f60-42cf-976b-9ec31a3b6878",
+                      "name":  "Collect All Folder IDs",
+                      "parameters":  {
+                                         "jsCode":  "// All 7 folders have been created sequentially, collect their IDs\nconst rootId = $(\u0027Store Root Folder ID\u0027).item.json.rootFolderId;\nconst audioId = $(\u0027Create Incoming Audio Folder\u0027).item.json.id;\nconst transcriptId = $(\u0027Create Transcript Folder\u0027).item.json.id;\nconst linkedinId = $(\u0027Create LinkedIn Posts Folder\u0027).item.json.id;\nconst twitterId = $(\u0027Create Twitter Posts Folder\u0027).item.json.id;\nconst hooksId = $(\u0027Create Hooks Folder\u0027).item.json.id;\nconst imagesId = $(\u0027Create Post Images Folder\u0027).item.json.id;\nconst archiveId = $(\u0027Create Archive Folder\u0027).item.json.id;\n\nreturn [{\n  json: {\n    CONTENT_FACTORY_ROOT_ID: rootId,\n    INCOMING_AUDIO_FOLDER_ID: audioId,\n    TRANSCRIPT_FOLDER_ID: transcriptId,\n    LINKEDIN_POSTS_FOLDER_ID: linkedinId,\n    TWITTER_POSTS_FOLDER_ID: twitterId,\n    HOOKS_FOLDER_ID: hooksId,\n    POST_IMAGES_FOLDER_ID: imagesId,\n    ARCHIVE_FOLDER_ID: archiveId\n  }\n}];"
+                                     },
+                      "position":  [
+                                       6096,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2
+                  },
+                  {
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      },
+                      "id":  "70b7fe1e-b556-4823-83dc-1ee0a5abbc3f",
+                      "name":  "Create Content Alchemist Spreadsheet",
+                      "parameters":  {
+                                         "operation":  "create",
+                                         "options":  {
+
+                                                     },
+                                         "resource":  "spreadsheet",
+                                         "title":  "Content Alchemist"
+                                     },
+                      "position":  [
+                                       6352,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7
+                  },
+                  {
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      },
+                      "id":  "2366e4e6-acd2-4f5f-aa24-e47dac03849b",
+                      "name":  "Add LinkedIn Post Headers to Sheet1",
+                      "parameters":  {
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "Content":  "Content",
+                                                                       "Image URL":  "Image URL",
+                                                                       "Timestamp":  "Timestamp",
+                                                                       "Transcript":  "Transcript"
+                                                                   }
+                                                     },
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "={{ $(\u0027Create Content Alchemist Spreadsheet\u0027).item.json.spreadsheetId }}"
+                                                        },
+                                         "operation":  "append",
+                                         "options":  {
+
+                                                     },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "mode":  "name",
+                                                           "value":  "Sheet1"
+                                                       }
+                                     },
+                      "position":  [
+                                       6608,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7
+                  },
+                  {
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      },
+                      "id":  "rename-sheet1-http",
+                      "name":  "Rename Sheet1 to LinkedIn Post",
+                      "parameters":  {
+                                         "authentication":  "predefinedCredentialType",
+                                         "jsonBody":  "={\n  \"requests\": [\n    {\n      \"updateSheetProperties\": {\n        \"properties\": {\n          \"sheetId\": 0,\n          \"title\": \"LinkedIn Post\"\n        },\n        \"fields\": \"title\"\n      }\n    }\n  ]\n}",
+                                         "method":  "POST",
+                                         "nodeCredentialType":  "googleSheetsOAuth2Api",
+                                         "options":  {
+
+                                                     },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "url":  "=https://sheets.googleapis.com/v4/spreadsheets/{{ $(\u0027Create Content Alchemist Spreadsheet\u0027).item.json.spreadsheetId }}:batchUpdate"
+                                     },
+                      "position":  [
+                                       6864,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4
+                  },
+                  {
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      },
+                      "id":  "5e7e1beb-0e15-453a-85dc-1c07b23e218f",
+                      "name":  "Add X Post Tab",
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "={{ $(\u0027Create Content Alchemist Spreadsheet\u0027).item.json.spreadsheetId }}"
+                                                        },
+                                         "operation":  "create",
+                                         "options":  {
+
+                                                     },
+                                         "title":  "X Post"
+                                     },
+                      "position":  [
+                                       7120,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7
+                  },
+                  {
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      },
+                      "id":  "c2dbe222-4657-42ea-8121-c59f2ab16da8",
+                      "name":  "Add X Post Headers",
+                      "parameters":  {
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "Content":  "Content",
+                                                                       "Image URL":  "Image URL",
+                                                                       "Timestamp":  "Timestamp",
+                                                                       "Transcript":  "Transcript"
+                                                                   }
+                                                     },
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "={{ $(\u0027Create Content Alchemist Spreadsheet\u0027).item.json.spreadsheetId }}"
+                                                        },
+                                         "operation":  "append",
+                                         "options":  {
+
+                                                     },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "mode":  "name",
+                                                           "value":  "X Post"
+                                                       }
+                                     },
+                      "position":  [
+                                       7376,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7
+                  },
+                  {
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      },
+                      "id":  "4f884bee-8fb8-4377-81f3-6df1129c7901",
+                      "name":  "Add Hooks Tab",
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "={{ $(\u0027Create Content Alchemist Spreadsheet\u0027).item.json.spreadsheetId }}"
+                                                        },
+                                         "operation":  "create",
+                                         "options":  {
+
+                                                     },
+                                         "title":  "Hooks"
+                                     },
+                      "position":  [
+                                       7632,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7
+                  },
+                  {
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      },
+                      "id":  "654f0d88-b785-4c6d-95ff-98901cb6b3c3",
+                      "name":  "Add Hooks Headers",
+                      "parameters":  {
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "Hook":  "Hook",
+                                                                       "Timestamp":  "Timestamp",
+                                                                       "Transcript":  "Transcript"
+                                                                   }
+                                                     },
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "={{ $(\u0027Create Content Alchemist Spreadsheet\u0027).item.json.spreadsheetId }}"
+                                                        },
+                                         "operation":  "append",
+                                         "options":  {
+
+                                                     },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "mode":  "name",
+                                                           "value":  "Hooks"
+                                                       }
+                                     },
+                      "position":  [
+                                       7888,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7
+                  },
+                  {
+                      "id":  "f1d511f2-61db-4abd-9a34-a4e516a7a600",
+                      "name":  "Final Output â€” All IDs",
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "f1",
+                                                                                     "name":  "CONTENT_FACTORY_ROOT_ID",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $(\u0027Collect All Folder IDs\u0027).item.json.CONTENT_FACTORY_ROOT_ID }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "f2",
+                                                                                     "name":  "INCOMING_AUDIO_FOLDER_ID",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $(\u0027Collect All Folder IDs\u0027).item.json.INCOMING_AUDIO_FOLDER_ID }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "f3",
+                                                                                     "name":  "TRANSCRIPT_FOLDER_ID",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $(\u0027Collect All Folder IDs\u0027).item.json.TRANSCRIPT_FOLDER_ID }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "f4",
+                                                                                     "name":  "LINKEDIN_POSTS_FOLDER_ID",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $(\u0027Collect All Folder IDs\u0027).item.json.LINKEDIN_POSTS_FOLDER_ID }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "f5",
+                                                                                     "name":  "TWITTER_POSTS_FOLDER_ID",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $(\u0027Collect All Folder IDs\u0027).item.json.TWITTER_POSTS_FOLDER_ID }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "f6",
+                                                                                     "name":  "HOOKS_FOLDER_ID",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $(\u0027Collect All Folder IDs\u0027).item.json.HOOKS_FOLDER_ID }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "f7",
+                                                                                     "name":  "POST_IMAGES_FOLDER_ID",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $(\u0027Collect All Folder IDs\u0027).item.json.POST_IMAGES_FOLDER_ID }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "f8",
+                                                                                     "name":  "ARCHIVE_FOLDER_ID",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $(\u0027Collect All Folder IDs\u0027).item.json.ARCHIVE_FOLDER_ID }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "f9",
+                                                                                     "name":  "SHEETS_SPREADSHEET_ID",
+                                                                                     "type":  "string",
+                                                                                     "value":  "={{ $(\u0027Create Content Alchemist Spreadsheet\u0027).item.json.spreadsheetId }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "f10",
+                                                                                     "name":  "INSTRUCTIONS",
+                                                                                     "type":  "string",
+                                                                                     "value":  "Copy these IDs into the Config node in Workflow A (MAIN). Then disable this workflow."
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "mode":  "manual",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "position":  [
+                                       8144,
+                                       656
+                                   ],
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4
+                  }
+              ],
+    "connections":  {
+                        "Add Hooks Headers":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "index":  0,
+                                                                       "node":  "Final Output â€” All IDs",
+                                                                       "type":  "main"
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Add Hooks Tab":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "index":  0,
+                                                                   "node":  "Add Hooks Headers",
+                                                                   "type":  "main"
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Add LinkedIn Post Headers to Sheet1":  {
+                                                                    "main":  [
+                                                                                 [
+                                                                                     {
+                                                                                         "index":  0,
+                                                                                         "node":  "Rename Sheet1 to LinkedIn Post",
+                                                                                         "type":  "main"
+                                                                                     }
+                                                                                 ]
+                                                                             ]
+                                                                },
+                        "Add X Post Headers":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "index":  0,
+                                                                        "node":  "Add Hooks Tab",
+                                                                        "type":  "main"
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Add X Post Tab":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "index":  0,
+                                                                    "node":  "Add X Post Headers",
+                                                                    "type":  "main"
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Collect All Folder IDs":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "index":  0,
+                                                                            "node":  "Create Content Alchemist Spreadsheet",
+                                                                            "type":  "main"
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Create Archive Folder":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "index":  0,
+                                                                           "node":  "Collect All Folder IDs",
+                                                                           "type":  "main"
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Create Content Alchemist Spreadsheet":  {
+                                                                     "main":  [
+                                                                                  [
+                                                                                      {
+                                                                                          "index":  0,
+                                                                                          "node":  "Add LinkedIn Post Headers to Sheet1",
+                                                                                          "type":  "main"
+                                                                                      }
+                                                                                  ]
+                                                                              ]
+                                                                 },
+                        "Create Content Factory Root Folder":  {
+                                                                   "main":  [
+                                                                                [
+                                                                                    {
+                                                                                        "index":  0,
+                                                                                        "node":  "Store Root Folder ID",
+                                                                                        "type":  "main"
+                                                                                    }
+                                                                                ]
+                                                                            ]
+                                                               },
+                        "Create Hooks Folder":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "index":  0,
+                                                                         "node":  "Create Post Images Folder",
+                                                                         "type":  "main"
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Create Incoming Audio Folder":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "index":  0,
+                                                                                  "node":  "Create Transcript Folder",
+                                                                                  "type":  "main"
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         },
+                        "Create LinkedIn Posts Folder":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "index":  0,
+                                                                                  "node":  "Create Twitter Posts Folder",
+                                                                                  "type":  "main"
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         },
+                        "Create Post Images Folder":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "index":  0,
+                                                                               "node":  "Create Archive Folder",
+                                                                               "type":  "main"
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "Create Transcript Folder":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "index":  0,
+                                                                              "node":  "Create LinkedIn Posts Folder",
+                                                                              "type":  "main"
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "Create Twitter Posts Folder":  {
+                                                            "main":  [
+                                                                         [
+                                                                             {
+                                                                                 "index":  0,
+                                                                                 "node":  "Create Hooks Folder",
+                                                                                 "type":  "main"
+                                                                             }
+                                                                         ]
+                                                                     ]
+                                                        },
+                        "Manual Trigger â€” Run Once":  {
+                                                            "main":  [
+                                                                         [
+                                                                             {
+                                                                                 "index":  0,
+                                                                                 "node":  "Create Content Factory Root Folder",
+                                                                                 "type":  "main"
+                                                                             }
+                                                                         ]
+                                                                     ]
+                                                        },
+                        "Rename Sheet1 to LinkedIn Post":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "index":  0,
+                                                                                    "node":  "Add X Post Tab",
+                                                                                    "type":  "main"
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           },
+                        "Store Root Folder ID":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "index":  0,
+                                                                          "node":  "Create Incoming Audio Folder",
+                                                                          "type":  "main"
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "saveManualExecutions":  true,
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  null,
+    "pinData":  {
+
+                },
+    "versionId":  "1fa87e07-077d-4647-bea9-dc2148a167bd",
+    "activeVersionId":  null,
+    "versionCounter":  16,
+    "triggerCount":  0,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-10T02:22:20.929Z",
+                       "createdAt":  "2026-04-10T02:22:20.929Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "Wtr5nu0TvjnkrATM",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

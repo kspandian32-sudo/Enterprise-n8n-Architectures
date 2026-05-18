@@ -1,0 +1,609 @@
+﻿{
+  "success": true,
+  "data": {
+    "updatedAt": "2026-02-07T19:27:07.870Z",
+    "createdAt": "2026-01-26T15:44:37.367Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name": "Enterprise AI Sales Rep [v9.1 - Slack Fix]",
+    "description": null,
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "url": "={{ $json['Company URL'] || $json.url || 'https://example.com' }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "User-Agent",
+                "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+              },
+              {
+                "name": "Accept",
+                "value": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+              },
+              {
+                "name": "Accept-Language",
+                "value": "en-US,en;q=0.9"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "632e8490-54ee-4832-8efb-773e7a3b665a",
+        "name": "Scrape",
+        "position": [
+          7776,
+          112
+        ],
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.1,
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "scrape-check",
+                "leftValue": "={{ $json.data }}",
+                "operator": {
+                  "name": "filter.operator.exists",
+                  "operation": "exists",
+                  "type": "string"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            }
+          },
+          "options": {}
+        },
+        "id": "90d35301-cbb2-46f8-94fa-97b2d460cd2b",
+        "name": "IsScrapeOK",
+        "position": [
+          8000,
+          112
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "parameters": {
+          "url": "=https://serpapi.com/search.json?q={{ encodeURIComponent($node['Lead Input Form'].json['Company Name'] || 'company') }}+company+description&engine=google",
+          "options": {}
+        },
+        "id": "298035c5-fb60-4522-964c-c4c0b22460b7",
+        "name": "SearchFallback",
+        "position": [
+          8224,
+          224
+        ],
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.1
+      },
+      {
+        "parameters": {
+          "mode": "chooseBranch"
+        },
+        "id": "533f5aad-949e-47d8-b2a6-41fa1c7ba40d",
+        "name": "Consolidate",
+        "position": [
+          8432,
+          112
+        ],
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 2.1
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "user-keywords-check",
+                "leftValue": "={{ (() => { const keywords = ($node['Lead Input Form'].json['Qualifying Keywords'] || '').toLowerCase().split(',').map(k => k.trim()).filter(k => k); const content = JSON.stringify($json).toLowerCase(); return keywords.length === 0 || keywords.some(kw => content.includes(kw)); })() }}",
+                "operator": {
+                  "name": "filter.operator.equals",
+                  "operation": "equals",
+                  "type": "boolean"
+                },
+                "rightValue": true
+              }
+            ],
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": false,
+              "typeValidation": "loose"
+            }
+          },
+          "options": {}
+        },
+        "id": "ee372523-082f-42a4-af1c-fa3d0c8ed5bc",
+        "name": "FilterLeads",
+        "position": [
+          8656,
+          112
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "parameters": {
+          "agent": "toolsAgent",
+          "hasOutputParser": true,
+          "options": {
+            "returnIntermediateSteps": false,
+            "systemMessage": "You are a Senior Enterprise Sales Development Representative (SDR) specializing in personalized B2B outreach.\n\nOBJECTIVE: Analyze the provided company data and draft a high-converting, professional sales email.\n\nCRITICAL RULES:\n1. You MUST respond ONLY with valid JSON matching the required schema.\n2. Do NOT include markdown code blocks, introductory text, or commentary.\n3. If company data is sparse, focus on industry-standard challenges.\n\nEMAIL GUIDELINES:\n- Tone: Professional, consultative, not aggressive\n- Personalization: Reference specific services, products, or pain points from the scraped data\n- Call-to-Action: Suggest a brief 10-15 minute discovery call\n- Length: 150-250 words maximum\n\nREQUIRED JSON OUTPUT:\n{\n  \"email_subject\": \"Engaging, non-spammy subject line\",\n  \"email_body\": \"Full email text with [CONTACT_NAME] placeholder if name unknown\",\n  \"personalization_insight\": \"1-sentence explanation of why this lead was targeted\",\n  \"confidence_score\": 0.0-1.0\n}"
+          },
+          "promptType": "define",
+          "text": "=Analyze this company and draft a personalized B2B sales email:\n\nCompany Name: {{ $node['Lead Input Form'].json['Company Name'] }}\nCompany URL: {{ $node['Lead Input Form'].json['Company URL'] }}\nQualifying Keywords: {{ $node['Lead Input Form'].json['Qualifying Keywords'] }}\n\nScraped Website Content (first 5000 chars):\n{{ $json.data ? $json.data.substring(0, 5000) : 'No data available' }}"
+        },
+        "id": "ae80bd07-3cc7-43f4-b1a6-5dc30ff22cb6",
+        "name": "Agent",
+        "position": [
+          8880,
+          112
+        ],
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.7
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "6af5e32b-ffe5-443c-8ff3-1fd6e82581de",
+        "name": "Model",
+        "position": [
+          8816,
+          368
+        ],
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "credentials": {
+          "googlePalmApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Gemini API Key for Auto-Blogger Logs"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "id": "e89505ec-b974-4438-b616-1314e5e36501",
+        "name": "Parser",
+        "position": [
+          9056,
+          480
+        ],
+        "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+        "typeVersion": 1.2
+      },
+      {
+        "parameters": {
+          "channelId": {
+            "__rl": true,
+            "mode": "name",
+            "value": "sales-approvals"
+          },
+          "operation": "post",
+          "otherOptions": {},
+          "select": "channel",
+          "text": "=*New Lead Draft Ready for Review*\n\n*Company:* {{ $node['Lead Input Form'].json['Company Name'] }}\n*URL:* {{ $node['Lead Input Form'].json['Company URL'] }}\n\n*Subject:* {{ $json.email_subject || 'No subject generated' }}\n\n*Email Body:*\n{{ $json.email_body || 'No body generated' }}\n\n*Personalization:* {{ $json.personalization_insight || 'N/A' }}\n*Confidence:* {{ Math.round(($json.confidence_score || 0) * 100) }}%\n\n---\nClick to approve: {{ $execution.resumeUrl }}?action=approve\nClick to reject: {{ $execution.resumeUrl }}?action=reject"
+        },
+        "id": "dc505a76-7b85-4bae-b718-1d16d4633224",
+        "name": "ApprovalPost",
+        "position": [
+          9216,
+          112
+        ],
+        "type": "n8n-nodes-base.slack",
+        "typeVersion": 2.1,
+        "webhookId": "88e52e01-805c-4000-8e06-24eb49d0029a",
+        "credentials": {
+          "slackApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Working Slack account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "authentication": "serviceAccount",
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1O1NDVzL0QEV4jzsR5F29ccjVeGbEh5WDsToIL5xGWZY",
+            "mode": "list",
+            "cachedResultName": "AI Sales Rep - Leads",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1O1NDVzL0QEV4jzsR5F29ccjVeGbEh5WDsToIL5xGWZY/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1O1NDVzL0QEV4jzsR5F29ccjVeGbEh5WDsToIL5xGWZY/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Company_Name": "={{ $('Agent').item.json.output.company_name }}",
+              "CEO_Name": "={{ $('Agent').item.json.output.ceo_name }}",
+              "Rejection_Reason": "={{ $('Agent').item.json.output.rejection_reason }}",
+              "Confidence": "={{ $('Agent').item.json.output.confidence }}",
+              "Website_URL": "={{ $('Agent').item.json.output.website_url }}",
+              "Status": "={{ $('Agent').item.json.output.lead_status }}",
+              "Draft_Body": "={{ $('Agent').item.json.output.email_body }}",
+              "Draft_Subject": "={{ $('Agent').item.json.output.email_subject }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Company_Name",
+                "displayName": "Company_Name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Website_URL",
+                "displayName": "Website_URL",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "CEO_Name",
+                "displayName": "CEO_Name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Status",
+                "displayName": "Status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Draft_Subject",
+                "displayName": "Draft_Subject",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Draft_Body",
+                "displayName": "Draft_Body",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Confidence",
+                "displayName": "Confidence",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Rejection_Reason",
+                "displayName": "Rejection_Reason",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "id": "11e30144-3e5d-41e2-8021-de638adbc787",
+        "name": "RecordResult",
+        "position": [
+          9472,
+          80
+        ],
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "credentials": {
+          "googleApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Service Account account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "httpMethod": "GET",
+          "responseData": "allEntries",
+          "resume": "webhook"
+        },
+        "id": "wait-for-approval",
+        "name": "WaitForApproval",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          9328,
+          112
+        ],
+        "webhookId": "cf319c55-3fd4-4a96-bc7b-f6701e1b3fc9"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "approval-condition",
+                "leftValue": "={{ $json.body?.action || $json.query?.action }}",
+                "operator": {
+                  "name": "filter.operator.equals",
+                  "operation": "equals",
+                  "type": "string"
+                },
+                "rightValue": "approve"
+              }
+            ],
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            }
+          },
+          "options": {}
+        },
+        "id": "is-approved-check",
+        "name": "IsApproved",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          9552,
+          112
+        ]
+      },
+      {
+        "parameters": {
+          "formTitle": "Enterprise AI Sales Rep - Lead Input",
+          "formDescription": "Enter the lead details to analyze and generate a personalized sales email.",
+          "formFields": {
+            "values": [
+              {
+                "fieldLabel": "Company Name",
+                "placeholder": "e.g., Acme Corp",
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Company URL",
+                "placeholder": "e.g., https://acme.com",
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Qualifying Keywords",
+                "placeholder": "e.g., SaaS, B2B, Enterprise (comma-separated)"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "form-trigger-start",
+        "name": "Lead Input Form",
+        "type": "n8n-nodes-base.formTrigger",
+        "typeVersion": 2.2,
+        "position": [
+          7552,
+          112
+        ],
+        "webhookId": "c76a4a08-a862-4f6c-874f-97a66b53afc3"
+      }
+    ],
+    "connections": {
+      "Scrape": {
+        "main": [
+          [
+            {
+              "node": "IsScrapeOK",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IsScrapeOK": {
+        "main": [
+          [
+            {
+              "node": "Consolidate",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "SearchFallback",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "SearchFallback": {
+        "main": [
+          [
+            {
+              "node": "Consolidate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Consolidate": {
+        "main": [
+          [
+            {
+              "node": "FilterLeads",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FilterLeads": {
+        "main": [
+          [
+            {
+              "node": "Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Agent": {
+        "main": [
+          [
+            {
+              "node": "ApprovalPost",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parser": {
+        "ai_outputParser": [
+          [
+            {
+              "node": "Agent",
+              "type": "ai_outputParser",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "ApprovalPost": {
+        "main": [
+          [
+            {
+              "node": "WaitForApproval",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "WaitForApproval": {
+        "main": [
+          [
+            {
+              "node": "IsApproved",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IsApproved": {
+        "main": [
+          [
+            {
+              "node": "RecordResult",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Lead Input Form": {
+        "main": [
+          [
+            {
+              "node": "Scrape",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "saveDataErrorExecution": "all",
+      "saveDataSuccessExecution": "all",
+      "saveManualExecutions": true,
+      "saveExecutionProgress": true,
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false
+    },
+    "staticData": null,
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "pinData": {},
+    "versionId": "3e645311-d9d7-47aa-9220-575d3d773c95",
+    "activeVersionId": null,
+    "versionCounter": 49,
+    "triggerCount": 0,
+    "shared": [
+      {
+        "updatedAt": "2026-01-26T15:44:37.373Z",
+        "createdAt": "2026-01-26T15:44:37.373Z",
+        "role": "workflow:owner",
+        "workflowId": "CmXyvK72PvYqhte4",
+        "projectId": "4z38v6JO6ntgY8gF",
+        "project": {
+          "updatedAt": "2026-01-13T19:13:51.671Z",
+          "createdAt": "2026-01-13T19:11:25.659Z",
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "YOUR_NAME <your-email@example.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+        }
+      }
+    ],
+    "tags": [],
+    "activeVersion": null
+  }
+}
+

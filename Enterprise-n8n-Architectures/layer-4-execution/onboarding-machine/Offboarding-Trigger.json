@@ -1,0 +1,59 @@
+{
+  "nodes": [
+    {
+      "name": "\u23f0 Daily 12 PM: Offboarding?",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        100,
+        1500
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hours": 12
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "\ud83d\udce5 Fetch Completed Clients",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        300,
+        1500
+      ],
+      "parameters": {
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+        "sheetName": {
+          "__rl": true,
+          "value": 1994705565,
+          "mode": "id"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "Google Sheets - kspandian32"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "\u23f0 Daily 12 PM: Offboarding?": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udce5 Fetch Completed Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

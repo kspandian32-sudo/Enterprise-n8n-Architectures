@@ -1,0 +1,132 @@
+{
+  "nodes": [
+    {
+      "name": "\ud83e\udd16 Gemini: Write Completion Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        500,
+        1500
+      ],
+      "parameters": {
+        "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'You are a professional project manager named ' + $json.yourName + ' from ' + $json.agencyName + '. Write a project completion and testimonial request email for ' + $json.clientName + ' from ' + $json.clientCompany + '. Based on their service (' + $json.serviceRequired + '), summarize the successful delivery of their project roadmap. Include a warm thank-you, a request for a testimonial, and a link to our feedback form: https://forms.gle/sbZKjFkPS7bJ2enKA. Keep it celebratory and professional, under 150 words. Return ONLY valid JSON: {\"subject\": \"Project Successfully Completed! \ud83c\udfc6\", \"body\": \"email body\"}. No markdown, no backticks.' }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } }) }}",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "method": "POST",
+        "authentication": "predefinedCredentialType",
+        "nodecredentialtype": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "contentType": "application/json"
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 35000,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "1jdjTjj9aaTK6i6Y",
+          "name": "Query Auth Gemini kspandian32"
+        }
+      }
+    },
+    {
+      "name": "\ud83d\udee1\ufe0f IF: Safe Mode? (Completion)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        700,
+        1500
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{.SAFE_MODE}}",
+              "value2": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "\ud83d\udce7 Send Completion Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        900,
+        1500
+      ],
+      "parameters": {
+        "fromEmail": "kspandian32@gmail.com",
+        "toEmail": "={{ $json.clientEmail }}",
+        "subject": "",
+        "html": "",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": {
+          "id": "udtIzlJq8iqmL3aZ",
+          "name": "SMTP account - kspandian32"
+        }
+      }
+    },
+    {
+      "name": "\ud83d\udcdd Update CRM \u2192 Archived",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1100,
+        1500
+      ],
+      "parameters": {
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+        "sheetName": {
+          "__rl": true,
+          "value": 1994705565,
+          "mode": "id"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "Google Sheets - kspandian32"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "\ud83d\udee1\ufe0f IF: Safe Mode? (Completion)": {
+      "main": [
+        [],
+        [
+          {
+            "node": "\ud83d\udce7 Send Completion Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83d\udce7 Send Completion Email": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udcdd Update CRM \u2192 Archived",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83e\udd16 Gemini: Write Completion Report": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udee1\ufe0f IF: Safe Mode? (Completion)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

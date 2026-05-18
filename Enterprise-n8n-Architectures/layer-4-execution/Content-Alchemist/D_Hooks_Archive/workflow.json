@@ -1,0 +1,275 @@
+﻿{
+    "updatedAt":  "2026-04-11T07:07:30.023Z",
+    "createdAt":  "2026-04-09T19:24:50.612Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name":  "ðŸª Content Alchemist â€” Workflow D (Hooks + Archive)",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "inputSource":  "passthrough"
+                                     },
+                      "id":  "134d0177-de5c-4a60-9458-303842b009c4",
+                      "name":  "Workflow Input",
+                      "type":  "n8n-nodes-base.executeWorkflowTrigger",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       -432,
+                                       192
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "fieldToSplitOut":  "hooks",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "730e5f58-01ed-4b96-8485-a6354f7cffb3",
+                      "name":  "Split Hooks Array",
+                      "type":  "n8n-nodes-base.splitOut",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -208,
+                                       192
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "move",
+                                         "fileId":  {
+                                                        "__rl":  true,
+                                                        "mode":  "id",
+                                                        "value":  "={{ $(\u0027Workflow Input\u0027).item.json.audioFileId }}"
+                                                    },
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Workflow Input\u0027).item.json.archiveFolderId || \u0027REPLACE_WITH_YOUR_FOLDER_ID\u0027 }}"
+                                                      }
+                                     },
+                      "id":  "b05bcf70-b726-4d62-b342-09948324b3e0",
+                      "name":  "Move Audio to Archive",
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       448,
+                                       392
+                                   ],
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "Content Alchemist - Google Drive"
+                                                                   }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "createFromText",
+                                         "content":  "={{ $(\u0027Split Hooks Array\u0027).item.json.hooks }}",
+                                         "name":  "={{ \u0027hook_\u0027 + ($runIndex + 1) + \u0027_\u0027 + $(\u0027Workflow Input\u0027).item.json.timestamp.replace(/:/g, \u0027-\u0027).substring(0, 19) + \u0027.txt\u0027 }}",
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "mode":  "id",
+                                                          "value":  "={{ $(\u0027Workflow Input\u0027).item.json.hooksFolderId || \u0027REPLACE_WITH_YOUR_FOLDER_ID\u0027 }}"
+                                                      },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "ba15bdc2-bb9f-4ce6-8e18-9a5ff25e8b33",
+                      "name":  "Save Hook .txt to Drive",
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       448,
+                                       192
+                                   ],
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                       "name":  "Content Alchemist - Google Drive"
+                                                                   }
+                                      }
+                  },
+                  {
+                      "id":  "loop-hooks",
+                      "name":  "Loop Hooks",
+                      "type":  "n8n-nodes-base.splitInBatches",
+                      "typeVersion":  3,
+                      "position":  [
+                                       28,
+                                       192
+                                   ],
+                      "parameters":  {
+                                         "batchSize":  1,
+                                         "options":  {
+
+                                                     }
+                                     }
+                  },
+                  {
+                      "id":  "09d12ee1-e621-4e0d-aa34-11e1382a3de7",
+                      "name":  "Log Hook to Sheets",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       228,
+                                       192
+                                   ],
+                      "parameters":  {
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "matchingColumns":  [
+
+                                                                             ],
+                                                         "schema":  [
+
+                                                                    ],
+                                                         "value":  {
+                                                                       "Hook":  "={{ $json.hooks }}",
+                                                                       "Timestamp":  "={{ $(\u0027Workflow Input\u0027).item.json.timestamp }}",
+                                                                       "Transcript":  "={{ $(\u0027Workflow Input\u0027).item.json.transcript.substring(0, 400) }}"
+                                                                   }
+                                                     },
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "={{ $(\u0027Workflow Input\u0027).item.json.sheetsId || \u0027REPLACE_WITH_YOUR_SPREADSHEET_ID\u0027 }}"
+                                                        },
+                                         "operation":  "append",
+                                         "options":  {
+
+                                                     },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "mode":  "name",
+                                                           "value":  "Hooks"
+                                                       }
+                                     },
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                                                        "name":  "AI Proposal - Google Sheets"
+                                                                    }
+                                      }
+                  }
+              ],
+    "connections":  {
+                        "Workflow Input":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Split Hooks Array",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Split Hooks Array":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Loop Hooks",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Log Hook to Sheets":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Save Hook .txt to Drive",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Save Hook .txt to Drive":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "Loop Hooks",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "Loop Hooks":  {
+                                           "main":  [
+                                                        [
+                                                            {
+                                                                "node":  "Move Audio to Archive",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ],
+                                                        [
+                                                            {
+                                                                "node":  "Log Hook to Sheets",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ]
+                                                    ]
+                                       }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "saveDataErrorExecution":  "all",
+                     "saveDataSuccessExecution":  "all",
+                     "saveManualExecutions":  true,
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "availableInMCP":  false,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  null,
+    "pinData":  {
+
+                },
+    "versionId":  "bb3d7221-3e75-400f-b26e-27d76b3ddde4",
+    "activeVersionId":  null,
+    "versionCounter":  37,
+    "triggerCount":  0,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-09T19:24:50.694Z",
+                       "createdAt":  "2026-04-09T19:24:50.694Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "UUxEZHG6LhWH2Zce",
+                       "projectId":  "4z38v6JO6ntgY8gF",
+                       "project":  {
+                                       "updatedAt":  "2026-01-13T19:13:51.671Z",
+                                       "createdAt":  "2026-01-13T19:11:25.659Z",
+                                       "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                                       "name":  "YOUR_NAME \u003cyour-email@example.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

@@ -1,0 +1,737 @@
+﻿{
+  "success": true,
+  "data": {
+    "updatedAt": "2026-03-03T08:56:18.504Z",
+    "createdAt": "2026-03-03T08:56:18.504Z",
+    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+    "name": "ðŸ½ï¸ Restaurant WhatsApp AI Bot - DEMO",
+    "description": null,
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "id": "wa-webhook-1",
+        "name": "WhatsApp Incoming Message",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          300
+        ],
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "restaurant-bot",
+          "responseMode": "lastNode",
+          "options": {}
+        }
+      },
+      {
+        "id": "extract-1",
+        "name": "Extract Message Details",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          220,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const body = $input.first().json.body || $input.first().json;\nconst entry = body?.entry?.[0];\nconst change = entry?.changes?.[0];\nconst value = change?.value;\nconst msg = value?.messages?.[0];\nconst contact = value?.contacts?.[0];\n\nif (!msg) {\n  return [{ json: { skip: true } }];\n}\n\nconst customerName = contact?.profile?.name || 'Valued Guest';\nconst customerPhone = msg.from;\nconst messageText = msg.text?.body || '';\nconst messageId = msg.id;\nconst phoneNumberId = value?.metadata?.phone_number_id;\n\nreturn [{\n  json: {\n    customerName,\n    customerPhone,\n    messageText,\n    messageId,\n    phoneNumberId,\n    timestamp: new Date().toISOString()\n  }\n}];"
+        }
+      },
+      {
+        "id": "skip-check-1",
+        "name": "Has Message?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          440,
+          300
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": false
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $json.skip }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "notEquals"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "ai-classify-1",
+        "name": "AI Intent Classifier",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          660,
+          200
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "json",
+          "body": {
+            "model": "google/gemini-flash-1.5",
+            "max_tokens": 50,
+            "messages": [
+              {
+                "role": "system",
+                "content": "You are an intent classifier for a restaurant WhatsApp bot. Classify the customer message into EXACTLY ONE of these intents: BOOKING, MENU, HOURS, LOCATION, COMPLAINT, GREETING, GENERAL. Reply with ONLY the intent word, nothing else."
+              },
+              {
+                "role": "user",
+                "content": "={{ $json.messageText }}"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "extract-intent-1",
+        "name": "Extract Intent",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          880,
+          200
+        ],
+        "parameters": {
+          "jsCode": "const prev = $input.first().json;\nconst intent = prev.choices?.[0]?.message?.content?.trim().toUpperCase() || 'GENERAL';\nconst validIntents = ['BOOKING','MENU','HOURS','LOCATION','COMPLAINT','GREETING','GENERAL'];\nconst finalIntent = validIntents.includes(intent) ? intent : 'GENERAL';\n\n// Carry forward all previous data\nconst data = $('Extract Message Details').first().json;\n\nreturn [{\n  json: {\n    ...data,\n    intent: finalIntent\n  }\n}];"
+        }
+      },
+      {
+        "id": "route-1",
+        "name": "Route by Intent",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3,
+        "position": [
+          1100,
+          200
+        ],
+        "parameters": {
+          "mode": "rules",
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.intent }}",
+                      "rightValue": "BOOKING",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                },
+                "renameOutput": true,
+                "outputKey": "Booking"
+              },
+              {
+                "conditions": {
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.intent }}",
+                      "rightValue": "MENU",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                },
+                "renameOutput": true,
+                "outputKey": "Menu"
+              },
+              {
+                "conditions": {
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.intent }}",
+                      "rightValue": "HOURS",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                },
+                "renameOutput": true,
+                "outputKey": "Hours"
+              },
+              {
+                "conditions": {
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.intent }}",
+                      "rightValue": "COMPLAINT",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                },
+                "renameOutput": true,
+                "outputKey": "Complaint"
+              }
+            ]
+          },
+          "fallbackOutput": "extra"
+        }
+      },
+      {
+        "id": "reply-booking-1",
+        "name": "Generate Booking Reply",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1320,
+          0
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "json",
+          "body": {
+            "model": "google/gemini-flash-1.5",
+            "max_tokens": 200,
+            "messages": [
+              {
+                "role": "system",
+                "content": "You are a friendly WhatsApp assistant for a premium restaurant in Bangalore. Customer wants to make a booking. Reply warmly in 2-3 short lines. Ask for: date, time, number of guests. Sign off as 'Team [Restaurant]'. Keep it conversational, not formal. Use one relevant emoji."
+              },
+              {
+                "role": "user",
+                "content": "={{ $json.messageText }}"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "reply-menu-1",
+        "name": "Generate Menu Reply",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1320,
+          160
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "json",
+          "body": {
+            "model": "google/gemini-flash-1.5",
+            "max_tokens": 200,
+            "messages": [
+              {
+                "role": "system",
+                "content": "You are a friendly WhatsApp assistant for a traditional South Indian restaurant in Bangalore. Customer is asking about the menu. Mention 3-4 signature dishes enthusiastically. Offer to share the full digital menu link. Keep it to 3 short lines. Use one food emoji."
+              },
+              {
+                "role": "user",
+                "content": "={{ $json.messageText }}"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "reply-hours-1",
+        "name": "Generate Hours Reply",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1320,
+          320
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "json",
+          "body": {
+            "model": "google/gemini-flash-1.5",
+            "max_tokens": 150,
+            "messages": [
+              {
+                "role": "system",
+                "content": "You are a WhatsApp assistant for a restaurant in Bangalore. Opening hours: Mon-Sat 7:30AM-10:30PM, Sunday 8AM-3PM only. Share this warmly and invite them to visit or book a table. 2 lines max. Use a clock emoji."
+              },
+              {
+                "role": "user",
+                "content": "={{ $json.messageText }}"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "reply-complaint-1",
+        "name": "Generate Complaint Reply",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1320,
+          480
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "json",
+          "body": {
+            "model": "google/gemini-flash-1.5",
+            "max_tokens": 150,
+            "messages": [
+              {
+                "role": "system",
+                "content": "You are a WhatsApp assistant for a restaurant. Customer has a complaint. Respond with empathy, apologize sincerely, assure them the manager will personally call within 30 minutes. Ask for their convenient time. Keep it to 3 lines. Professional but warm tone."
+              },
+              {
+                "role": "user",
+                "content": "={{ $json.messageText }}"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "reply-general-1",
+        "name": "Generate General Reply",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1320,
+          640
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "json",
+          "body": {
+            "model": "google/gemini-flash-1.5",
+            "max_tokens": 200,
+            "messages": [
+              {
+                "role": "system",
+                "content": "You are a friendly WhatsApp assistant for a premium restaurant in Bangalore. Greet the customer warmly by name if known. Offer to help with: 1) Table booking 2) Menu info 3) Opening hours 4) Special requests. Keep it to 3 short punchy lines. Use one appropriate emoji."
+              },
+              {
+                "role": "user",
+                "content": "={{ $json.messageText }}"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "format-reply-1",
+        "name": "Format Final Reply",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1560,
+          300
+        ],
+        "parameters": {
+          "jsCode": "// Get reply text from whichever branch ran\nlet replyText = '';\nconst branches = ['Generate Booking Reply','Generate Menu Reply','Generate Hours Reply','Generate Complaint Reply','Generate General Reply'];\n\nfor (const branch of branches) {\n  try {\n    const result = $(branch).first().json;\n    if (result?.choices?.[0]?.message?.content) {\n      replyText = result.choices[0].message.content.trim();\n      break;\n    }\n  } catch(e) {}\n}\n\nif (!replyText) replyText = 'Thank you for contacting us! We will get back to you shortly. ðŸ™';\n\nconst msgData = $('Extract Message Details').first().json;\n\nreturn [{\n  json: {\n    customerPhone: msgData.customerPhone,\n    customerName: msgData.customerName,\n    phoneNumberId: msgData.phoneNumberId,\n    originalMessage: msgData.messageText,\n    intent: $('Extract Intent').first().json.intent,\n    replyText,\n    timestamp: msgData.timestamp\n  }\n}];"
+        }
+      },
+      {
+        "id": "send-whatsapp-1",
+        "name": "Send WhatsApp Reply",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1780,
+          300
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "=https://graph.facebook.com/v19.0/{{ $json.phoneNumberId }}/messages",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "json",
+          "body": {
+            "messaging_product": "whatsapp",
+            "to": "={{ $json.customerPhone }}",
+            "type": "text",
+            "text": {
+              "body": "={{ $json.replyText }}"
+            }
+          }
+        }
+      },
+      {
+        "id": "log-sheets-1",
+        "name": "Log Conversation to Sheets",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.4,
+        "position": [
+          2000,
+          300
+        ],
+        "parameters": {
+          "authentication": "serviceAccount",
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "REPLACE_WITH_YOUR_ID",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Bot Conversations",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Timestamp": "={{ $json.timestamp }}",
+              "Customer_Name": "={{ $json.customerName }}",
+              "Customer_Phone": "={{ $json.customerPhone }}",
+              "Intent": "={{ $json.intent }}",
+              "Customer_Message": "={{ $json.originalMessage }}",
+              "Bot_Reply": "={{ $json.replyText }}"
+            },
+            "matchingColumns": [],
+            "schema": []
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleApi": {
+            "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+            "name": "Google Service Account"
+          }
+        }
+      },
+      {
+        "id": "respond-ok-1",
+        "name": "Respond 200 OK",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.1,
+        "position": [
+          2220,
+          300
+        ],
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "{\"status\":\"ok\"}"
+        }
+      }
+    ],
+    "connections": {
+      "WhatsApp Incoming Message": {
+        "main": [
+          [
+            {
+              "node": "Extract Message Details",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Message Details": {
+        "main": [
+          [
+            {
+              "node": "Has Message?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Message?": {
+        "main": [
+          [
+            {
+              "node": "AI Intent Classifier",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      },
+      "AI Intent Classifier": {
+        "main": [
+          [
+            {
+              "node": "Extract Intent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Intent": {
+        "main": [
+          [
+            {
+              "node": "Route by Intent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Route by Intent": {
+        "main": [
+          [
+            {
+              "node": "Generate Booking Reply",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Generate Menu Reply",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Generate Hours Reply",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Generate Complaint Reply",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Generate General Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate Booking Reply": {
+        "main": [
+          [
+            {
+              "node": "Format Final Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate Menu Reply": {
+        "main": [
+          [
+            {
+              "node": "Format Final Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate Hours Reply": {
+        "main": [
+          [
+            {
+              "node": "Format Final Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate Complaint Reply": {
+        "main": [
+          [
+            {
+              "node": "Format Final Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate General Reply": {
+        "main": [
+          [
+            {
+              "node": "Format Final Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Final Reply": {
+        "main": [
+          [
+            {
+              "node": "Send WhatsApp Reply",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send WhatsApp Reply": {
+        "main": [
+          [
+            {
+              "node": "Log Conversation to Sheets",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log Conversation to Sheets": {
+        "main": [
+          [
+            {
+              "node": "Respond 200 OK",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "Asia/Kolkata",
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": null,
+    "versionId": "995f3396-a1bf-4fbb-bdc5-630a6b7555aa",
+    "activeVersionId": null,
+    "versionCounter": 1,
+    "triggerCount": 0,
+    "shared": [
+      {
+        "updatedAt": "2026-03-03T08:56:18.508Z",
+        "createdAt": "2026-03-03T08:56:18.508Z",
+        "role": "workflow:owner",
+        "workflowId": "fpZkKGLGMdjIkOy4",
+        "projectId": "4z38v6JO6ntgY8gF",
+        "project": {
+          "updatedAt": "2026-01-13T19:13:51.671Z",
+          "createdAt": "2026-01-13T19:11:25.659Z",
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "YOUR_NAME <your-email@example.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+        }
+      }
+    ],
+    "tags": [],
+    "activeVersion": null
+  }
+}
+

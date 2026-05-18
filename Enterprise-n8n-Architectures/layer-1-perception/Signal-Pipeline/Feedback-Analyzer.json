@@ -1,0 +1,325 @@
+{
+  "updatedAt": "2026-04-25T06:34:36.338Z",
+  "createdAt": "2026-04-25T06:28:20.209Z",
+  "name": "Feedback Loop Analyzer",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 7
+            }
+          ]
+        }
+      },
+      "id": "3cbb818b-e973-414e-aca2-4a6be0563aa1",
+      "name": "Every Week",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -896,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "171oeM44bH3FyBHOvzS-icqR11QnSXkpxgsxMokCbrKE",
+          "mode": "list",
+          "cachedResultName": "Automation Business — Command Center",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/171oeM44bH3FyBHOvzS-icqR11QnSXkpxgsxMokCbrKE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "mode": "name",
+          "value": "Signal Log"
+        },
+        "options": {}
+      },
+      "id": "4343271e-2ffe-4cbe-8f81-9336e9244608",
+      "name": "Read Last 50 Signals",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -688,
+        112
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Service Account - kspandian32"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nif (items.length === 0) return [{ json: { decision: 'No feedback data', newThreshold: null } }];\n\nlet relevantCount = 0;\nlet irrelevantCount = 0;\n\nitems.forEach(item => {\n  const feedback = (item.json['User Feedback'] || '').toLowerCase().trim();\n  if (feedback === 'relevant') relevantCount++;\n  if (feedback === 'irrelevant') irrelevantCount++;\n});\n\nconst totalFeedback = relevantCount + irrelevantCount;\nif (totalFeedback < 5) return [{ json: { decision: 'Not enough feedback data', totalFeedback, newThreshold: null } }];\n\nconst accuracy = relevantCount / totalFeedback;\nlet adjustment = 0;\nif (accuracy < 0.5) adjustment = 0.5; // tighten threshold (requires higher score)\nelse if (accuracy > 0.8) adjustment = -0.5; // loosen threshold\n\nreturn [{ json: { accuracy, relevantCount, irrelevantCount, totalFeedback, adjustment } }];"
+      },
+      "id": "b42676bd-514c-495c-8e75-f479def939e9",
+      "name": "Analyze Feedback Ratio",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "2bc3c4b5-8664-4e20-994c-af6dfdc8b093",
+              "leftValue": "={{ $json.adjustment }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEqual"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1b603333-3f5e-4659-b647-747cba0571bc",
+      "name": "Needs Adjustment?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -240,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "171oeM44bH3FyBHOvzS-icqR11QnSXkpxgsxMokCbrKE",
+          "mode": "list",
+          "cachedResultName": "Automation Business — Command Center",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/171oeM44bH3FyBHOvzS-icqR11QnSXkpxgsxMokCbrKE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "mode": "name",
+          "value": "Config"
+        },
+        "options": {}
+      },
+      "id": "08aaae2f-c4c4-4b9e-a723-fed285dbbe0a",
+      "name": "Read Current Config",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Service Account - kspandian32"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const stats = $('Analyze Feedback Ratio').item.json;\nconst configItems = $input.all();\nlet currentThreshold = 7.5; // default\n\nfor (const item of configItems) {\n  if (item.json['Configuration Key'] === 'Confidence Threshold') {\n    currentThreshold = parseFloat(item.json['Configuration Value']) || 7.5;\n  }\n}\n\nif (currentThreshold < 1) currentThreshold = currentThreshold * 10;\n\nlet newThreshold = currentThreshold + stats.adjustment;\nif (newThreshold > 9) newThreshold = 9;\nif (newThreshold < 5) newThreshold = 5;\n\nreturn [{ \n  json: { \n    'Configuration Key': 'Confidence Threshold', \n    'Configuration Value': newThreshold,\n    oldValue: currentThreshold,\n    stats \n  }\n}];"
+      },
+      "id": "774d3ddb-1e73-4f8b-8c8d-5703d5bdc985",
+      "name": "Calculate New Threshold",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "mode": "id",
+          "value": "171oeM44bH3FyBHOvzS-icqR11QnSXkpxgsxMokCbrKE"
+        },
+        "sheetName": {
+          "mode": "name",
+          "value": "Config"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Configuration Value": "={{ $json['Configuration Value'] }}",
+            "row_number": 0
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Configuration Key",
+              "displayName": "Configuration Key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Configuration Value",
+              "displayName": "Configuration Value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "a4302b6f-e51b-431f-b3fa-5715e1575fd6",
+      "name": "Update Config Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Service Account - kspandian32"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every Week": {
+      "main": [
+        [
+          {
+            "node": "Read Last 50 Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Last 50 Signals": {
+      "main": [
+        [
+          {
+            "node": "Analyze Feedback Ratio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Feedback Ratio": {
+      "main": [
+        [
+          {
+            "node": "Needs Adjustment?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Adjustment?": {
+      "main": [
+        [
+          {
+            "node": "Read Current Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Current Config": {
+      "main": [
+        [
+          {
+            "node": "Calculate New Threshold",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate New Threshold": {
+      "main": [
+        [
+          {
+            "node": "Update Config Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d0bb6f8f-4ca1-4b20-9bd6-74d1cc4988b8",
+  "activeVersionId": null,
+  "versionCounter": 16,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-25T06:28:20.212Z",
+      "createdAt": "2026-04-25T06:28:20.212Z",
+      "role": "workflow:owner",
+      "workflowId": "HjdYWY3reYLowZeU",
+      "projectId": "4z38v6JO6ntgY8gF",
+      "project": {
+        "updatedAt": "2026-01-13T19:13:51.671Z",
+        "createdAt": "2026-01-13T19:11:25.659Z",
+        "id": "4z38v6JO6ntgY8gF",
+        "name": "PANDIAN K S <kspandia@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "75bbfac3-5195-4843-9435-78dfd0d8f34f"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}

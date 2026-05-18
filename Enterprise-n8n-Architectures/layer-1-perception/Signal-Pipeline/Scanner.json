@@ -1,0 +1,456 @@
+{
+  "name": "Signal Pipeline - Job Posting Scanner",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "af25926b-80e7-4f8b-bb0d-b87ca3f24757",
+      "name": "Every 6 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -144,
+        112
+      ],
+      "disabled": false
+    },
+    {
+      "id": "d90f445c-319f-4aca-9e6c-498566857f47",
+      "name": "Select Search Query",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        304,
+        112
+      ],
+      "disabled": false
+    },
+    {
+      "id": "7839e9b1-cccd-46de-9b9e-39b803e311fe",
+      "name": "Search Job Postings",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        528,
+        112
+      ],
+      "disabled": false
+    },
+    {
+      "id": "2489f2ea-a339-4350-9277-90746ecd27fe",
+      "name": "Extract Job Data",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        752,
+        112
+      ],
+      "disabled": false
+    },
+    {
+      "id": "573e663e-f7bc-4b34-8924-78d6e3e9bcbf",
+      "name": "Deduplicate & Pre-Filter",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        976,
+        112
+      ],
+      "disabled": false
+    },
+    {
+      "id": "8f2da48b-4a1b-4911-8024-c6cbf5b51543",
+      "name": "Process One By One",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        1200,
+        96
+      ],
+      "disabled": false
+    },
+    {
+      "id": "c6fa50f3-89b0-4559-aa78-cfdf7ac7c49e",
+      "name": "Detect Tech Stack",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1424,
+        16
+      ],
+      "disabled": false
+    },
+    {
+      "id": "a0d3eed4-971b-4b32-830d-ae58036e15e0",
+      "name": "AI Score This Job",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1648,
+        16
+      ],
+      "disabled": false
+    },
+    {
+      "id": "08ce6321-d571-40fc-abcf-0964f3e744aa",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1872,
+        16
+      ],
+      "disabled": false
+    },
+    {
+      "id": "d456cb2b-8e71-424e-b942-cc9421c59f0e",
+      "name": "Accumulate Result",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2096,
+        16
+      ],
+      "disabled": false
+    },
+    {
+      "id": "6ce45a3f-fa6b-4bd4-809e-d51cbf956faf",
+      "name": "Collect All Results",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1424,
+        208
+      ],
+      "disabled": false
+    },
+    {
+      "id": "b27de458-148c-4cc6-8a59-3093c1119148",
+      "name": "Has Results?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1648,
+        208
+      ],
+      "disabled": false
+    },
+    {
+      "id": "26f9ba8f-7bf2-4195-93ac-e09d781e246a",
+      "name": "Log All Scanned",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1872,
+        208
+      ],
+      "disabled": false
+    },
+    {
+      "id": "604f30cc-5fbe-4e09-bf4c-5ec99e1f8bef",
+      "name": "Filter Qualified Leads",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1872,
+        400
+      ],
+      "disabled": false
+    },
+    {
+      "id": "4b83ec51-9c1f-4629-9597-d73e2406bf2e",
+      "name": "Log to Signal Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        2096,
+        376
+      ],
+      "disabled": false
+    },
+    {
+      "id": "ce36bf0d-cc0e-4ca8-b266-76ccc98f42d0",
+      "name": "Build Hot Alert Summary",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2096,
+        568
+      ],
+      "disabled": false
+    },
+    {
+      "id": "a4455ea8-99e5-421d-85ec-1cec03e8cd61",
+      "name": "Has Hot Leads?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2320,
+        568
+      ],
+      "disabled": false
+    },
+    {
+      "id": "1bfa762e-e04c-4c55-82c9-01eec438d75a",
+      "name": "Send Hot Signal Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [
+        2744,
+        568
+      ],
+      "disabled": false
+    },
+    {
+      "id": "90dffbae-47c4-4acb-8af5-819c871d08bd",
+      "name": "Get Dynamic Threshold",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        80,
+        112
+      ],
+      "disabled": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "e4085e89-5cb5-456d-be8b-c44cba5a5af9",
+              "leftValue": "={{ $env.SAFE_MODE }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c7205544-5bd1-4abd-b728-fbd8fce421a2",
+      "name": "Is SAFE_MODE? (Send Hot Signal Alert)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2344,
+        568
+      ],
+      "notes": "SAFE_MODE gate: When SAFE_MODE=true, skips the dangerous action and routes to a SIMULATED NoOp instead."
+    },
+    {
+      "parameters": {},
+      "id": "5be859e4-00a4-4fc2-88e9-d28d3fc6d3e2",
+      "name": "SIMULATED (Send Hot Signal Alert)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        718
+      ],
+      "notes": "SAFE_MODE: Simulated execution of \"Send Hot Signal Alert\". No real action taken."
+    }
+  ],
+  "connections": {
+    "Every 6 Hours": {
+      "main": [
+        [
+          {
+            "node": "Get Dynamic Threshold",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Search Query": {
+      "main": [
+        [
+          {
+            "node": "Search Job Postings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Job Postings": {
+      "main": [
+        [
+          {
+            "node": "Extract Job Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Job Data": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate & Pre-Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduplicate & Pre-Filter": {
+      "main": [
+        [
+          {
+            "node": "Process One By One",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process One By One": {
+      "main": [
+        [
+          {
+            "node": "Collect All Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Detect Tech Stack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Tech Stack": {
+      "main": [
+        [
+          {
+            "node": "AI Score This Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Score This Job": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Accumulate Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accumulate Result": {
+      "main": [
+        [
+          {
+            "node": "Process One By One",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect All Results": {
+      "main": [
+        [
+          {
+            "node": "Has Results?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Results?": {
+      "main": [
+        [
+          {
+            "node": "Log All Scanned",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter Qualified Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Qualified Leads": {
+      "main": [
+        [
+          {
+            "node": "Log to Signal Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Build Hot Alert Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Hot Alert Summary": {
+      "main": [
+        [
+          {
+            "node": "Has Hot Leads?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Hot Leads?": {
+      "main": [
+        [
+          {
+            "node": "Is SAFE_MODE? (Send Hot Signal Alert)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Dynamic Threshold": {
+      "main": [
+        [
+          {
+            "node": "Select Search Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is SAFE_MODE? (Send Hot Signal Alert)": {
+      "main": [
+        [
+          {
+            "node": "SIMULATED (Send Hot Signal Alert)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Hot Signal Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodeCount": 19,
+  "connectionCount": 16
+}

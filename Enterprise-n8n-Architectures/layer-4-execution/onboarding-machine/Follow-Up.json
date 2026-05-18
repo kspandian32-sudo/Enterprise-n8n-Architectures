@@ -1,0 +1,319 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "id": "4df70e91-e320-46e5-aad0-63a53768a976",
+      "name": "\u23f0 Daily 10 AM: Kickoff Follow-Up?",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1328,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+        "sheetName": {
+          "__rl": true,
+          "value": 1994705565,
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Welcome Email Sent"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c47d34f3-a037-4de6-b177-a6499172dc50",
+      "name": "\ud83d\udce5 Fetch 'Welcome Email Sent' Clients",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1104,
+        832
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "Google Sheets - kspandian32"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter: only clients where 2+ days have passed since onboarding\nconst items = $input.all();\nconst now = Date.now();\nconst TWO_DAYS = 2 * 24 * 60 * 60 * 1000;\n\nconst due = items.filter(item => {\n  const onboardedAt = item.json['timestamp'];\n  if (!onboardedAt) return false;\n  return (now - new Date(onboardedAt).getTime()) >= TWO_DAYS;\n});\n\nif (due.length === 0) return [];\nreturn due;"
+      },
+      "id": "d00b96f2-1aee-43ce-a167-fcd3fa8ee11a",
+      "name": "\ud83d\udd0d Filter: 2+ Days Since Welcome",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "wait-followup-id",
+      "name": "Wait (10s) - Follow-Up",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "predefinedCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'You are a professional project manager named ' + $json.yourName + ' from ' + $json.agencyName + '. Write a warm, gentle follow-up email to schedule a kickoff call. Client name: ' + $json.clientName + '. Company: ' + $json.clientCompany + '. Project: ' + $json.serviceRequired + '. Current date: ' + new Date().toDateString() + '. Suggest 3 specific time slots (including dates) for a 30-min kickoff call starting from tomorrow. Keep it under 100 words, professional but friendly. Return ONLY valid JSON: {\"subject\": \"email subject\", \"body\": \"email body\"}. No markdown, no backticks. Sign off as ' + $json.yourName + '.' }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } }) }}",
+        "options": {},
+        "nodecredentialtype": "httpQueryAuth",
+        "contentType": "application/json"
+      },
+      "id": "1ffd1f61-411b-4afd-888a-516a934a1232",
+      "name": "\ud83e\udd16 Gemini: Write Follow-Up Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -656,
+        832
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "1jdjTjj9aaTK6i6Y",
+          "name": "Query Auth Gemini kspandian32"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 35000
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResps = $input.all();\nconst clients = $('\ud83d\udd0d Filter: 2+ Days Since Welcome').all();\nreturn aiResps.map((aiResp, i) => {\n  const client = clients[i]?.json || {};\n  let email = {};\n  try {\n    const raw = aiResp.json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\n    email = JSON.parse(raw.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim());\n  } catch (e) {\n    email = {\n      subject: `Quick follow-up \u2014 Scheduling our kickoff call for ${client['serviceRequired']}`,\n      body: `Hi ${client['clientName']},\\n\\nHope you're doing well! Just following up on my welcome email from a couple of days ago. We're excited to get started on the ${client['serviceRequired']} project for ${client['clientCompany']}.\\n\\nWould any of these times work for a 30-minute kickoff call?\\n- Tomorrow at 11 AM IST\\n- Tomorrow at 3 PM IST\\n- Day after at 10 AM IST\\n\\nLooking forward to kicking things off!\\n\\nBest regards`\n    };\n  }\n  const formattedBody = (email.body || '').replace(/\\n/g, '<br>') + `<br><div style=\"display:none!important\">Ref ID: ${client.row_number}</div>`;\n  return { json: { ...client, followUpSubject: email.subject, followUpBody: formattedBody } };\n});"
+      },
+      "id": "45ba883e-8f8a-4748-bbe2-5277f365a0b6",
+      "name": "\ud83d\udd00 Parse Follow-Up Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "safe-mode-cond",
+              "leftValue": "={{$env.SAFE_MODE}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "true"
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "safe-mode-followup-id",
+      "name": "\ud83d\udee1\ufe0f IF: Safe Mode? (Follow-Up)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -384,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "kspandian32@gmail.com",
+        "toEmail": "={{ $json.clientEmail }}",
+        "subject": "={{ $json.followUpSubject }}",
+        "html": "",
+        "options": {}
+      },
+      "id": "23c836bc-edad-408d-8013-474c02cb0a16",
+      "name": "\ud83d\udce7 Send Kickoff Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -208,
+        832
+      ],
+      "webhookId": "5cb2c1f3-01cb-44a3-b433-bc47da3c384a",
+      "credentials": {
+        "smtp": {
+          "id": "udtIzlJq8iqmL3aZ",
+          "name": "SMTP account - kspandian32"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": "16dAe64XCQ_iecfAlrrdG5n6TtJyr2cDrMmIN4Uv9xBU",
+        "sheetName": {
+          "__rl": true,
+          "value": 1994705565,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "row_number"
+          ],
+          "value": {
+            "Status": "Reminder Sent",
+            "row_number": "={{ $('\ud83d\udd00 Parse Follow-Up Email').item.json.row_number }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "07ff2bd1-f256-45ba-b761-0586657224da",
+      "name": "\ud83d\udcdd Update CRM \u2192 Reminder Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        16,
+        832
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hiWj9Xv9QRzG92uS",
+          "name": "Google Sheets - kspandian32"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Wait (10s) - Follow-Up": {
+      "main": [
+        [
+          {
+            "node": "\ud83e\udd16 Gemini: Write Follow-Up Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\u23f0 Daily 10 AM: Kickoff Follow-Up?": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udce5 Fetch 'Welcome Email Sent' Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83d\udce5 Fetch 'Welcome Email Sent' Clients": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udd0d Filter: 2+ Days Since Welcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83d\udd00 Parse Follow-Up Email": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udee1\ufe0f IF: Safe Mode? (Follow-Up)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83e\udd16 Gemini: Write Follow-Up Email": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udd00 Parse Follow-Up Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83d\udee1\ufe0f IF: Safe Mode? (Follow-Up)": {
+      "main": [
+        [],
+        [
+          {
+            "node": "\ud83d\udce7 Send Kickoff Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83d\udd0d Filter: 2+ Days Since Welcome": {
+      "main": [
+        [
+          {
+            "node": "Wait (10s) - Follow-Up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83d\udce7 Send Kickoff Reminder": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udcdd Update CRM \u2192 Reminder Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
